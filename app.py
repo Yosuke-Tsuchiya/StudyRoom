@@ -105,10 +105,13 @@ CUSTOM_CSS = """
 .room-card {
     border: 1px solid rgba(128,128,128,.25);
     border-radius: 10px;
-    padding: 10px;
+    padding: 9px 10px 10px 10px;
     margin-bottom: 0;
-    background: rgba(128,128,128,.05);
+    background:
+        linear-gradient(180deg, rgba(255,255,255,.08), rgba(128,128,128,.035)),
+        rgba(128,128,128,.045);
     min-height: 112px;
+    box-shadow: inset 0 3px 0 rgba(46,204,113,.18);
 }
 .avatar {
     font-size: 1.65rem;
@@ -144,6 +147,11 @@ CUSTOM_CSS = """
     font-size: .82rem;
     line-height: 1.25;
 }
+.desk-line {
+    height: 1px;
+    background: rgba(128,128,128,.18);
+    margin: 7px 0 5px 0;
+}
 .small-muted {opacity:.70; font-size:.78rem; line-height:1.25;}
 .online-dot {
     display:inline-block;
@@ -158,11 +166,19 @@ CUSTOM_CSS = """
     border-radius: 12px;
     padding: 14px 14px 4px 14px;
     margin: 16px 0 14px 0;
-    background: rgba(128,128,128,.035);
+    background:
+        linear-gradient(rgba(128,128,128,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(128,128,128,.028) 1px, transparent 1px),
+        rgba(128,128,128,.03);
+    background-size: 28px 28px;
 }
 .activity-room.mine {
     border-color: rgba(46,204,113,.55);
-    background: rgba(46,204,113,.08);
+    background:
+        linear-gradient(rgba(46,204,113,.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(46,204,113,.05) 1px, transparent 1px),
+        rgba(46,204,113,.08);
+    background-size: 28px 28px;
 }
 .activity-room.empty {
     opacity: .7;
@@ -191,6 +207,17 @@ CUSTOM_CSS = """
     padding: 12px 14px;
     margin-top: 16px;
     background: rgba(128,128,128,.035);
+}
+.room-desk-area {
+    border: 1px solid rgba(128,128,128,.18);
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 14px;
+    background:
+        linear-gradient(rgba(128,128,128,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(128,128,128,.028) 1px, transparent 1px),
+        rgba(128,128,128,.025);
+    background-size: 28px 28px;
 }
 .room-heading {
     display:flex;
@@ -748,7 +775,7 @@ with st.sidebar:
         "ニックネーム",
         value=st.session_state.nickname,
         max_chars=20,
-        placeholder="例：ねこ学生",
+        placeholder="例：通信花子",
         help="本名や学籍番号は入力しない運用を想定しています。全角10文字、または半角20文字以内です。",
     )
     avatar = st.selectbox(
@@ -975,6 +1002,7 @@ def live_area():
                 f'<div class="profile-comment">{comment_text}</div>'
                 '</div>'
                 f'<div class="participant-name"><span class="online-dot"></span><strong>{label}</strong></div>'
+                '<div class="desk-line"></div>'
                 f'<div class="participant-detail">🗂️ {detail_text}</div>'
                 f'<div class="small-muted">💬 {mood_text}</div>'
                 '</div>'
@@ -995,7 +1023,7 @@ def live_area():
         else:
             with st.expander(f"📘 {activity}　{room_count_text}", expanded=False):
                 st.markdown(
-                    f'<div class="room-members">{members_html}</div>',
+                    f'<div class="room-desk-area"><div class="room-members">{members_html}</div></div>',
                     unsafe_allow_html=True,
                 )
 
