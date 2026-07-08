@@ -109,7 +109,7 @@ CUSTOM_CSS = """
     padding: 10px;
     margin-bottom: 0;
     background:
-        linear-gradient(180deg, #f8faf9 0 38px, #ffffff 38px),
+        linear-gradient(180deg, #f8faf9 0 58px, #ffffff 58px),
         #ffffff;
     min-height: 112px;
     box-shadow: inset 0 -3px 0 rgba(128,128,128,.14);
