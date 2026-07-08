@@ -42,10 +42,10 @@ CUSTOM_CSS = """
 <style>
 .block-container {padding-top: 2rem; padding-bottom: 3rem;}
 [data-testid="stSidebar"] .block-container {
-    padding-top: 1.75rem;
+    padding-top: .9rem;
 }
 .sidebar-brand {
-    margin-bottom: 1rem;
+    margin-bottom: .8rem;
 }
 .sidebar-brand h1 {
     font-size: 2rem;
