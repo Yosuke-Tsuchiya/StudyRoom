@@ -735,6 +735,7 @@ with st.sidebar:
         <div class="sidebar-notice">
           <strong>試験運用中です</strong>
           表示名やコメントに、本名・学籍番号・メールアドレスなどの個人情報を書かないでください。
+          ブラウザを閉じるなどして更新が止まった場合、3分後に自動退室扱いになります。
         </div>
         """,
         unsafe_allow_html=True,
@@ -887,10 +888,6 @@ with st.sidebar:
             st.success("送信しました。ありがとうございます。")
 
     st.divider()
-    st.caption(
-        "プロトタイプ版：入室状況はSQLiteに保存され、"
-        f"{PRESENCE_TIMEOUT_MINUTES}分間更新がない参加者は自動退室扱いになります。"
-    )
     st.markdown('<div class="sidebar-credit">Copyright 2026 Yosuke Tsuchiya</div>', unsafe_allow_html=True)
 
 
