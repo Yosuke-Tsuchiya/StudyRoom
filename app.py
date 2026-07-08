@@ -1090,13 +1090,16 @@ def get_quick_join_request() -> dict | None:
     return request
 
 
-def build_main_page_url(course_code, detail) -> str:
+def build_main_page_url(course_code, detail, takeover_id=None) -> str:
     lesson_value = "other"
     if detail in DETAIL_OPTIONS:
         detail_index = DETAIL_OPTIONS.index(detail)
         if 0 <= detail_index < 8:
             lesson_value = str(detail_index + 1)
-    query = urllib.parse.urlencode({"course": course_code, "lesson": lesson_value})
+    query_params = {"course": course_code, "lesson": lesson_value}
+    if takeover_id:
+        query_params["takeover"] = takeover_id
+    query = urllib.parse.urlencode(query_params)
     return f"/?{query}"
 
 
@@ -1112,6 +1115,16 @@ def fetch_activity_detail_counts(activity, detail):
             (activity, detail),
         ).fetchone()[0]
     return activity_count, detail_count
+
+
+def fetch_participant(session_id):
+    if not session_id:
+        return None
+    with get_conn() as conn:
+        return conn.execute(
+            "SELECT * FROM participants WHERE session_id = ?",
+            (session_id,),
+        ).fetchone()
 
 
 def parse_iso_datetime(value) -> datetime | None:
@@ -1173,7 +1186,7 @@ def render_quick_checkin_panel(request):
     activity = request["activity"]
     detail = request["detail"]
     activity_count, detail_count = fetch_activity_detail_counts(activity, detail)
-    main_page_url = build_main_page_url(request["course_code"], detail)
+    main_page_url = build_main_page_url(request["course_code"], detail, st.session_state.session_id)
     st.markdown(
         f"""
         <section class="quick-checkin">
@@ -1417,10 +1430,34 @@ if "expires_at" not in st.session_state:
     st.session_state.expires_at = None
 if "quick_join_registered_key" not in st.session_state:
     st.session_state.quick_join_registered_key = None
+if "takeover_loaded_id" not in st.session_state:
+    st.session_state.takeover_loaded_id = None
 if "last_study_summary" not in st.session_state:
     st.session_state.last_study_summary = None
 if "last_feedback_at" not in st.session_state:
     st.session_state.last_feedback_at = None
+
+takeover_id = query_value("takeover").strip()
+if (
+    takeover_id
+    and takeover_id != st.session_state.session_id
+    and takeover_id != st.session_state.takeover_loaded_id
+):
+    takeover_row = fetch_participant(takeover_id)
+    if takeover_row:
+        st.session_state.session_id = takeover_row["session_id"]
+        st.session_state.nickname = takeover_row["nickname"] or QUICK_JOIN_NICKNAME
+        st.session_state.avatar = takeover_row["avatar"] or DEFAULT_AVATAR
+        st.session_state.comment = takeover_row["comment"] or DEFAULT_COMMENT
+        st.session_state.activity = takeover_row["activity"] or ACTIVITY_OPTIONS[0]
+        st.session_state.detail = takeover_row["detail"] or "第1回"
+        st.session_state.mood = takeover_row["mood"] or DEFAULT_MOOD
+        st.session_state.difficulty = normalize_difficulty(takeover_row["difficulty"])
+        st.session_state.participation_type = takeover_row["participation_type"] or "quick"
+        st.session_state.expires_at = takeover_row["expires_at"]
+        st.session_state.joined = True
+        st.session_state.quick_join_registered_key = None
+        st.session_state.takeover_loaded_id = takeover_id
 
 quick_join_request = get_quick_join_request()
 quick_join_error = None
