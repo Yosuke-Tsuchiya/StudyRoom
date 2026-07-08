@@ -175,13 +175,13 @@ CUSTOM_CSS = """
 .small-muted {color: #475467; opacity:.78; font-size:.78rem; line-height:1.25;}
 .card-difficulty {
     display:inline-block;
-    margin-top: 4px;
+    margin-top: 3px;
     border: 1px solid rgba(128,128,128,.22);
     border-radius: 999px;
-    padding: 1px 8px;
-    font-size: .72rem;
+    padding: 1px 6px;
+    font-size: .66rem;
     font-weight: 700;
-    line-height: 1.35;
+    line-height: 1.25;
 }
 .card-difficulty.easy {
     color: #067647;
@@ -921,7 +921,7 @@ with st.sidebar:
         DIFFICULTY_OPTIONS,
         index=DIFFICULTY_OPTIONS.index(st.session_state.difficulty)
         if st.session_state.difficulty in DIFFICULTY_OPTIONS else 0,
-        help="具体的な内容は表示せず、部屋ごとの目安として色つきで表示します。",
+        help="具体的な内容は表示せず、参加者カードに体感難易度だけを表示します。",
     )
 
     if not st.session_state.joined:
