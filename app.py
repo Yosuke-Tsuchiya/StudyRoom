@@ -103,27 +103,38 @@ CUSTOM_CSS = """
     text-align: center;
 }
 .room-card {
-    border: 1px solid rgba(128,128,128,.25);
-    border-radius: 10px;
-    padding: 9px 10px 10px 10px;
+    position: relative;
+    border: 1px solid rgba(128,128,128,.26);
+    border-radius: 8px;
+    padding: 20px 10px 10px 10px;
     margin-bottom: 0;
     background:
-        linear-gradient(180deg, rgba(255,255,255,.08), rgba(128,128,128,.035)),
+        linear-gradient(180deg, rgba(128,128,128,.075) 0 38px, rgba(128,128,128,.035) 38px),
         rgba(128,128,128,.045);
     min-height: 112px;
-    box-shadow: inset 0 3px 0 rgba(46,204,113,.18);
+    box-shadow: inset 0 -3px 0 rgba(128,128,128,.14);
+}
+.room-card::before {
+    content: "SEAT";
+    position: absolute;
+    top: 5px;
+    right: 8px;
+    font-size: .58rem;
+    letter-spacing: .08em;
+    opacity: .45;
 }
 .avatar {
-    font-size: 1.65rem;
-    width: 42px;
-    height: 42px;
-    min-width: 42px;
-    flex: 0 0 42px;
+    font-size: 1.5rem;
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    flex: 0 0 38px;
     display:flex;
     align-items:center;
     justify-content:center;
-    border-radius: 50%;
-    background: rgba(100,120,255,.12);
+    border-radius: 12px;
+    background: rgba(100,120,255,.13);
+    border: 1px solid rgba(128,128,128,.18);
 }
 .card-top {
     display:flex;
@@ -148,9 +159,10 @@ CUSTOM_CSS = """
     line-height: 1.25;
 }
 .desk-line {
-    height: 1px;
-    background: rgba(128,128,128,.18);
-    margin: 7px 0 5px 0;
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(128,128,128,.14);
+    margin: 8px 0 6px 0;
 }
 .small-muted {opacity:.70; font-size:.78rem; line-height:1.25;}
 .online-dot {
@@ -775,7 +787,7 @@ with st.sidebar:
         "ニックネーム",
         value=st.session_state.nickname,
         max_chars=20,
-        placeholder="例：通信花子",
+        placeholder="例：でこぴん",
         help="本名や学籍番号は入力しない運用を想定しています。全角10文字、または半角20文字以内です。",
     )
     avatar = st.selectbox(
