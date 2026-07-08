@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+*.pyc
+study_room.db
+study_room.db-*
+*.sqlite
+*.sqlite3
+.streamlit/secrets.toml
+.env
