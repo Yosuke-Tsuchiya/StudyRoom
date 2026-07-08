@@ -173,22 +173,30 @@ CUSTOM_CSS = """
     margin: 8px 0 6px 0;
 }
 .small-muted {color: #475467; opacity:.78; font-size:.78rem; line-height:1.25;}
-.online-dot {
+.card-difficulty {
     display:inline-block;
-    width:10px;
-    height:10px;
-    border-radius:50%;
-    margin-right:6px;
-    box-shadow: 0 0 0 2px rgba(255,255,255,.8);
+    margin-top: 4px;
+    border: 1px solid rgba(128,128,128,.22);
+    border-radius: 999px;
+    padding: 1px 8px;
+    font-size: .72rem;
+    font-weight: 700;
+    line-height: 1.35;
 }
-.online-dot.easy {
-    background:#12b76a;
+.card-difficulty.easy {
+    color: #067647;
+    background: rgba(18,183,106,.13);
+    border-color: rgba(18,183,106,.30);
 }
-.online-dot.normal {
-    background:#2f71f4;
+.card-difficulty.normal {
+    color: #175cd3;
+    background: rgba(47,113,244,.12);
+    border-color: rgba(47,113,244,.26);
 }
-.online-dot.hard {
-    background:#f04438;
+.card-difficulty.hard {
+    color: #b42318;
+    background: rgba(240,68,56,.12);
+    border-color: rgba(240,68,56,.28);
 }
 .activity-room {
     border: 1px solid rgba(128,128,128,.22);
@@ -1122,7 +1130,10 @@ def live_area():
         )
 
     st.subheader("学習中の部屋")
-    st.caption("ここには入室中の参加者のニックネーム、コメント、授業回、状態が表示されます。")
+    st.caption(
+        "ここには入室中の参加者のニックネーム、コメント、授業回、状態が表示されます。"
+        "部屋の体感は、参加者が選んだ体感難易度の平均です。"
+    )
     if not participants:
         st.info("現在はまだ誰もいません。最初の一人として入室してみてください。")
 
@@ -1153,7 +1164,7 @@ def live_area():
         if difficulty_summary:
             tags.append(
                 f'<span class="difficulty-tag {difficulty_summary["class"]}">'
-                f'体感：{difficulty_summary["label"]}'
+                f'体感平均：{difficulty_summary["label"]}'
                 '</span>'
             )
         if is_my_room:
@@ -1178,12 +1189,12 @@ def live_area():
                 f'<div class="profile-comment">{comment_text}</div>'
                 '</div>'
                 '<div class="participant-name">'
-                f'<span class="online-dot {difficulty_class}" title="体感難易度：{difficulty_label}"></span>'
                 f'<strong>{label}</strong>'
                 '</div>'
                 '<div class="desk-line"></div>'
                 f'<div class="participant-detail">🗂️ {detail_text}</div>'
                 f'<div class="small-muted">💬 {mood_text}</div>'
+                f'<div><span class="card-difficulty {difficulty_class}">体感：{difficulty_label}</span></div>'
                 '</div>'
             )
 
@@ -1202,7 +1213,7 @@ def live_area():
         else:
             expander_label = f"📘 {activity}　{room_count_text}"
             if difficulty_summary:
-                expander_label += f"　体感：{difficulty_summary['label']}"
+                expander_label += f"　体感平均：{difficulty_summary['label']}"
             with st.expander(expander_label, expanded=False):
                 st.markdown(
                     f'<div class="room-desk-area"><div class="room-members">{members_html}</div></div>',
