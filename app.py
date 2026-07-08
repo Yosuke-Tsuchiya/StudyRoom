@@ -165,6 +165,7 @@ CUSTOM_CSS = """
     line-height: 1.25;
     color: #344054;
     min-width: 0;
+    overflow-wrap: anywhere;
 }
 .desk-line {
     height: 6px;
@@ -186,7 +187,7 @@ CUSTOM_CSS = """
     border: 1px solid rgba(128,128,128,.22);
     border-radius: 999px;
     padding: 1px 6px;
-    font-size: .66rem;
+    font-size: .64rem;
     font-weight: 700;
     line-height: 1.25;
 }
@@ -1156,7 +1157,7 @@ def live_area():
                 '<div class="desk-line"></div>'
                 '<div class="card-meta-row">'
                 f'<div class="participant-detail">🗂️ {detail_text}</div>'
-                f'<span class="card-difficulty {difficulty_class}">体感：{difficulty_label}</span>'
+                f'<span class="card-difficulty {difficulty_class}">{difficulty_label}</span>'
                 '</div>'
                 f'<div class="small-muted">💬 {mood_text}</div>'
                 '</div>'
