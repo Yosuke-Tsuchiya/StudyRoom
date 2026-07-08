@@ -178,8 +178,17 @@ CUSTOM_CSS = """
     width:10px;
     height:10px;
     border-radius:50%;
-    background:#2ecc71;
     margin-right:6px;
+    box-shadow: 0 0 0 2px rgba(255,255,255,.8);
+}
+.online-dot.easy {
+    background:#12b76a;
+}
+.online-dot.normal {
+    background:#2f71f4;
+}
+.online-dot.hard {
+    background:#f04438;
 }
 .activity-room {
     border: 1px solid rgba(128,128,128,.22);
@@ -1159,13 +1168,19 @@ def live_area():
             comment_text = safe_text(p["comment"] or "一緒に学習中")
             detail_text = safe_text(p["detail"] or "学習中")
             mood_text = safe_text(p["mood"] or "学習中")
+            difficulty_meta = DIFFICULTY_META.get(p["difficulty"], DIFFICULTY_META["ふつう"])
+            difficulty_class = safe_text(difficulty_meta["class"])
+            difficulty_label = safe_text(difficulty_meta["label"])
             member_cards.append(
                 '<div class="room-card">'
                 '<div class="card-top">'
                 f'<div class="avatar">{avatar_text}</div>'
                 f'<div class="profile-comment">{comment_text}</div>'
                 '</div>'
-                f'<div class="participant-name"><span class="online-dot"></span><strong>{label}</strong></div>'
+                '<div class="participant-name">'
+                f'<span class="online-dot {difficulty_class}" title="体感難易度：{difficulty_label}"></span>'
+                f'<strong>{label}</strong>'
+                '</div>'
                 '<div class="desk-line"></div>'
                 f'<div class="participant-detail">🗂️ {detail_text}</div>'
                 f'<div class="small-muted">💬 {mood_text}</div>'
@@ -1185,7 +1200,10 @@ def live_area():
         if is_my_room:
             st.markdown(room_html, unsafe_allow_html=True)
         else:
-            with st.expander(f"📘 {activity}　{room_count_text}", expanded=False):
+            expander_label = f"📘 {activity}　{room_count_text}"
+            if difficulty_summary:
+                expander_label += f"　体感：{difficulty_summary['label']}"
+            with st.expander(expander_label, expanded=False):
                 st.markdown(
                     f'<div class="room-desk-area"><div class="room-members">{members_html}</div></div>',
                     unsafe_allow_html=True,
