@@ -59,6 +59,20 @@ CUSTOM_CSS = """
     opacity: .75;
     font-size: .88rem;
 }
+.sidebar-notice {
+    border: 1px solid rgba(128,128,128,.22);
+    border-radius: 8px;
+    padding: 8px 10px;
+    margin: .75rem 0 1rem 0;
+    background: rgba(128,128,128,.045);
+    font-size: .78rem;
+    line-height: 1.45;
+}
+.sidebar-notice strong {
+    display: block;
+    font-size: .82rem;
+    margin-bottom: 2px;
+}
 .sidebar-stats {
     display:grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -716,9 +730,19 @@ with st.sidebar:
     )
     sidebar_status = st.empty()
     st.caption("顔出し不要。今、一緒に学んでいる仲間の気配だけを感じられる場所です。")
+    st.markdown(
+        """
+        <div class="sidebar-notice">
+          <strong>試験運用中です</strong>
+          表示名やコメントに、本名・学籍番号・メールアドレスなどの個人情報を書かないでください。
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
     st.divider()
 
     st.header("入室設定")
+    st.caption("画面にはニックネーム、アイコン、コメント、学習中の科目が表示されます。")
     nickname = st.text_input(
         "ニックネーム",
         value=st.session_state.nickname,
@@ -824,7 +848,10 @@ with st.sidebar:
 
     st.divider()
     st.subheader("意見・要望")
-    st.caption("本名、学籍番号、メールアドレスなどの個人情報は書かないでください。")
+    st.caption(
+        "このフォームはプロトタイプ改善のためのものです。"
+        "授業内容の質問や緊急の連絡には使用しないでください。"
+    )
     with st.form("feedback_form", clear_on_submit=True):
         feedback_category = st.selectbox(
             "種類",
@@ -905,6 +932,7 @@ def live_area():
         )
 
     st.subheader("学習中の部屋")
+    st.caption("ここには入室中の参加者のニックネーム、コメント、授業回、状態が表示されます。")
     if not participants:
         st.info("現在はまだ誰もいません。最初の一人として入室してみてください。")
 
