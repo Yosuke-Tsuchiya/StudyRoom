@@ -98,6 +98,27 @@ CUSTOM_CSS = """
     font-size: .82rem;
     margin-bottom: 2px;
 }
+.study-summary {
+    border: 1px solid rgba(46,204,113,.35);
+    border-radius: 8px;
+    padding: 9px 10px;
+    margin: .75rem 0 1rem 0;
+    background: rgba(46,204,113,.08);
+    font-size: .78rem;
+    line-height: 1.45;
+}
+.study-summary strong {
+    display:block;
+    font-size:.86rem;
+    margin-bottom:3px;
+}
+.study-summary ul {
+    margin: 6px 0 0 1.1rem;
+    padding: 0;
+}
+.study-summary li {
+    margin: 2px 0;
+}
 .sidebar-stats {
     display:grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -408,6 +429,16 @@ def init_db():
                 total_count INTEGER NOT NULL,
                 created_at TEXT NOT NULL
             );
+
+            CREATE TABLE IF NOT EXISTS study_segments (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                session_id TEXT NOT NULL,
+                activity TEXT NOT NULL,
+                detail TEXT,
+                participation_type TEXT,
+                started_at TEXT NOT NULL,
+                ended_at TEXT
+            );
             """
         )
         columns = {row["name"] for row in conn.execute("PRAGMA table_info(participants)").fetchall()}
@@ -471,6 +502,8 @@ def cleanup_stale():
             (current, cutoff),
         )
         for row in stale_rows:
+            segment_ended_at = row["expires_at"] if (row["participation_type"] or "regular") == "quick" else row["last_seen"]
+            close_open_study_segment(conn, row["session_id"], segment_ended_at)
             log_presence_event(
                 conn,
                 "自動退室",
@@ -528,6 +561,99 @@ def log_presence_event(
     )
 
 
+def close_open_study_segment(conn, session_id, ended_at=None):
+    conn.execute(
+        """
+        UPDATE study_segments
+        SET ended_at = ?
+        WHERE session_id = ? AND ended_at IS NULL
+        """,
+        (ended_at or now_iso(), session_id),
+    )
+
+
+def start_study_segment(conn, session_id, activity, detail, participation_type="regular", started_at=None):
+    conn.execute(
+        """
+        INSERT INTO study_segments
+            (session_id, activity, detail, participation_type, started_at, ended_at)
+        VALUES (?, ?, ?, ?, ?, NULL)
+        """,
+        (
+            session_id,
+            activity,
+            detail,
+            participation_type,
+            started_at or now_iso(),
+        ),
+    )
+
+
+def switch_study_segment(session_id, activity, detail, participation_type="regular"):
+    current = now_iso()
+    with get_conn() as conn:
+        close_open_study_segment(conn, session_id, current)
+        start_study_segment(conn, session_id, activity, detail, participation_type, current)
+
+
+def format_duration_seconds(total_seconds) -> str:
+    total_seconds = max(0, int(total_seconds))
+    total_minutes = total_seconds // 60
+    if total_minutes < 1:
+        return "1分未満"
+    if total_minutes < 60:
+        return f"{total_minutes}分"
+
+    hours, minutes = divmod(total_minutes, 60)
+    if minutes == 0:
+        return f"{hours}時間"
+    return f"{hours}時間{minutes}分"
+
+
+def study_summary_from_segments(session_id, since) -> dict | None:
+    current = now_iso()
+    with get_conn() as conn:
+        rows = conn.execute(
+            """
+            SELECT activity, detail, started_at, COALESCE(ended_at, ?) AS ended_at
+            FROM study_segments
+            WHERE session_id = ? AND started_at >= ?
+            ORDER BY started_at
+            """,
+            (current, session_id, since),
+        ).fetchall()
+
+    total_seconds = 0
+    breakdown = {}
+    for row in rows:
+        started_at = parse_iso_datetime(row["started_at"])
+        ended_at = parse_iso_datetime(row["ended_at"])
+        if not started_at or not ended_at or ended_at < started_at:
+            continue
+        raw_seconds = (ended_at - started_at).total_seconds()
+        if raw_seconds <= 0:
+            continue
+        seconds = max(1, int(raw_seconds))
+        key = (row["activity"], row["detail"] or "学習中")
+        breakdown[key] = breakdown.get(key, 0) + seconds
+        total_seconds += seconds
+
+    if total_seconds <= 0:
+        return None
+
+    return {
+        "total_label": format_duration_seconds(total_seconds),
+        "items": [
+            {
+                "activity": activity,
+                "detail": detail,
+                "duration_label": format_duration_seconds(seconds),
+            }
+            for (activity, detail), seconds in breakdown.items()
+        ],
+    }
+
+
 def upsert_presence(
     session_id,
     nickname,
@@ -579,6 +705,9 @@ def upsert_presence(
             ),
         )
         if event_type:
+            if event_type == "入室":
+                close_open_study_segment(conn, session_id, current)
+                start_study_segment(conn, session_id, activity, detail, participation_type, current)
             log_presence_event(
                 conn,
                 event_type,
@@ -598,6 +727,8 @@ def leave_room(session_id):
         row = conn.execute("SELECT * FROM participants WHERE session_id = ?", (session_id,)).fetchone()
         conn.execute("DELETE FROM participants WHERE session_id = ?", (session_id,))
         if row:
+            closed_at = now_iso()
+            close_open_study_segment(conn, session_id, closed_at)
             log_presence_event(
                 conn,
                 "退室",
@@ -610,6 +741,9 @@ def leave_room(session_id):
                 row["difficulty"],
                 row["participation_type"] or "regular",
             )
+            conn.commit()
+            return study_summary_from_segments(session_id, row["joined_at"])
+    return None
 
 
 def fetch_participants():
@@ -854,6 +988,31 @@ def elapsed_study_time(joined_at) -> str:
     return f"入室から{hours}時間{minutes}分"
 
 
+def render_study_summary(summary):
+    if not summary:
+        return
+
+    items_html = "".join(
+        (
+            "<li>"
+            f"{safe_text(item['activity'])} {safe_text(item['detail'])}: "
+            f"{safe_text(item['duration_label'])}"
+            "</li>"
+        )
+        for item in summary["items"]
+    )
+    st.markdown(
+        f"""
+        <div class="study-summary">
+          <strong>おつかれさまでした</strong>
+          今回は{safe_text(summary["total_label"])}、学習に取り組みました。
+          <ul>{items_html}</ul>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
 def text_width(value) -> int:
     return sum(1 if ord(char) <= 0x7F else 2 for char in value)
 
@@ -1049,6 +1208,8 @@ if "expires_at" not in st.session_state:
     st.session_state.expires_at = None
 if "quick_join_registered_key" not in st.session_state:
     st.session_state.quick_join_registered_key = None
+if "last_study_summary" not in st.session_state:
+    st.session_state.last_study_summary = None
 if "last_feedback_at" not in st.session_state:
     st.session_state.last_feedback_at = None
 
@@ -1079,6 +1240,7 @@ if quick_join_request:
             st.session_state.expires_at = expires_at
             st.session_state.joined = True
             st.session_state.quick_join_registered_key = quick_join_key
+            st.session_state.last_study_summary = None
             upsert_presence(
                 st.session_state.session_id,
                 QUICK_JOIN_NICKNAME,
@@ -1133,6 +1295,9 @@ with st.sidebar:
 
     if quick_join_error:
         st.error(quick_join_error)
+
+    if st.session_state.last_study_summary and not st.session_state.joined:
+        render_study_summary(st.session_state.last_study_summary)
 
     if st.session_state.participation_type == "quick" and st.session_state.joined:
         st.header("簡易参加中")
@@ -1224,6 +1389,7 @@ with st.sidebar:
                     st.session_state.participation_type = "regular"
                     st.session_state.expires_at = None
                     st.session_state.quick_join_registered_key = None
+                    st.session_state.last_study_summary = None
                     st.session_state.joined = True
                     upsert_presence(
                         st.session_state.session_id,
@@ -1248,6 +1414,8 @@ with st.sidebar:
                 elif comment_error:
                     st.error(comment_error)
                 else:
+                    previous_activity = st.session_state.activity
+                    previous_detail = st.session_state.detail
                     st.session_state.nickname = cleaned
                     st.session_state.avatar = avatar
                     st.session_state.comment = cleaned_comment
@@ -1258,6 +1426,8 @@ with st.sidebar:
                     st.session_state.participation_type = "regular"
                     st.session_state.expires_at = None
                     st.session_state.quick_join_registered_key = None
+                    if activity != previous_activity or detail != previous_detail:
+                        switch_study_segment(st.session_state.session_id, activity, detail)
                     upsert_presence(
                         st.session_state.session_id,
                         cleaned,
@@ -1272,7 +1442,7 @@ with st.sidebar:
                     st.success("表示を更新しました。")
 
             if st.button("退室する", use_container_width=True):
-                leave_room(st.session_state.session_id)
+                st.session_state.last_study_summary = leave_room(st.session_state.session_id)
                 st.session_state.joined = False
                 st.session_state.participation_type = "regular"
                 st.session_state.expires_at = None
