@@ -271,6 +271,19 @@ CUSTOM_CSS = """
 }
 @media (max-width: 760px) {
     .room-members {grid-template-columns: repeat(2, minmax(0, 1fr));}
+    .room-heading {
+        align-items:flex-start;
+        flex-direction: column;
+        gap: 6px;
+    }
+    .room-heading h3 {
+        font-size: 1rem;
+        line-height: 1.35;
+        overflow-wrap: anywhere;
+    }
+    .room-tags {
+        justify-content: flex-start;
+    }
 }
 @media (max-width: 380px) {
     .room-members {grid-template-columns: 1fr;}
