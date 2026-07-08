@@ -6,15 +6,18 @@ import json
 import os
 import sqlite3
 import urllib.error
+import urllib.parse
 import urllib.request
 import uuid
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import streamlit as st
+import streamlit.components.v1 as components
 
 APP_TITLE = "StudyRoom"
 DB_PATH = Path(os.getenv("STUDY_ROOM_DB", "study_room.db"))
+PREFERENCES_COOKIE_NAME = "studyroom_preferences"
 PRESENCE_TIMEOUT_MINUTES = 3
 QUICK_JOIN_TIMEOUT_MINUTES = 15
 NICKNAME_MAX_WIDTH = 20
@@ -35,16 +38,20 @@ ACTIVITY_OPTIONS = [
 DETAIL_OPTIONS = [f"第{i}回" for i in range(1, 9)] + ["その他"]
 MOOD_OPTIONS = ["集中して学習中", "ゆっくり学習中", "小テスト実施中", "休憩中", "もうひと頑張り"]
 AVATAR_OPTIONS = ["🧑‍💻", "📖", "✏️", "🎧", "💻", "📝", "🧠", "☕"]
-DIFFICULTY_OPTIONS = ["ふつう", "やさしめ", "むずかしい"]
+DEFAULT_COMMENT = "一緒に学習中"
+DEFAULT_AVATAR = "🧑‍💻"
+DEFAULT_MOOD = "集中して学習中"
+DEFAULT_DIFFICULTY = "表示なし"
+DIFFICULTY_OPTIONS = ["表示なし", "ふつう", "やさしい", "むずかしい"]
 DIFFICULTY_META = {
-    "やさしめ": {"score": 1, "label": "やさしめ", "class": "easy"},
+    "やさしい": {"score": 1, "label": "やさしい", "class": "easy"},
     "ふつう": {"score": 2, "label": "ふつう", "class": "normal"},
     "むずかしい": {"score": 3, "label": "むずかしめ", "class": "hard"},
 }
 QUICK_JOIN_NICKNAME = "匿名学生さん"
 QUICK_JOIN_AVATAR = "📖"
-QUICK_JOIN_COMMENT = "一緒に学習中"
-QUICK_JOIN_MOOD = "集中して学習中"
+QUICK_JOIN_COMMENT = DEFAULT_COMMENT
+QUICK_JOIN_MOOD = DEFAULT_MOOD
 QUICK_JOIN_DIFFICULTY = "ふつう"
 QUICK_COURSE_CODES = {
     "info-basic": "情報基礎A・B",
@@ -921,6 +928,66 @@ def safe_text(value) -> str:
     return html.escape(str(value or ""), quote=True)
 
 
+def normalize_difficulty(value) -> str:
+    if value == "やさしめ":
+        return "やさしい"
+    if value in DIFFICULTY_OPTIONS:
+        return value
+    return DEFAULT_DIFFICULTY
+
+
+def load_saved_preferences() -> dict:
+    context = getattr(st, "context", None)
+    cookies = getattr(context, "cookies", {}) if context else {}
+    raw_value = cookies.get(PREFERENCES_COOKIE_NAME, "") if cookies else ""
+    if not raw_value:
+        return {}
+    try:
+        preferences = json.loads(urllib.parse.unquote(raw_value))
+    except (json.JSONDecodeError, TypeError):
+        return {}
+    if not isinstance(preferences, dict):
+        return {}
+    return preferences
+
+
+def saved_value(preferences, key, default, allowed=None):
+    value = str(preferences.get(key, "") or "")
+    if allowed is not None and value not in allowed:
+        return default
+    return value or default
+
+
+def persist_preferences_to_browser(preferences):
+    payload = json.dumps(preferences, ensure_ascii=False)
+    payload_literal = json.dumps(payload, ensure_ascii=False).replace("</", "<\\/")
+    cookie_name = json.dumps(PREFERENCES_COOKIE_NAME)
+    components.html(
+        f"""
+        <script>
+        const cookieName = {cookie_name};
+        const preferences = JSON.parse({payload_literal});
+        const encoded = encodeURIComponent(JSON.stringify(preferences));
+        document.cookie = `${{cookieName}}=${{encoded}}; max-age=31536000; path=/; SameSite=Lax`;
+        </script>
+        """,
+        height=0,
+        width=0,
+    )
+
+
+def current_preferences() -> dict:
+    return {
+        "nickname": st.session_state.nickname,
+        "avatar": st.session_state.avatar,
+        "comment": st.session_state.comment,
+        "activity": st.session_state.activity,
+        "detail": st.session_state.detail,
+        "mood": st.session_state.mood,
+        "difficulty": st.session_state.difficulty,
+    }
+
+
 def query_value(name) -> str:
     value = st.query_params.get(name, "")
     if isinstance(value, list):
@@ -1184,24 +1251,26 @@ if is_admin_route():
     render_admin_dashboard()
     st.stop()
 
+saved_preferences = load_saved_preferences()
+
 if "session_id" not in st.session_state:
     st.session_state.session_id = str(uuid.uuid4())
 if "joined" not in st.session_state:
     st.session_state.joined = False
 if "nickname" not in st.session_state:
-    st.session_state.nickname = ""
+    st.session_state.nickname = saved_value(saved_preferences, "nickname", "")
 if "avatar" not in st.session_state:
-    st.session_state.avatar = AVATAR_OPTIONS[0]
+    st.session_state.avatar = saved_value(saved_preferences, "avatar", DEFAULT_AVATAR, AVATAR_OPTIONS)
 if "comment" not in st.session_state:
-    st.session_state.comment = ""
+    st.session_state.comment = saved_value(saved_preferences, "comment", DEFAULT_COMMENT)
 if "activity" not in st.session_state:
-    st.session_state.activity = ACTIVITY_OPTIONS[0]
+    st.session_state.activity = saved_value(saved_preferences, "activity", ACTIVITY_OPTIONS[0], ACTIVITY_OPTIONS)
 if "detail" not in st.session_state:
-    st.session_state.detail = "第1回"
+    st.session_state.detail = saved_value(saved_preferences, "detail", "第1回", DETAIL_OPTIONS)
 if "mood" not in st.session_state:
-    st.session_state.mood = "集中して学習中"
+    st.session_state.mood = saved_value(saved_preferences, "mood", DEFAULT_MOOD, MOOD_OPTIONS)
 if "difficulty" not in st.session_state:
-    st.session_state.difficulty = "ふつう"
+    st.session_state.difficulty = normalize_difficulty(saved_value(saved_preferences, "difficulty", DEFAULT_DIFFICULTY))
 if "participation_type" not in st.session_state:
     st.session_state.participation_type = "regular"
 if "expires_at" not in st.session_state:
@@ -1254,6 +1323,9 @@ if quick_join_request:
                 participation_type="quick",
                 expires_at=expires_at,
             )
+
+if st.session_state.participation_type != "quick":
+    persist_preferences_to_browser(current_preferences())
 
 with st.sidebar:
     st.markdown(
@@ -1320,7 +1392,7 @@ with st.sidebar:
         )
     else:
         st.header("入室設定")
-        st.caption("画面にはニックネーム、アイコン、コメント、学習中の科目が表示されます。")
+        st.caption("まずはニックネーム、科目、授業回だけで入室できます。前回の設定がある場合は自動で入力されます。")
         nickname = st.text_input(
             "ニックネーム",
             value=st.session_state.nickname,
@@ -1328,20 +1400,6 @@ with st.sidebar:
             placeholder="例：でこぴん",
             help="本名や学籍番号は入力しない運用を想定しています。全角10文字、または半角20文字以内です。",
         )
-        avatar = st.selectbox(
-            "アイコン",
-            AVATAR_OPTIONS,
-            index=AVATAR_OPTIONS.index(st.session_state.avatar)
-            if st.session_state.avatar in AVATAR_OPTIONS else 0,
-        )
-        comment = st.text_input(
-            "コメント",
-            value=st.session_state.comment,
-            max_chars=COMMENT_MAX_WIDTH,
-            placeholder="例：試験前です",
-            help="参加者カードのアイコン横に表示されます。全角20文字、または半角40文字以内です。",
-        )
-
         activity = st.selectbox(
             "今取り組んでいること",
             ACTIVITY_OPTIONS,
@@ -1354,24 +1412,37 @@ with st.sidebar:
             index=DETAIL_OPTIONS.index(st.session_state.detail)
             if st.session_state.detail in DETAIL_OPTIONS else 0,
         )
-        mood = st.selectbox(
-            "ひとこと状態",
-            MOOD_OPTIONS,
-            index=MOOD_OPTIONS.index(st.session_state.mood)
-            if st.session_state.mood in MOOD_OPTIONS else 0,
-        )
-        difficulty = st.selectbox(
-            "体感難易度",
-            DIFFICULTY_OPTIONS,
-            index=DIFFICULTY_OPTIONS.index(st.session_state.difficulty)
-            if st.session_state.difficulty in DIFFICULTY_OPTIONS else 0,
-            help="具体的な内容は表示せず、参加者カードに体感難易度だけを表示します。",
-        )
+        with st.expander("詳細設定", expanded=False):
+            avatar = st.selectbox(
+                "アイコン",
+                AVATAR_OPTIONS,
+                index=AVATAR_OPTIONS.index(st.session_state.avatar)
+                if st.session_state.avatar in AVATAR_OPTIONS else 0,
+            )
+            comment = st.text_input(
+                "コメント",
+                value=st.session_state.comment or DEFAULT_COMMENT,
+                max_chars=COMMENT_MAX_WIDTH,
+                placeholder=DEFAULT_COMMENT,
+                help="参加者カードのアイコン横に表示されます。空欄の場合は「一緒に学習中」と表示します。",
+            )
+            mood = st.selectbox(
+                "ひとこと状態",
+                MOOD_OPTIONS,
+                index=MOOD_OPTIONS.index(st.session_state.mood)
+                if st.session_state.mood in MOOD_OPTIONS else 0,
+            )
+            difficulty = st.selectbox(
+                "体感難易度",
+                DIFFICULTY_OPTIONS,
+                index=DIFFICULTY_OPTIONS.index(normalize_difficulty(st.session_state.difficulty)),
+                help="具体的な内容は表示せず、参加者カードに体感難易度だけを表示します。",
+            )
 
         if not st.session_state.joined:
             if st.button("入室する", type="primary", use_container_width=True):
                 cleaned = nickname.strip()
-                cleaned_comment = comment.strip()
+                cleaned_comment = comment.strip() or DEFAULT_COMMENT
                 nickname_error = validate_nickname(cleaned)
                 comment_error = validate_comment(cleaned_comment)
                 if nickname_error:
@@ -1406,7 +1477,7 @@ with st.sidebar:
         else:
             if st.button("学習内容を更新", use_container_width=True):
                 cleaned = nickname.strip() or st.session_state.nickname
-                cleaned_comment = comment.strip()
+                cleaned_comment = comment.strip() or DEFAULT_COMMENT
                 nickname_error = validate_nickname(cleaned)
                 comment_error = validate_comment(cleaned_comment)
                 if nickname_error:
@@ -1439,6 +1510,7 @@ with st.sidebar:
                         difficulty,
                         event_type="更新",
                     )
+                    persist_preferences_to_browser(current_preferences())
                     st.success("表示を更新しました。")
 
             if st.button("退室する", use_container_width=True):
@@ -1592,9 +1664,12 @@ def live_area():
             detail_text = safe_text(p["detail"] or "学習中")
             mood_text = safe_text(p["mood"] or "学習中")
             elapsed_text = safe_text(elapsed_study_time(p["joined_at"]))
-            difficulty_meta = DIFFICULTY_META.get(p["difficulty"], DIFFICULTY_META["ふつう"])
-            difficulty_class = safe_text(difficulty_meta["class"])
-            difficulty_label = safe_text(difficulty_meta["label"])
+            difficulty_meta = DIFFICULTY_META.get(normalize_difficulty(p["difficulty"]))
+            difficulty_html = ""
+            if difficulty_meta:
+                difficulty_class = safe_text(difficulty_meta["class"])
+                difficulty_label = safe_text(difficulty_meta["label"])
+                difficulty_html = f'<span class="card-difficulty {difficulty_class}">{difficulty_label}</span>'
             member_cards.append(
                 '<div class="room-card">'
                 '<div class="card-top">'
@@ -1607,7 +1682,7 @@ def live_area():
                 '<div class="desk-line"></div>'
                 '<div class="card-meta-row">'
                 f'<div class="participant-detail">🗂️ {detail_text}</div>'
-                f'<span class="card-difficulty {difficulty_class}">{difficulty_label}</span>'
+                f'{difficulty_html}'
                 '</div>'
                 f'<div class="small-muted">💬 {mood_text}</div>'
                 f'<div class="small-muted">⏱ {elapsed_text}</div>'
