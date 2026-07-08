@@ -177,8 +177,9 @@ CUSTOM_CSS = """
 .card-meta-row {
     display:flex;
     align-items:center;
-    justify-content:space-between;
-    gap: 6px;
+    justify-content:flex-start;
+    gap: 5px;
+    flex-wrap: wrap;
     margin-top: 5px;
 }
 .card-difficulty {
@@ -205,13 +206,6 @@ CUSTOM_CSS = """
     color: #b42318;
     background: rgba(240,68,56,.12);
     border-color: rgba(240,68,56,.28);
-}
-@media (max-width: 420px) {
-    .card-meta-row {
-        align-items:flex-start;
-        flex-direction: column;
-        gap: 3px;
-    }
 }
 .activity-room {
     border: 1px solid rgba(128,128,128,.22);
