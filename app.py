@@ -106,22 +106,13 @@ CUSTOM_CSS = """
     position: relative;
     border: 1px solid rgba(128,128,128,.26);
     border-radius: 8px;
-    padding: 20px 10px 10px 10px;
+    padding: 10px;
     margin-bottom: 0;
     background:
-        linear-gradient(180deg, rgba(128,128,128,.075) 0 38px, rgba(128,128,128,.035) 38px),
-        rgba(128,128,128,.045);
+        linear-gradient(180deg, #f8faf9 0 38px, #ffffff 38px),
+        #ffffff;
     min-height: 112px;
     box-shadow: inset 0 -3px 0 rgba(128,128,128,.14);
-}
-.room-card::before {
-    content: "SEAT";
-    position: absolute;
-    top: 5px;
-    right: 8px;
-    font-size: .58rem;
-    letter-spacing: .08em;
-    opacity: .45;
 }
 .avatar {
     font-size: 1.5rem;
