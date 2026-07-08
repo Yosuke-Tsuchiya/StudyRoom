@@ -2,8 +2,11 @@ import csv
 import hmac
 import html
 import io
+import json
 import os
 import sqlite3
+import urllib.error
+import urllib.request
 import uuid
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -455,14 +458,43 @@ def add_feedback(session_id, nickname, activity, detail, category, body):
         )
 
 
-def get_admin_password() -> str:
-    env_password = os.getenv("STUDY_ROOM_ADMIN_PASSWORD", "").strip()
-    if env_password:
-        return env_password
+def get_config_value(name) -> str:
+    env_value = os.getenv(name, "").strip()
+    if env_value:
+        return env_value
     try:
-        return str(st.secrets.get("STUDY_ROOM_ADMIN_PASSWORD", "")).strip()
+        return str(st.secrets.get(name, "")).strip()
     except Exception:
         return ""
+
+
+def send_feedback_webhook(payload) -> tuple[bool, str]:
+    webhook_url = get_config_value("FEEDBACK_WEBHOOK_URL")
+    if not webhook_url:
+        return True, ""
+
+    token = get_config_value("FEEDBACK_WEBHOOK_TOKEN")
+    body = dict(payload)
+    if token:
+        body["token"] = token
+
+    request = urllib.request.Request(
+        webhook_url,
+        data=json.dumps(body, ensure_ascii=False).encode("utf-8"),
+        headers={"Content-Type": "application/json; charset=utf-8"},
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=10) as response:
+            if 200 <= response.status < 300:
+                return True, ""
+            return False, f"送信先からエラーが返りました。status={response.status}"
+    except urllib.error.URLError as exc:
+        return False, f"送信先に接続できませんでした。{exc}"
+
+
+def get_admin_password() -> str:
+    return get_config_value("STUDY_ROOM_ADMIN_PASSWORD")
 
 
 def csv_safe(value) -> str:
@@ -923,13 +955,27 @@ with st.sidebar:
         elif last_feedback_at and (now - last_feedback_at).total_seconds() < FEEDBACK_COOLDOWN_SECONDS:
             st.error("連続送信は少し時間をおいてからお願いします。")
         else:
+            feedback_payload = {
+                "session_id": st.session_state.session_id,
+                "nickname": st.session_state.nickname if st.session_state.joined else "",
+                "activity": st.session_state.activity if st.session_state.joined else "",
+                "detail": st.session_state.detail if st.session_state.joined else "",
+                "category": feedback_category,
+                "body": cleaned_feedback,
+                "created_at": now_iso(),
+            }
+            webhook_ok, webhook_error = send_feedback_webhook(feedback_payload)
+            if not webhook_ok:
+                st.error(f"送信できませんでした。時間をおいてもう一度お試しください。{webhook_error}")
+                st.stop()
+
             add_feedback(
-                st.session_state.session_id,
-                st.session_state.nickname if st.session_state.joined else "",
-                st.session_state.activity if st.session_state.joined else "",
-                st.session_state.detail if st.session_state.joined else "",
-                feedback_category,
-                cleaned_feedback,
+                feedback_payload["session_id"],
+                feedback_payload["nickname"],
+                feedback_payload["activity"],
+                feedback_payload["detail"],
+                feedback_payload["category"],
+                feedback_payload["body"],
             )
             st.session_state.last_feedback_at = now
             st.success("送信しました。ありがとうございます。")
