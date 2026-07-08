@@ -34,6 +34,12 @@ ACTIVITY_OPTIONS = [
 DETAIL_OPTIONS = [f"第{i}回" for i in range(1, 9)] + ["その他"]
 MOOD_OPTIONS = ["集中して学習中", "ゆっくり学習中", "小テスト実施中", "休憩中", "もうひと頑張り"]
 AVATAR_OPTIONS = ["🧑‍💻", "📖", "✏️", "🎧", "💻", "📝", "🧠", "☕"]
+DIFFICULTY_OPTIONS = ["ふつう", "やさしめ", "むずかしい"]
+DIFFICULTY_META = {
+    "やさしめ": {"score": 1, "label": "やさしめ", "class": "easy"},
+    "ふつう": {"score": 2, "label": "ふつう", "class": "normal"},
+    "むずかしい": {"score": 3, "label": "むずかしめ", "class": "hard"},
+}
 
 st.set_page_config(
     page_title=APP_TITLE,
@@ -265,6 +271,29 @@ CUSTOM_CSS = """
 .room-tag.mine {
     background: rgba(46,204,113,.18);
 }
+.difficulty-tag {
+    border: 1px solid rgba(128,128,128,.22);
+    border-radius: 999px;
+    padding: 2px 9px;
+    font-size: .78rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+.difficulty-tag.easy {
+    color: #067647;
+    background: rgba(18,183,106,.14);
+    border-color: rgba(18,183,106,.32);
+}
+.difficulty-tag.normal {
+    color: #175cd3;
+    background: rgba(47,113,244,.13);
+    border-color: rgba(47,113,244,.28);
+}
+.difficulty-tag.hard {
+    color: #b42318;
+    background: rgba(240,68,56,.13);
+    border-color: rgba(240,68,56,.30);
+}
 .room-members {
     display:grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -327,6 +356,7 @@ def init_db():
                 activity TEXT NOT NULL,
                 detail TEXT,
                 mood TEXT,
+                difficulty TEXT,
                 joined_at TEXT NOT NULL,
                 last_seen TEXT NOT NULL
             );
@@ -351,6 +381,7 @@ def init_db():
                 detail TEXT,
                 comment TEXT,
                 mood TEXT,
+                difficulty TEXT,
                 room_count INTEGER NOT NULL,
                 total_count INTEGER NOT NULL,
                 created_at TEXT NOT NULL
@@ -362,11 +393,15 @@ def init_db():
             conn.execute("ALTER TABLE participants ADD COLUMN avatar TEXT")
         if "comment" not in columns:
             conn.execute("ALTER TABLE participants ADD COLUMN comment TEXT")
+        if "difficulty" not in columns:
+            conn.execute("ALTER TABLE participants ADD COLUMN difficulty TEXT")
         event_columns = {row["name"] for row in conn.execute("PRAGMA table_info(presence_events)").fetchall()}
         if "comment" not in event_columns:
             conn.execute("ALTER TABLE presence_events ADD COLUMN comment TEXT")
         if "mood" not in event_columns:
             conn.execute("ALTER TABLE presence_events ADD COLUMN mood TEXT")
+        if "difficulty" not in event_columns:
+            conn.execute("ALTER TABLE presence_events ADD COLUMN difficulty TEXT")
 
 
 def cleanup_stale():
@@ -384,10 +419,11 @@ def cleanup_stale():
                 row["detail"],
                 row["comment"],
                 row["mood"],
+                row["difficulty"],
             )
 
 
-def log_presence_event(conn, event_type, session_id, nickname, activity, detail, comment, mood):
+def log_presence_event(conn, event_type, session_id, nickname, activity, detail, comment, mood, difficulty):
     room_count = conn.execute(
         "SELECT COUNT(*) FROM participants WHERE activity = ?",
         (activity,),
@@ -396,21 +432,33 @@ def log_presence_event(conn, event_type, session_id, nickname, activity, detail,
     conn.execute(
         """
         INSERT INTO presence_events
-            (event_type, session_id, nickname, activity, detail, comment, mood, room_count, total_count, created_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            (event_type, session_id, nickname, activity, detail, comment, mood, difficulty, room_count, total_count, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
-        (event_type, session_id, nickname, activity, detail, comment, mood, room_count, total_count, now_iso()),
+        (
+            event_type,
+            session_id,
+            nickname,
+            activity,
+            detail,
+            comment,
+            mood,
+            difficulty,
+            room_count,
+            total_count,
+            now_iso(),
+        ),
     )
 
 
-def upsert_presence(session_id, nickname, avatar, comment, activity, detail, mood, event_type=None):
+def upsert_presence(session_id, nickname, avatar, comment, activity, detail, mood, difficulty, event_type=None):
     current = now_iso()
     with get_conn() as conn:
         conn.execute(
             """
             INSERT INTO participants
-                (session_id, nickname, avatar, comment, activity, detail, mood, joined_at, last_seen)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                (session_id, nickname, avatar, comment, activity, detail, mood, difficulty, joined_at, last_seen)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(session_id) DO UPDATE SET
                 nickname=excluded.nickname,
                 avatar=excluded.avatar,
@@ -418,12 +466,13 @@ def upsert_presence(session_id, nickname, avatar, comment, activity, detail, moo
                 activity=excluded.activity,
                 detail=excluded.detail,
                 mood=excluded.mood,
+                difficulty=excluded.difficulty,
                 last_seen=excluded.last_seen
             """,
-            (session_id, nickname, avatar, comment, activity, detail, mood, current, current),
+            (session_id, nickname, avatar, comment, activity, detail, mood, difficulty, current, current),
         )
         if event_type:
-            log_presence_event(conn, event_type, session_id, nickname, activity, detail, comment, mood)
+            log_presence_event(conn, event_type, session_id, nickname, activity, detail, comment, mood, difficulty)
 
 
 def leave_room(session_id):
@@ -440,6 +489,7 @@ def leave_room(session_id):
                 row["detail"],
                 row["comment"],
                 row["mood"],
+                row["difficulty"],
             )
 
 
@@ -565,6 +615,7 @@ def presence_events_csv(rows) -> str:
             "detail",
             "comment",
             "mood",
+            "difficulty",
             "room_count",
             "total_count",
             "session_id",
@@ -581,6 +632,7 @@ def presence_events_csv(rows) -> str:
                 csv_safe(row["detail"]),
                 csv_safe(row["comment"]),
                 csv_safe(row["mood"]),
+                csv_safe(row["difficulty"]),
                 row["room_count"],
                 row["total_count"],
                 row["session_id"],
@@ -638,6 +690,25 @@ def validate_feedback(value) -> str | None:
     if len(value) > FEEDBACK_MAX_CHARS:
         return f"内容は{FEEDBACK_MAX_CHARS}文字以内にしてください。"
     return None
+
+
+def room_difficulty_summary(members):
+    scores = [
+        DIFFICULTY_META[member["difficulty"]]["score"]
+        for member in members
+        if member["difficulty"] in DIFFICULTY_META
+    ]
+    if not scores:
+        return None
+
+    average = sum(scores) / len(scores)
+    if average < 1.67:
+        key = "やさしめ"
+    elif average > 2.34:
+        key = "むずかしい"
+    else:
+        key = "ふつう"
+    return DIFFICULTY_META[key]
 
 
 def room_sort_key(activity, members):
@@ -742,6 +813,7 @@ def render_admin_dashboard():
                         "授業回": row["detail"] or "",
                         "コメント": row["comment"] or "",
                         "状態": row["mood"] or "",
+                        "体感難易度": row["difficulty"] or "",
                         "部屋人数": row["room_count"],
                         "全体人数": row["total_count"],
                     }
@@ -799,6 +871,8 @@ if "detail" not in st.session_state:
     st.session_state.detail = "第1回"
 if "mood" not in st.session_state:
     st.session_state.mood = "集中して学習中"
+if "difficulty" not in st.session_state:
+    st.session_state.difficulty = "ふつう"
 if "last_feedback_at" not in st.session_state:
     st.session_state.last_feedback_at = None
 
@@ -867,6 +941,13 @@ with st.sidebar:
         index=MOOD_OPTIONS.index(st.session_state.mood)
         if st.session_state.mood in MOOD_OPTIONS else 0,
     )
+    difficulty = st.selectbox(
+        "体感難易度",
+        DIFFICULTY_OPTIONS,
+        index=DIFFICULTY_OPTIONS.index(st.session_state.difficulty)
+        if st.session_state.difficulty in DIFFICULTY_OPTIONS else 0,
+        help="具体的な内容は表示せず、部屋ごとの目安として色つきで表示します。",
+    )
 
     if not st.session_state.joined:
         if st.button("入室する", type="primary", use_container_width=True):
@@ -885,6 +966,7 @@ with st.sidebar:
                 st.session_state.activity = activity
                 st.session_state.detail = detail
                 st.session_state.mood = mood
+                st.session_state.difficulty = difficulty
                 st.session_state.joined = True
                 upsert_presence(
                     st.session_state.session_id,
@@ -894,6 +976,7 @@ with st.sidebar:
                     activity,
                     detail,
                     mood,
+                    difficulty,
                     event_type="入室",
                 )
                 st.rerun()
@@ -914,6 +997,7 @@ with st.sidebar:
                 st.session_state.activity = activity
                 st.session_state.detail = detail
                 st.session_state.mood = mood
+                st.session_state.difficulty = difficulty
                 upsert_presence(
                     st.session_state.session_id,
                     cleaned,
@@ -922,6 +1006,7 @@ with st.sidebar:
                     activity,
                     detail,
                     mood,
+                    difficulty,
                     event_type="更新",
                 )
                 st.success("表示を更新しました。")
@@ -1000,6 +1085,7 @@ def live_area():
             st.session_state.activity,
             st.session_state.detail,
             st.session_state.mood,
+            st.session_state.difficulty,
         )
 
     participants = fetch_participants()
@@ -1054,6 +1140,13 @@ def live_area():
         room_classes = "activity-room mine" if is_my_room else "activity-room"
         room_count_text = f"{len(room_members)}人が学習中"
         tags = [f'<span class="room-count">{room_count_text}</span>']
+        difficulty_summary = room_difficulty_summary(room_members)
+        if difficulty_summary:
+            tags.append(
+                f'<span class="difficulty-tag {difficulty_summary["class"]}">'
+                f'体感：{difficulty_summary["label"]}'
+                '</span>'
+            )
         if is_my_room:
             tags.append('<span class="room-tag mine">あなたの部屋</span>')
         tags_html = "".join(tags)
