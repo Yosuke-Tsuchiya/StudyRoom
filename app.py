@@ -16,6 +16,7 @@ import streamlit as st
 APP_TITLE = "StudyRoom"
 DB_PATH = Path(os.getenv("STUDY_ROOM_DB", "study_room.db"))
 PRESENCE_TIMEOUT_MINUTES = 3
+QUICK_JOIN_TIMEOUT_MINUTES = 15
 NICKNAME_MAX_WIDTH = 20
 COMMENT_MAX_WIDTH = 40
 FEEDBACK_MAX_CHARS = 1000
@@ -39,6 +40,21 @@ DIFFICULTY_META = {
     "やさしめ": {"score": 1, "label": "やさしめ", "class": "easy"},
     "ふつう": {"score": 2, "label": "ふつう", "class": "normal"},
     "むずかしい": {"score": 3, "label": "むずかしめ", "class": "hard"},
+}
+QUICK_JOIN_NICKNAME = "匿名学生さん"
+QUICK_JOIN_AVATAR = "📖"
+QUICK_JOIN_COMMENT = "一緒に学習中"
+QUICK_JOIN_MOOD = "集中して学習中"
+QUICK_JOIN_DIFFICULTY = "ふつう"
+QUICK_COURSE_CODES = {
+    "info-basic": "情報基礎A・B",
+    "internet-tech": "インターネット技術Ⅰ・Ⅱ",
+    "data-algorithms": "データ構造とアルゴリズムⅠ・Ⅱ",
+    "programming": "実践プログラミングⅠ・Ⅱ",
+    "secure-programming": "初級セキュアプログラミング",
+    "seminar": "基礎ゼミA・B",
+    "certification": "資格勉強",
+    "other": "その他",
 }
 
 st.set_page_config(
@@ -360,6 +376,8 @@ def init_db():
                 detail TEXT,
                 mood TEXT,
                 difficulty TEXT,
+                participation_type TEXT,
+                expires_at TEXT,
                 joined_at TEXT NOT NULL,
                 last_seen TEXT NOT NULL
             );
@@ -385,6 +403,7 @@ def init_db():
                 comment TEXT,
                 mood TEXT,
                 difficulty TEXT,
+                participation_type TEXT,
                 room_count INTEGER NOT NULL,
                 total_count INTEGER NOT NULL,
                 created_at TEXT NOT NULL
@@ -398,6 +417,10 @@ def init_db():
             conn.execute("ALTER TABLE participants ADD COLUMN comment TEXT")
         if "difficulty" not in columns:
             conn.execute("ALTER TABLE participants ADD COLUMN difficulty TEXT")
+        if "participation_type" not in columns:
+            conn.execute("ALTER TABLE participants ADD COLUMN participation_type TEXT")
+        if "expires_at" not in columns:
+            conn.execute("ALTER TABLE participants ADD COLUMN expires_at TEXT")
         event_columns = {row["name"] for row in conn.execute("PRAGMA table_info(presence_events)").fetchall()}
         if "comment" not in event_columns:
             conn.execute("ALTER TABLE presence_events ADD COLUMN comment TEXT")
@@ -405,13 +428,48 @@ def init_db():
             conn.execute("ALTER TABLE presence_events ADD COLUMN mood TEXT")
         if "difficulty" not in event_columns:
             conn.execute("ALTER TABLE presence_events ADD COLUMN difficulty TEXT")
+        if "participation_type" not in event_columns:
+            conn.execute("ALTER TABLE presence_events ADD COLUMN participation_type TEXT")
 
 
 def cleanup_stale():
     cutoff = (datetime.now(JST) - timedelta(minutes=PRESENCE_TIMEOUT_MINUTES)).isoformat(timespec="seconds")
+    current = now_iso()
     with get_conn() as conn:
-        stale_rows = conn.execute("SELECT * FROM participants WHERE last_seen < ?", (cutoff,)).fetchall()
-        conn.execute("DELETE FROM participants WHERE last_seen < ?", (cutoff,))
+        stale_rows = conn.execute(
+            """
+            SELECT * FROM participants
+            WHERE
+                (
+                    COALESCE(participation_type, 'regular') = 'quick'
+                    AND expires_at IS NOT NULL
+                    AND expires_at < ?
+                )
+                OR
+                (
+                    COALESCE(participation_type, 'regular') != 'quick'
+                    AND last_seen < ?
+                )
+            """,
+            (current, cutoff),
+        ).fetchall()
+        conn.execute(
+            """
+            DELETE FROM participants
+            WHERE
+                (
+                    COALESCE(participation_type, 'regular') = 'quick'
+                    AND expires_at IS NOT NULL
+                    AND expires_at < ?
+                )
+                OR
+                (
+                    COALESCE(participation_type, 'regular') != 'quick'
+                    AND last_seen < ?
+                )
+            """,
+            (current, cutoff),
+        )
         for row in stale_rows:
             log_presence_event(
                 conn,
@@ -423,10 +481,22 @@ def cleanup_stale():
                 row["comment"],
                 row["mood"],
                 row["difficulty"],
+                row["participation_type"] or "regular",
             )
 
 
-def log_presence_event(conn, event_type, session_id, nickname, activity, detail, comment, mood, difficulty):
+def log_presence_event(
+    conn,
+    event_type,
+    session_id,
+    nickname,
+    activity,
+    detail,
+    comment,
+    mood,
+    difficulty,
+    participation_type="regular",
+):
     room_count = conn.execute(
         "SELECT COUNT(*) FROM participants WHERE activity = ?",
         (activity,),
@@ -435,8 +505,11 @@ def log_presence_event(conn, event_type, session_id, nickname, activity, detail,
     conn.execute(
         """
         INSERT INTO presence_events
-            (event_type, session_id, nickname, activity, detail, comment, mood, difficulty, room_count, total_count, created_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            (
+                event_type, session_id, nickname, activity, detail, comment,
+                mood, difficulty, participation_type, room_count, total_count, created_at
+            )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
             event_type,
@@ -447,6 +520,7 @@ def log_presence_event(conn, event_type, session_id, nickname, activity, detail,
             comment,
             mood,
             difficulty,
+            participation_type,
             room_count,
             total_count,
             now_iso(),
@@ -454,14 +528,29 @@ def log_presence_event(conn, event_type, session_id, nickname, activity, detail,
     )
 
 
-def upsert_presence(session_id, nickname, avatar, comment, activity, detail, mood, difficulty, event_type=None):
+def upsert_presence(
+    session_id,
+    nickname,
+    avatar,
+    comment,
+    activity,
+    detail,
+    mood,
+    difficulty,
+    event_type=None,
+    participation_type="regular",
+    expires_at=None,
+):
     current = now_iso()
     with get_conn() as conn:
         conn.execute(
             """
             INSERT INTO participants
-                (session_id, nickname, avatar, comment, activity, detail, mood, difficulty, joined_at, last_seen)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                (
+                    session_id, nickname, avatar, comment, activity, detail,
+                    mood, difficulty, participation_type, expires_at, joined_at, last_seen
+                )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(session_id) DO UPDATE SET
                 nickname=excluded.nickname,
                 avatar=excluded.avatar,
@@ -470,12 +559,38 @@ def upsert_presence(session_id, nickname, avatar, comment, activity, detail, moo
                 detail=excluded.detail,
                 mood=excluded.mood,
                 difficulty=excluded.difficulty,
+                participation_type=excluded.participation_type,
+                expires_at=excluded.expires_at,
                 last_seen=excluded.last_seen
             """,
-            (session_id, nickname, avatar, comment, activity, detail, mood, difficulty, current, current),
+            (
+                session_id,
+                nickname,
+                avatar,
+                comment,
+                activity,
+                detail,
+                mood,
+                difficulty,
+                participation_type,
+                expires_at,
+                current,
+                current,
+            ),
         )
         if event_type:
-            log_presence_event(conn, event_type, session_id, nickname, activity, detail, comment, mood, difficulty)
+            log_presence_event(
+                conn,
+                event_type,
+                session_id,
+                nickname,
+                activity,
+                detail,
+                comment,
+                mood,
+                difficulty,
+                participation_type,
+            )
 
 
 def leave_room(session_id):
@@ -493,6 +608,7 @@ def leave_room(session_id):
                 row["comment"],
                 row["mood"],
                 row["difficulty"],
+                row["participation_type"] or "regular",
             )
 
 
@@ -619,6 +735,7 @@ def presence_events_csv(rows) -> str:
             "comment",
             "mood",
             "difficulty",
+            "participation_type",
             "room_count",
             "total_count",
             "session_id",
@@ -636,6 +753,7 @@ def presence_events_csv(rows) -> str:
                 csv_safe(row["comment"]),
                 csv_safe(row["mood"]),
                 csv_safe(row["difficulty"]),
+                csv_safe(row["participation_type"]),
                 row["room_count"],
                 row["total_count"],
                 row["session_id"],
@@ -667,6 +785,55 @@ def fetch_admin_stats():
 
 def safe_text(value) -> str:
     return html.escape(str(value or ""), quote=True)
+
+
+def query_value(name) -> str:
+    value = st.query_params.get(name, "")
+    if isinstance(value, list):
+        return str(value[0]) if value else ""
+    return str(value or "")
+
+
+def lesson_to_detail(value) -> str | None:
+    cleaned = value.strip()
+    if cleaned.isdigit():
+        number = int(cleaned)
+        if 1 <= number <= 8:
+            return f"第{number}回"
+    if cleaned in DETAIL_OPTIONS:
+        return cleaned
+    if cleaned.lower() in {"other", "etc"}:
+        return "その他"
+    return None
+
+
+def get_quick_join_request() -> dict | None:
+    if query_value("quick").lower() not in {"1", "true", "yes"}:
+        return None
+
+    course_code = query_value("course").strip().lower()
+    activity = QUICK_COURSE_CODES.get(course_code)
+    detail = lesson_to_detail(query_value("lesson"))
+
+    if not activity or not detail:
+        return {
+            "error": "簡易参加リンクの指定が正しくありません。授業ページのリンクを確認してください。",
+        }
+
+    return {
+        "course_code": course_code,
+        "activity": activity,
+        "detail": detail,
+    }
+
+
+def parse_iso_datetime(value) -> datetime | None:
+    if not value:
+        return None
+    try:
+        return datetime.fromisoformat(value)
+    except ValueError:
+        return None
 
 
 def text_width(value) -> int:
@@ -798,6 +965,7 @@ def render_admin_dashboard():
                         "コメント": row["comment"] or "",
                         "状態": row["mood"] or "",
                         "体感難易度": row["difficulty"] or "",
+                        "参加方法": row["participation_type"] or "regular",
                         "部屋人数": row["room_count"],
                         "全体人数": row["total_count"],
                     }
@@ -857,8 +1025,55 @@ if "mood" not in st.session_state:
     st.session_state.mood = "集中して学習中"
 if "difficulty" not in st.session_state:
     st.session_state.difficulty = "ふつう"
+if "participation_type" not in st.session_state:
+    st.session_state.participation_type = "regular"
+if "expires_at" not in st.session_state:
+    st.session_state.expires_at = None
+if "quick_join_registered_key" not in st.session_state:
+    st.session_state.quick_join_registered_key = None
 if "last_feedback_at" not in st.session_state:
     st.session_state.last_feedback_at = None
+
+quick_join_request = get_quick_join_request()
+quick_join_error = None
+if quick_join_request:
+    quick_join_error = quick_join_request.get("error")
+    if not quick_join_error:
+        quick_join_key = f"{quick_join_request['course_code']}:{quick_join_request['detail']}"
+        registered_expires_dt = parse_iso_datetime(st.session_state.expires_at)
+        registered_expired = registered_expires_dt and registered_expires_dt <= datetime.now(JST)
+        should_register_quick_join = (
+            st.session_state.quick_join_registered_key != quick_join_key
+            or (registered_expired and not st.session_state.joined)
+        )
+        if should_register_quick_join:
+            expires_at = (
+                datetime.now(JST) + timedelta(minutes=QUICK_JOIN_TIMEOUT_MINUTES)
+            ).isoformat(timespec="seconds")
+            st.session_state.nickname = QUICK_JOIN_NICKNAME
+            st.session_state.avatar = QUICK_JOIN_AVATAR
+            st.session_state.comment = QUICK_JOIN_COMMENT
+            st.session_state.activity = quick_join_request["activity"]
+            st.session_state.detail = quick_join_request["detail"]
+            st.session_state.mood = QUICK_JOIN_MOOD
+            st.session_state.difficulty = QUICK_JOIN_DIFFICULTY
+            st.session_state.participation_type = "quick"
+            st.session_state.expires_at = expires_at
+            st.session_state.joined = True
+            st.session_state.quick_join_registered_key = quick_join_key
+            upsert_presence(
+                st.session_state.session_id,
+                QUICK_JOIN_NICKNAME,
+                QUICK_JOIN_AVATAR,
+                QUICK_JOIN_COMMENT,
+                quick_join_request["activity"],
+                quick_join_request["detail"],
+                QUICK_JOIN_MOOD,
+                QUICK_JOIN_DIFFICULTY,
+                event_type="入室",
+                participation_type="quick",
+                expires_at=expires_at,
+            )
 
 with st.sidebar:
     st.markdown(
@@ -872,133 +1087,175 @@ with st.sidebar:
     )
     sidebar_status = st.empty()
     st.caption("顔出し不要。今、一緒に学んでいる仲間の気配だけを感じられる場所です。")
-    st.markdown(
-        """
-        <div class="sidebar-notice">
-          <strong>試験運用中です</strong>
-          表示名やコメントに、本名・学籍番号・メールアドレスなどの個人情報を書かないでください。
-          ブラウザを閉じるなどして更新が止まった場合、3分後に自動退室扱いになります。
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    if st.session_state.participation_type == "quick" and st.session_state.joined:
+        st.markdown(
+            f"""
+            <div class="sidebar-notice">
+              <strong>試験運用中です</strong>
+              授業ページからの簡易参加です。表示名や状態は固定され、{QUICK_JOIN_TIMEOUT_MINUTES}分後に自動退室扱いになります。
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    else:
+        st.markdown(
+            """
+            <div class="sidebar-notice">
+              <strong>試験運用中です</strong>
+              表示名やコメントに、本名・学籍番号・メールアドレスなどの個人情報を書かないでください。
+              ブラウザを閉じるなどして更新が止まった場合、3分後に自動退室扱いになります。
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
     st.divider()
 
-    st.header("入室設定")
-    st.caption("画面にはニックネーム、アイコン、コメント、学習中の科目が表示されます。")
-    nickname = st.text_input(
-        "ニックネーム",
-        value=st.session_state.nickname,
-        max_chars=20,
-        placeholder="例：でこぴん",
-        help="本名や学籍番号は入力しない運用を想定しています。全角10文字、または半角20文字以内です。",
-    )
-    avatar = st.selectbox(
-        "アイコン",
-        AVATAR_OPTIONS,
-        index=AVATAR_OPTIONS.index(st.session_state.avatar)
-        if st.session_state.avatar in AVATAR_OPTIONS else 0,
-    )
-    comment = st.text_input(
-        "コメント",
-        value=st.session_state.comment,
-        max_chars=COMMENT_MAX_WIDTH,
-        placeholder="例：試験前です",
-        help="参加者カードのアイコン横に表示されます。全角20文字、または半角40文字以内です。",
-    )
+    if quick_join_error:
+        st.error(quick_join_error)
 
-    activity = st.selectbox(
-        "今取り組んでいること",
-        ACTIVITY_OPTIONS,
-        index=ACTIVITY_OPTIONS.index(st.session_state.activity)
-        if st.session_state.activity in ACTIVITY_OPTIONS else 0,
-    )
-    detail = st.selectbox(
-        "授業回",
-        DETAIL_OPTIONS,
-        index=DETAIL_OPTIONS.index(st.session_state.detail)
-        if st.session_state.detail in DETAIL_OPTIONS else 0,
-    )
-    mood = st.selectbox(
-        "ひとこと状態",
-        MOOD_OPTIONS,
-        index=MOOD_OPTIONS.index(st.session_state.mood)
-        if st.session_state.mood in MOOD_OPTIONS else 0,
-    )
-    difficulty = st.selectbox(
-        "体感難易度",
-        DIFFICULTY_OPTIONS,
-        index=DIFFICULTY_OPTIONS.index(st.session_state.difficulty)
-        if st.session_state.difficulty in DIFFICULTY_OPTIONS else 0,
-        help="具体的な内容は表示せず、参加者カードに体感難易度だけを表示します。",
-    )
-
-    if not st.session_state.joined:
-        if st.button("入室する", type="primary", use_container_width=True):
-            cleaned = nickname.strip()
-            cleaned_comment = comment.strip()
-            nickname_error = validate_nickname(cleaned)
-            comment_error = validate_comment(cleaned_comment)
-            if nickname_error:
-                st.error(nickname_error)
-            elif comment_error:
-                st.error(comment_error)
-            else:
-                st.session_state.nickname = cleaned
-                st.session_state.avatar = avatar
-                st.session_state.comment = cleaned_comment
-                st.session_state.activity = activity
-                st.session_state.detail = detail
-                st.session_state.mood = mood
-                st.session_state.difficulty = difficulty
-                st.session_state.joined = True
-                upsert_presence(
-                    st.session_state.session_id,
-                    cleaned,
-                    avatar,
-                    cleaned_comment,
-                    activity,
-                    detail,
-                    mood,
-                    difficulty,
-                    event_type="入室",
-                )
-                st.rerun()
+    if st.session_state.participation_type == "quick" and st.session_state.joined:
+        st.header("簡易参加中")
+        st.caption("授業ページから自動で入室しています。名前や状態は固定表示です。")
+        difficulty_label = DIFFICULTY_META.get(
+            st.session_state.difficulty,
+            DIFFICULTY_META["ふつう"],
+        )["label"]
+        st.markdown(
+            f"""
+            <div class="sidebar-notice">
+              <strong>{safe_text(st.session_state.activity)} / {safe_text(st.session_state.detail)}</strong>
+              表示名：{safe_text(st.session_state.nickname)}<br>
+              コメント：{safe_text(st.session_state.comment)}<br>
+              状態：{safe_text(st.session_state.mood)}<br>
+              体感：{safe_text(difficulty_label)}
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
     else:
-        if st.button("学習内容を更新", use_container_width=True):
-            cleaned = nickname.strip() or st.session_state.nickname
-            cleaned_comment = comment.strip()
-            nickname_error = validate_nickname(cleaned)
-            comment_error = validate_comment(cleaned_comment)
-            if nickname_error:
-                st.error(nickname_error)
-            elif comment_error:
-                st.error(comment_error)
-            else:
-                st.session_state.nickname = cleaned
-                st.session_state.avatar = avatar
-                st.session_state.comment = cleaned_comment
-                st.session_state.activity = activity
-                st.session_state.detail = detail
-                st.session_state.mood = mood
-                st.session_state.difficulty = difficulty
-                upsert_presence(
-                    st.session_state.session_id,
-                    cleaned,
-                    avatar,
-                    cleaned_comment,
-                    activity,
-                    detail,
-                    mood,
-                    difficulty,
-                    event_type="更新",
-                )
-                st.success("表示を更新しました。")
+        st.header("入室設定")
+        st.caption("画面にはニックネーム、アイコン、コメント、学習中の科目が表示されます。")
+        nickname = st.text_input(
+            "ニックネーム",
+            value=st.session_state.nickname,
+            max_chars=20,
+            placeholder="例：でこぴん",
+            help="本名や学籍番号は入力しない運用を想定しています。全角10文字、または半角20文字以内です。",
+        )
+        avatar = st.selectbox(
+            "アイコン",
+            AVATAR_OPTIONS,
+            index=AVATAR_OPTIONS.index(st.session_state.avatar)
+            if st.session_state.avatar in AVATAR_OPTIONS else 0,
+        )
+        comment = st.text_input(
+            "コメント",
+            value=st.session_state.comment,
+            max_chars=COMMENT_MAX_WIDTH,
+            placeholder="例：試験前です",
+            help="参加者カードのアイコン横に表示されます。全角20文字、または半角40文字以内です。",
+        )
 
-        if st.button("退室する", use_container_width=True):
-            leave_room(st.session_state.session_id)
-            st.session_state.joined = False
-            st.rerun()
+        activity = st.selectbox(
+            "今取り組んでいること",
+            ACTIVITY_OPTIONS,
+            index=ACTIVITY_OPTIONS.index(st.session_state.activity)
+            if st.session_state.activity in ACTIVITY_OPTIONS else 0,
+        )
+        detail = st.selectbox(
+            "授業回",
+            DETAIL_OPTIONS,
+            index=DETAIL_OPTIONS.index(st.session_state.detail)
+            if st.session_state.detail in DETAIL_OPTIONS else 0,
+        )
+        mood = st.selectbox(
+            "ひとこと状態",
+            MOOD_OPTIONS,
+            index=MOOD_OPTIONS.index(st.session_state.mood)
+            if st.session_state.mood in MOOD_OPTIONS else 0,
+        )
+        difficulty = st.selectbox(
+            "体感難易度",
+            DIFFICULTY_OPTIONS,
+            index=DIFFICULTY_OPTIONS.index(st.session_state.difficulty)
+            if st.session_state.difficulty in DIFFICULTY_OPTIONS else 0,
+            help="具体的な内容は表示せず、参加者カードに体感難易度だけを表示します。",
+        )
+
+        if not st.session_state.joined:
+            if st.button("入室する", type="primary", use_container_width=True):
+                cleaned = nickname.strip()
+                cleaned_comment = comment.strip()
+                nickname_error = validate_nickname(cleaned)
+                comment_error = validate_comment(cleaned_comment)
+                if nickname_error:
+                    st.error(nickname_error)
+                elif comment_error:
+                    st.error(comment_error)
+                else:
+                    st.session_state.nickname = cleaned
+                    st.session_state.avatar = avatar
+                    st.session_state.comment = cleaned_comment
+                    st.session_state.activity = activity
+                    st.session_state.detail = detail
+                    st.session_state.mood = mood
+                    st.session_state.difficulty = difficulty
+                    st.session_state.participation_type = "regular"
+                    st.session_state.expires_at = None
+                    st.session_state.quick_join_registered_key = None
+                    st.session_state.joined = True
+                    upsert_presence(
+                        st.session_state.session_id,
+                        cleaned,
+                        avatar,
+                        cleaned_comment,
+                        activity,
+                        detail,
+                        mood,
+                        difficulty,
+                        event_type="入室",
+                    )
+                    st.rerun()
+        else:
+            if st.button("学習内容を更新", use_container_width=True):
+                cleaned = nickname.strip() or st.session_state.nickname
+                cleaned_comment = comment.strip()
+                nickname_error = validate_nickname(cleaned)
+                comment_error = validate_comment(cleaned_comment)
+                if nickname_error:
+                    st.error(nickname_error)
+                elif comment_error:
+                    st.error(comment_error)
+                else:
+                    st.session_state.nickname = cleaned
+                    st.session_state.avatar = avatar
+                    st.session_state.comment = cleaned_comment
+                    st.session_state.activity = activity
+                    st.session_state.detail = detail
+                    st.session_state.mood = mood
+                    st.session_state.difficulty = difficulty
+                    st.session_state.participation_type = "regular"
+                    st.session_state.expires_at = None
+                    st.session_state.quick_join_registered_key = None
+                    upsert_presence(
+                        st.session_state.session_id,
+                        cleaned,
+                        avatar,
+                        cleaned_comment,
+                        activity,
+                        detail,
+                        mood,
+                        difficulty,
+                        event_type="更新",
+                    )
+                    st.success("表示を更新しました。")
+
+            if st.button("退室する", use_container_width=True):
+                leave_room(st.session_state.session_id)
+                st.session_state.joined = False
+                st.session_state.participation_type = "regular"
+                st.session_state.expires_at = None
+                st.rerun()
 
     st.divider()
     st.subheader("意見・要望")
@@ -1061,16 +1318,23 @@ with st.sidebar:
 @st.fragment(run_every="10s")
 def live_area():
     if st.session_state.joined:
-        upsert_presence(
-            st.session_state.session_id,
-            st.session_state.nickname,
-            st.session_state.avatar,
-            st.session_state.comment,
-            st.session_state.activity,
-            st.session_state.detail,
-            st.session_state.mood,
-            st.session_state.difficulty,
-        )
+        expires_at = st.session_state.expires_at
+        expires_dt = parse_iso_datetime(expires_at)
+        if st.session_state.participation_type == "quick" and expires_dt and expires_dt <= datetime.now(JST):
+            st.session_state.joined = False
+        else:
+            upsert_presence(
+                st.session_state.session_id,
+                st.session_state.nickname,
+                st.session_state.avatar,
+                st.session_state.comment,
+                st.session_state.activity,
+                st.session_state.detail,
+                st.session_state.mood,
+                st.session_state.difficulty,
+                participation_type=st.session_state.participation_type,
+                expires_at=expires_at,
+            )
 
     participants = fetch_participants()
     unique_activities = len({p["activity"] for p in participants})

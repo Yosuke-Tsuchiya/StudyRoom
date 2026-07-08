@@ -6,6 +6,7 @@
 
 - 匿名・ニックネームで入室
 - 現在の科目、授業回、資格勉強などを表示
+- 授業ページからの簡易参加リンク
 - 同時参加人数をリアルタイム表示
 - 10秒ごとの自動更新
 - 意見・要望フォーム
@@ -109,6 +110,49 @@ STUDY_ROOM_ADMIN_PASSWORD = "任意のパスワード"
 - 入退室履歴と意見・要望のCSVダウンロード
 
 入退室履歴はSQLiteの `presence_events` テーブルに保存されます。
+
+## 授業ページからの簡易参加リンク
+
+授業回ごとのページから、StudyRoomの該当する部屋へ簡易参加できます。
+
+URL形式:
+
+```text
+https://studyroom.streamlit.app/?quick=1&course=info-basic&lesson=1
+```
+
+簡易参加では、表示名や状態は固定されます。
+
+- 表示名: 匿名学生さん
+- コメント: 一緒に学習中
+- 状態: 集中して学習中
+- 体感難易度: ふつう
+- 表示時間: 15分
+
+通常参加と異なり、ブラウザを閉じても15分間は部屋に表示されます。15分経過後は自動退室扱いになります。
+
+### courseコード対応表
+
+| course | 表示される部屋名 |
+| --- | --- |
+| `info-basic` | 情報基礎A・B |
+| `internet-tech` | インターネット技術Ⅰ・Ⅱ |
+| `data-algorithms` | データ構造とアルゴリズムⅠ・Ⅱ |
+| `programming` | 実践プログラミングⅠ・Ⅱ |
+| `secure-programming` | 初級セキュアプログラミング |
+| `seminar` | 基礎ゼミA・B |
+| `certification` | 資格勉強 |
+| `other` | その他 |
+
+### lesson指定
+
+`lesson=1` から `lesson=8` までを指定すると、それぞれ `第1回` から `第8回` として参加します。
+
+```text
+https://studyroom.streamlit.app/?quick=1&course=internet-tech&lesson=3
+```
+
+`lesson=other` を指定すると `その他` として参加します。
 
 ## プロトタイプの位置づけ
 
