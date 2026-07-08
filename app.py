@@ -1,4 +1,7 @@
+import csv
+import hmac
 import html
+import io
 import os
 import sqlite3
 import uuid
@@ -385,6 +388,120 @@ def add_feedback(session_id, nickname, activity, detail, category, body):
         )
 
 
+def get_admin_password() -> str:
+    env_password = os.getenv("STUDY_ROOM_ADMIN_PASSWORD", "").strip()
+    if env_password:
+        return env_password
+    try:
+        return str(st.secrets.get("STUDY_ROOM_ADMIN_PASSWORD", "")).strip()
+    except Exception:
+        return ""
+
+
+def csv_safe(value) -> str:
+    text = str(value or "")
+    if text.startswith(("=", "+", "-", "@")):
+        return "'" + text
+    return text
+
+
+def fetch_feedback(limit=500):
+    with get_conn() as conn:
+        return conn.execute(
+            """
+            SELECT * FROM feedback
+            ORDER BY id DESC
+            LIMIT ?
+            """,
+            (limit,),
+        ).fetchall()
+
+
+def fetch_presence_events(limit=500):
+    with get_conn() as conn:
+        return conn.execute(
+            """
+            SELECT * FROM presence_events
+            ORDER BY id DESC
+            LIMIT ?
+            """,
+            (limit,),
+        ).fetchall()
+
+
+def feedback_csv(rows) -> str:
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(["id", "created_at", "category", "nickname", "activity", "detail", "body"])
+    for row in rows:
+        writer.writerow(
+            [
+                row["id"],
+                row["created_at"],
+                csv_safe(row["category"]),
+                csv_safe(row["nickname"]),
+                csv_safe(row["activity"]),
+                csv_safe(row["detail"]),
+                csv_safe(row["body"]),
+            ]
+        )
+    return output.getvalue()
+
+
+def presence_events_csv(rows) -> str:
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(
+        [
+            "id",
+            "created_at",
+            "event_type",
+            "nickname",
+            "activity",
+            "detail",
+            "room_count",
+            "total_count",
+            "session_id",
+        ]
+    )
+    for row in rows:
+        writer.writerow(
+            [
+                row["id"],
+                row["created_at"],
+                csv_safe(row["event_type"]),
+                csv_safe(row["nickname"]),
+                csv_safe(row["activity"]),
+                csv_safe(row["detail"]),
+                row["room_count"],
+                row["total_count"],
+                row["session_id"],
+            ]
+        )
+    return output.getvalue()
+
+
+def fetch_admin_stats():
+    cleanup_stale()
+    with get_conn() as conn:
+        current_total = conn.execute("SELECT COUNT(*) FROM participants").fetchone()[0]
+        feedback_total = conn.execute("SELECT COUNT(*) FROM feedback").fetchone()[0]
+        event_total = conn.execute("SELECT COUNT(*) FROM presence_events").fetchone()[0]
+        active_rooms = conn.execute(
+            "SELECT activity, COUNT(*) AS count FROM participants GROUP BY activity ORDER BY count DESC, activity"
+        ).fetchall()
+        join_counts = conn.execute(
+            """
+            SELECT activity, COUNT(*) AS count
+            FROM presence_events
+            WHERE event_type = '入室'
+            GROUP BY activity
+            ORDER BY count DESC, activity
+            """
+        ).fetchall()
+    return current_total, feedback_total, event_total, active_rooms, join_counts
+
+
 def safe_text(value) -> str:
     return html.escape(str(value or ""), quote=True)
 
@@ -429,7 +546,127 @@ def participant_sort_key(participant):
     return (detail_index, participant["joined_at"])
 
 
+def is_admin_route() -> bool:
+    return st.query_params.get("admin") == "1"
+
+
+def render_admin_dashboard():
+    admin_password = get_admin_password()
+    if not admin_password:
+        st.error("管理者パスワードが設定されていません。")
+        st.caption("Streamlit Community CloudのSecretsに STUDY_ROOM_ADMIN_PASSWORD を設定してください。")
+        st.stop()
+
+    if "admin_authenticated" not in st.session_state:
+        st.session_state.admin_authenticated = False
+
+    if not st.session_state.admin_authenticated:
+        st.title("StudyRoom Admin")
+        entered_password = st.text_input("管理者パスワード", type="password")
+        if st.button("ログイン", type="primary"):
+            if hmac.compare_digest(entered_password, admin_password):
+                st.session_state.admin_authenticated = True
+                st.rerun()
+            else:
+                st.error("パスワードが違います。")
+        st.stop()
+
+    st.title("StudyRoom Admin")
+    st.caption("この画面は管理者用です。通常画面からはリンクしていません。")
+
+    if st.button("ログアウト"):
+        st.session_state.admin_authenticated = False
+        st.rerun()
+
+    current_total, feedback_total, event_total, active_rooms, join_counts = fetch_admin_stats()
+    c1, c2, c3 = st.columns(3)
+    c1.metric("現在の入室者", f"{current_total}人")
+    c2.metric("意見・要望", f"{feedback_total}件")
+    c3.metric("入退室履歴", f"{event_total}件")
+
+    overview_tab, events_tab, feedback_tab = st.tabs(["利用状況", "入退室履歴", "意見・要望"])
+
+    with overview_tab:
+        left, right = st.columns(2)
+        with left:
+            st.subheader("現在の部屋別人数")
+            if active_rooms:
+                st.dataframe(
+                    [{"部屋": row["activity"], "人数": row["count"]} for row in active_rooms],
+                    use_container_width=True,
+                    hide_index=True,
+                )
+            else:
+                st.caption("現在の入室者はいません。")
+        with right:
+            st.subheader("累計入室数（部屋別）")
+            if join_counts:
+                st.dataframe(
+                    [{"部屋": row["activity"], "入室数": row["count"]} for row in join_counts],
+                    use_container_width=True,
+                    hide_index=True,
+                )
+            else:
+                st.caption("入室履歴はまだありません。")
+
+    with events_tab:
+        event_rows = fetch_presence_events(limit=500)
+        st.download_button(
+            "入退室履歴CSVをダウンロード",
+            data="\ufeff" + presence_events_csv(event_rows),
+            file_name="studyroom_presence_events.csv",
+            mime="text/csv",
+            use_container_width=True,
+        )
+        if event_rows:
+            st.dataframe(
+                [
+                    {
+                        "日時": row["created_at"],
+                        "種別": row["event_type"],
+                        "ニックネーム": row["nickname"] or "",
+                        "部屋": row["activity"] or "",
+                        "授業回": row["detail"] or "",
+                        "部屋人数": row["room_count"],
+                        "全体人数": row["total_count"],
+                    }
+                    for row in event_rows
+                ],
+                use_container_width=True,
+                hide_index=True,
+            )
+        else:
+            st.caption("入退室履歴はまだありません。")
+
+    with feedback_tab:
+        feedback_rows = fetch_feedback(limit=500)
+        st.download_button(
+            "意見・要望CSVをダウンロード",
+            data="\ufeff" + feedback_csv(feedback_rows),
+            file_name="studyroom_feedback.csv",
+            mime="text/csv",
+            use_container_width=True,
+        )
+        if feedback_rows:
+            for row in feedback_rows[:50]:
+                st.markdown(
+                    f"**{safe_text(row['category'])}** "
+                    f"<span style='opacity:.65'>{safe_text(row['created_at'])}</span>",
+                    unsafe_allow_html=True,
+                )
+                st.caption(
+                    f"{row['nickname'] or '未入室'} / {row['activity'] or '-'} / {row['detail'] or '-'}"
+                )
+                st.write(row["body"])
+        else:
+            st.caption("意見・要望はまだありません。")
+
+
 init_db()
+
+if is_admin_route():
+    render_admin_dashboard()
+    st.stop()
 
 if "session_id" not in st.session_state:
     st.session_state.session_id = str(uuid.uuid4())
