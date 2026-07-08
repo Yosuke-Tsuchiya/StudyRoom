@@ -90,12 +90,19 @@ def init_db():
                 nickname TEXT,
                 activity TEXT,
                 detail TEXT,
+                comment TEXT,
+                mood TEXT,
                 room_count INTEGER NOT NULL,
                 total_count INTEGER NOT NULL,
                 created_at TEXT NOT NULL
             );
             """
         )
+        event_columns = {row["name"] for row in conn.execute("PRAGMA table_info(presence_events)").fetchall()}
+        if "comment" not in event_columns:
+            conn.execute("ALTER TABLE presence_events ADD COLUMN comment TEXT")
+        if "mood" not in event_columns:
+            conn.execute("ALTER TABLE presence_events ADD COLUMN mood TEXT")
 
 
 def log_presence_event(conn, event_type, row):
@@ -108,8 +115,8 @@ def log_presence_event(conn, event_type, row):
     conn.execute(
         """
         INSERT INTO presence_events
-            (event_type, session_id, nickname, activity, detail, room_count, total_count, created_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            (event_type, session_id, nickname, activity, detail, comment, mood, room_count, total_count, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
             event_type,
@@ -117,6 +124,8 @@ def log_presence_event(conn, event_type, row):
             row["nickname"],
             row["activity"],
             row["detail"],
+            row["comment"],
+            row["mood"],
             room_count,
             total_count,
             now_iso(),
@@ -187,6 +196,8 @@ def presence_events_csv(rows) -> str:
             "nickname",
             "activity",
             "detail",
+            "comment",
+            "mood",
             "room_count",
             "total_count",
             "session_id",
@@ -201,6 +212,8 @@ def presence_events_csv(rows) -> str:
                 csv_safe(row["nickname"]),
                 csv_safe(row["activity"]),
                 csv_safe(row["detail"]),
+                csv_safe(row["comment"]),
+                csv_safe(row["mood"]),
                 row["room_count"],
                 row["total_count"],
                 row["session_id"],
@@ -312,6 +325,8 @@ def render_admin_dashboard():
                         "ニックネーム": row["nickname"] or "",
                         "部屋": row["activity"] or "",
                         "授業回": row["detail"] or "",
+                        "コメント": row["comment"] or "",
+                        "状態": row["mood"] or "",
                         "部屋人数": row["room_count"],
                         "全体人数": row["total_count"],
                     }

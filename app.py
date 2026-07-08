@@ -285,6 +285,8 @@ def init_db():
                 nickname TEXT,
                 activity TEXT,
                 detail TEXT,
+                comment TEXT,
+                mood TEXT,
                 room_count INTEGER NOT NULL,
                 total_count INTEGER NOT NULL,
                 created_at TEXT NOT NULL
@@ -296,6 +298,11 @@ def init_db():
             conn.execute("ALTER TABLE participants ADD COLUMN avatar TEXT")
         if "comment" not in columns:
             conn.execute("ALTER TABLE participants ADD COLUMN comment TEXT")
+        event_columns = {row["name"] for row in conn.execute("PRAGMA table_info(presence_events)").fetchall()}
+        if "comment" not in event_columns:
+            conn.execute("ALTER TABLE presence_events ADD COLUMN comment TEXT")
+        if "mood" not in event_columns:
+            conn.execute("ALTER TABLE presence_events ADD COLUMN mood TEXT")
 
 
 def cleanup_stale():
@@ -311,10 +318,12 @@ def cleanup_stale():
                 row["nickname"],
                 row["activity"],
                 row["detail"],
+                row["comment"],
+                row["mood"],
             )
 
 
-def log_presence_event(conn, event_type, session_id, nickname, activity, detail):
+def log_presence_event(conn, event_type, session_id, nickname, activity, detail, comment, mood):
     room_count = conn.execute(
         "SELECT COUNT(*) FROM participants WHERE activity = ?",
         (activity,),
@@ -323,10 +332,10 @@ def log_presence_event(conn, event_type, session_id, nickname, activity, detail)
     conn.execute(
         """
         INSERT INTO presence_events
-            (event_type, session_id, nickname, activity, detail, room_count, total_count, created_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            (event_type, session_id, nickname, activity, detail, comment, mood, room_count, total_count, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
-        (event_type, session_id, nickname, activity, detail, room_count, total_count, now_iso()),
+        (event_type, session_id, nickname, activity, detail, comment, mood, room_count, total_count, now_iso()),
     )
 
 
@@ -350,7 +359,7 @@ def upsert_presence(session_id, nickname, avatar, comment, activity, detail, moo
             (session_id, nickname, avatar, comment, activity, detail, mood, current, current),
         )
         if event_type:
-            log_presence_event(conn, event_type, session_id, nickname, activity, detail)
+            log_presence_event(conn, event_type, session_id, nickname, activity, detail, comment, mood)
 
 
 def leave_room(session_id):
@@ -365,6 +374,8 @@ def leave_room(session_id):
                 row["nickname"],
                 row["activity"],
                 row["detail"],
+                row["comment"],
+                row["mood"],
             )
 
 
@@ -459,6 +470,8 @@ def presence_events_csv(rows) -> str:
             "nickname",
             "activity",
             "detail",
+            "comment",
+            "mood",
             "room_count",
             "total_count",
             "session_id",
@@ -473,6 +486,8 @@ def presence_events_csv(rows) -> str:
                 csv_safe(row["nickname"]),
                 csv_safe(row["activity"]),
                 csv_safe(row["detail"]),
+                csv_safe(row["comment"]),
+                csv_safe(row["mood"]),
                 row["room_count"],
                 row["total_count"],
                 row["session_id"],
@@ -627,6 +642,8 @@ def render_admin_dashboard():
                         "ニックネーム": row["nickname"] or "",
                         "部屋": row["activity"] or "",
                         "授業回": row["detail"] or "",
+                        "コメント": row["comment"] or "",
+                        "状態": row["mood"] or "",
                         "部屋人数": row["room_count"],
                         "全体人数": row["total_count"],
                     }
