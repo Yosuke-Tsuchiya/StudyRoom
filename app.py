@@ -836,6 +836,24 @@ def parse_iso_datetime(value) -> datetime | None:
         return None
 
 
+def elapsed_study_time(joined_at) -> str:
+    joined_dt = parse_iso_datetime(str(joined_at or ""))
+    if not joined_dt:
+        return "入室から計測中"
+
+    elapsed = datetime.now(JST) - joined_dt
+    total_minutes = max(0, int(elapsed.total_seconds() // 60))
+    if total_minutes < 1:
+        return "入室から1分未満"
+    if total_minutes < 60:
+        return f"入室から{total_minutes}分"
+
+    hours, minutes = divmod(total_minutes, 60)
+    if minutes == 0:
+        return f"入室から{hours}時間"
+    return f"入室から{hours}時間{minutes}分"
+
+
 def text_width(value) -> int:
     return sum(1 if ord(char) <= 0x7F else 2 for char in value)
 
@@ -1400,6 +1418,7 @@ def live_area():
             comment_text = safe_text(p["comment"] or "一緒に学習中")
             detail_text = safe_text(p["detail"] or "学習中")
             mood_text = safe_text(p["mood"] or "学習中")
+            elapsed_text = safe_text(elapsed_study_time(p["joined_at"]))
             difficulty_meta = DIFFICULTY_META.get(p["difficulty"], DIFFICULTY_META["ふつう"])
             difficulty_class = safe_text(difficulty_meta["class"])
             difficulty_label = safe_text(difficulty_meta["label"])
@@ -1418,6 +1437,7 @@ def live_area():
                 f'<span class="card-difficulty {difficulty_class}">{difficulty_label}</span>'
                 '</div>'
                 f'<div class="small-muted">💬 {mood_text}</div>'
+                f'<div class="small-muted">⏱ {elapsed_text}</div>'
                 '</div>'
             )
 
