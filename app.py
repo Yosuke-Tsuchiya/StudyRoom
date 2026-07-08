@@ -114,6 +114,7 @@ CUSTOM_CSS = """
     min-height: 112px;
     box-shadow:
         4px 5px 12px rgba(0,0,0,.12),
+        inset -3px 0 0 rgba(128,128,128,.14),
         inset 0 -3px 0 rgba(128,128,128,.14);
 }
 .avatar {
