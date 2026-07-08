@@ -212,9 +212,9 @@ CUSTOM_CSS = """
     background: rgba(128,128,128,.035);
 }
 .room-desk-area {
-    border: 1px solid rgba(128,128,128,.18);
-    border-radius: 12px;
-    padding: 12px;
+    border: 0;
+    border-radius: 0;
+    padding: 8px 0 0 0;
     margin-bottom: 14px;
     background:
         linear-gradient(rgba(128,128,128,.035) 1px, transparent 1px),
