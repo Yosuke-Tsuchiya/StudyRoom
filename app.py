@@ -119,6 +119,7 @@ CUSTOM_CSS = """
         4px 5px 12px rgba(0,0,0,.12),
         inset -2px 0 0 rgba(128,128,128,.14),
         inset 0 -3px 0 rgba(128,128,128,.14);
+    color: #24303f;
 }
 .avatar {
     font-size: 1.5rem;
@@ -132,6 +133,7 @@ CUSTOM_CSS = """
     border-radius: 12px;
     background: rgba(100,120,255,.13);
     border: 1px solid rgba(128,128,128,.18);
+    color: #24303f;
 }
 .card-top {
     display:flex;
@@ -142,6 +144,7 @@ CUSTOM_CSS = """
     min-width: 0;
     font-size: .68rem;
     line-height: 1.3;
+    color: #344054;
     opacity: .74;
     overflow-wrap: anywhere;
 }
@@ -149,11 +152,13 @@ CUSTOM_CSS = """
     margin-top: 8px;
     font-size: .9rem;
     line-height: 1.25;
+    color: #1f2937;
 }
 .participant-detail {
     margin-top: 5px;
     font-size: .82rem;
     line-height: 1.25;
+    color: #344054;
 }
 .desk-line {
     height: 6px;
@@ -161,7 +166,7 @@ CUSTOM_CSS = """
     background: rgba(128,128,128,.14);
     margin: 8px 0 6px 0;
 }
-.small-muted {opacity:.70; font-size:.78rem; line-height:1.25;}
+.small-muted {color: #475467; opacity:.78; font-size:.78rem; line-height:1.25;}
 .online-dot {
     display:inline-block;
     width:10px;
