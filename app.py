@@ -645,9 +645,14 @@ def render_admin_dashboard():
     st.title("StudyRoom Admin")
     st.caption("この画面は管理者用です。通常画面からはリンクしていません。")
 
-    if st.button("ログアウト"):
-        st.session_state.admin_authenticated = False
-        st.rerun()
+    action_col1, action_col2 = st.columns([1, 1])
+    with action_col1:
+        if st.button("最新の状態に更新", type="primary", use_container_width=True):
+            st.rerun()
+    with action_col2:
+        if st.button("ログアウト", use_container_width=True):
+            st.session_state.admin_authenticated = False
+            st.rerun()
 
     current_total, feedback_total, event_total, active_rooms, join_counts = fetch_admin_stats()
     c1, c2, c3 = st.columns(3)
