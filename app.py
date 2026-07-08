@@ -112,7 +112,9 @@ CUSTOM_CSS = """
         linear-gradient(180deg, #f8faf9 0 52px, #ffffff 52px),
         #ffffff;
     min-height: 112px;
-    box-shadow: inset 0 -3px 0 rgba(128,128,128,.14);
+    box-shadow:
+        4px 5px 12px rgba(0,0,0,.12),
+        inset 0 -3px 0 rgba(128,128,128,.14);
 }
 .avatar {
     font-size: 1.5rem;
