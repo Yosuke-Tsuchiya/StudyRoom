@@ -216,11 +216,7 @@ CUSTOM_CSS = """
     border-radius: 0;
     padding: 8px 0 0 0;
     margin-bottom: 14px;
-    background:
-        linear-gradient(rgba(128,128,128,.035) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(128,128,128,.028) 1px, transparent 1px),
-        rgba(128,128,128,.025);
-    background-size: 28px 28px;
+    background: transparent;
 }
 .room-heading {
     display:flex;
