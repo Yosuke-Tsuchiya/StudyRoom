@@ -161,10 +161,10 @@ CUSTOM_CSS = """
     color: #1f2937;
 }
 .participant-detail {
-    margin-top: 5px;
     font-size: .82rem;
     line-height: 1.25;
     color: #344054;
+    min-width: 0;
 }
 .desk-line {
     height: 6px;
@@ -173,9 +173,16 @@ CUSTOM_CSS = """
     margin: 8px 0 6px 0;
 }
 .small-muted {color: #475467; opacity:.78; font-size:.78rem; line-height:1.25;}
+.card-meta-row {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap: 6px;
+    margin-top: 5px;
+}
 .card-difficulty {
     display:inline-block;
-    margin-top: 3px;
+    flex: 0 0 auto;
     border: 1px solid rgba(128,128,128,.22);
     border-radius: 999px;
     padding: 1px 6px;
@@ -197,6 +204,13 @@ CUSTOM_CSS = """
     color: #b42318;
     background: rgba(240,68,56,.12);
     border-color: rgba(240,68,56,.28);
+}
+@media (max-width: 420px) {
+    .card-meta-row {
+        align-items:flex-start;
+        flex-direction: column;
+        gap: 3px;
+    }
 }
 .activity-room {
     border: 1px solid rgba(128,128,128,.22);
@@ -1140,9 +1154,11 @@ def live_area():
                 f'<strong>{label}</strong>'
                 '</div>'
                 '<div class="desk-line"></div>'
+                '<div class="card-meta-row">'
                 f'<div class="participant-detail">🗂️ {detail_text}</div>'
+                f'<span class="card-difficulty {difficulty_class}">体感：{difficulty_label}</span>'
+                '</div>'
                 f'<div class="small-muted">💬 {mood_text}</div>'
-                f'<div><span class="card-difficulty {difficulty_class}">体感：{difficulty_label}</span></div>'
                 '</div>'
             )
 
