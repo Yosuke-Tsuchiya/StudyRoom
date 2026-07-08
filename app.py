@@ -1199,6 +1199,26 @@ def render_quick_checkin_panel(request):
     )
 
 
+def render_quick_checkin_page(request, error=None):
+    st.markdown(
+        """
+        <div class="sidebar-brand">
+          <h1>📚 StudyRoom</h1>
+          <p>みんなのオンライン自習室</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    st.caption(
+        "ここは発言しなくても参加できる自習室です。"
+        "顔出し・音声・チャットなしで、同じ時間に学んでいる人の気配だけを感じられます。"
+    )
+    if error:
+        st.error(error)
+        return
+    render_quick_checkin_panel(request)
+
+
 def text_width(value) -> int:
     return sum(1 if ord(char) <= 0x7F else 2 for char in value)
 
@@ -1464,6 +1484,10 @@ elif course_lesson_request:
 
 if st.session_state.participation_type != "quick" and st.session_state.nickname != QUICK_JOIN_NICKNAME:
     persist_preferences_to_browser(current_preferences())
+
+if quick_join_request:
+    render_quick_checkin_page(quick_join_request, quick_join_error)
+    st.stop()
 
 with st.sidebar:
     st.markdown(
@@ -1867,8 +1891,5 @@ def live_area():
 
     st.caption("表示は10秒ごとに更新されます。顔・音声・学籍番号は表示しません。")
 
-
-if quick_join_request and not quick_join_error:
-    render_quick_checkin_panel(quick_join_request)
 
 live_area()
