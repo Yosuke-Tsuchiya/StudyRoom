@@ -288,29 +288,6 @@ CUSTOM_CSS = """
 .room-tag.mine {
     background: rgba(46,204,113,.18);
 }
-.difficulty-tag {
-    border: 1px solid rgba(128,128,128,.22);
-    border-radius: 999px;
-    padding: 2px 9px;
-    font-size: .78rem;
-    font-weight: 700;
-    white-space: nowrap;
-}
-.difficulty-tag.easy {
-    color: #067647;
-    background: rgba(18,183,106,.14);
-    border-color: rgba(18,183,106,.32);
-}
-.difficulty-tag.normal {
-    color: #175cd3;
-    background: rgba(47,113,244,.13);
-    border-color: rgba(47,113,244,.28);
-}
-.difficulty-tag.hard {
-    color: #b42318;
-    background: rgba(240,68,56,.13);
-    border-color: rgba(240,68,56,.30);
-}
 .room-members {
     display:grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -707,25 +684,6 @@ def validate_feedback(value) -> str | None:
     if len(value) > FEEDBACK_MAX_CHARS:
         return f"内容は{FEEDBACK_MAX_CHARS}文字以内にしてください。"
     return None
-
-
-def room_difficulty_summary(members):
-    scores = [
-        DIFFICULTY_META[member["difficulty"]]["score"]
-        for member in members
-        if member["difficulty"] in DIFFICULTY_META
-    ]
-    if not scores:
-        return None
-
-    average = sum(scores) / len(scores)
-    if average < 1.67:
-        key = "やさしめ"
-    elif average > 2.34:
-        key = "むずかしい"
-    else:
-        key = "ふつう"
-    return DIFFICULTY_META[key]
 
 
 def room_sort_key(activity, members):
@@ -1130,10 +1088,7 @@ def live_area():
         )
 
     st.subheader("学習中の部屋")
-    st.caption(
-        "ここには入室中の参加者のニックネーム、コメント、授業回、状態が表示されます。"
-        "部屋の体感は、参加者が選んだ体感難易度の平均です。"
-    )
+    st.caption("ここには入室中の参加者のニックネーム、コメント、授業回、状態が表示されます。")
     if not participants:
         st.info("現在はまだ誰もいません。最初の一人として入室してみてください。")
 
@@ -1160,13 +1115,6 @@ def live_area():
         room_classes = "activity-room mine" if is_my_room else "activity-room"
         room_count_text = f"{len(room_members)}人が学習中"
         tags = [f'<span class="room-count">{room_count_text}</span>']
-        difficulty_summary = room_difficulty_summary(room_members)
-        if difficulty_summary:
-            tags.append(
-                f'<span class="difficulty-tag {difficulty_summary["class"]}">'
-                f'体感平均：{difficulty_summary["label"]}'
-                '</span>'
-            )
         if is_my_room:
             tags.append('<span class="room-tag mine">あなたの部屋</span>')
         tags_html = "".join(tags)
@@ -1212,8 +1160,6 @@ def live_area():
             st.markdown(room_html, unsafe_allow_html=True)
         else:
             expander_label = f"📘 {activity}　{room_count_text}"
-            if difficulty_summary:
-                expander_label += f"　体感平均：{difficulty_summary['label']}"
             with st.expander(expander_label, expanded=False):
                 st.markdown(
                     f'<div class="room-desk-area"><div class="room-members">{members_html}</div></div>',
