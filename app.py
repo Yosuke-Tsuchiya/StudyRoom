@@ -126,6 +126,57 @@ CUSTOM_CSS = """
 .study-summary li {
     margin: 2px 0;
 }
+.quick-checkin {
+    border: 1px solid rgba(47,113,244,.30);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    background: rgba(47,113,244,.08);
+}
+.quick-checkin h2 {
+    margin: 0 0 6px 0;
+    font-size: 1.35rem;
+    line-height: 1.25;
+}
+.quick-checkin p {
+    margin: 6px 0;
+    line-height: 1.5;
+}
+.quick-checkin-subject {
+    font-size: 1.05rem;
+    font-weight: 700;
+}
+.quick-stats {
+    display:grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin: 12px 0;
+}
+.quick-stat {
+    border: 1px solid rgba(128,128,128,.22);
+    border-radius: 8px;
+    padding: 10px;
+    background: rgba(255,255,255,.55);
+    color: #1f2937;
+}
+.quick-stat-label {
+    font-size: .78rem;
+    opacity: .75;
+}
+.quick-stat-value {
+    font-size: 1.35rem;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-top: 2px;
+}
+.quick-link {
+    display:inline-block;
+    margin-top: 8px;
+    font-weight: 700;
+}
+@media (max-width: 640px) {
+    .quick-stats {grid-template-columns: 1fr;}
+}
 .sidebar-stats {
     display:grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1008,17 +1059,17 @@ def lesson_to_detail(value) -> str | None:
     return None
 
 
-def get_quick_join_request() -> dict | None:
-    if query_value("quick").lower() not in {"1", "true", "yes"}:
-        return None
-
+def get_course_lesson_request() -> dict | None:
     course_code = query_value("course").strip().lower()
     activity = QUICK_COURSE_CODES.get(course_code)
     detail = lesson_to_detail(query_value("lesson"))
 
+    if not course_code and not query_value("lesson"):
+        return None
+
     if not activity or not detail:
         return {
-            "error": "簡易参加リンクの指定が正しくありません。授業ページのリンクを確認してください。",
+            "error": "リンクの科目または授業回の指定が正しくありません。授業ページのリンクを確認してください。",
         }
 
     return {
@@ -1026,6 +1077,41 @@ def get_quick_join_request() -> dict | None:
         "activity": activity,
         "detail": detail,
     }
+
+
+def get_quick_join_request() -> dict | None:
+    if query_value("quick").lower() not in {"1", "true", "yes"}:
+        return None
+    request = get_course_lesson_request()
+    if request is None:
+        return {
+            "error": "簡易参加リンクの科目または授業回の指定がありません。授業ページのリンクを確認してください。",
+        }
+    return request
+
+
+def build_main_page_url(course_code, detail) -> str:
+    lesson_value = "other"
+    if detail in DETAIL_OPTIONS:
+        detail_index = DETAIL_OPTIONS.index(detail)
+        if 0 <= detail_index < 8:
+            lesson_value = str(detail_index + 1)
+    query = urllib.parse.urlencode({"course": course_code, "lesson": lesson_value})
+    return f"/?{query}"
+
+
+def fetch_activity_detail_counts(activity, detail):
+    cleanup_stale()
+    with get_conn() as conn:
+        activity_count = conn.execute(
+            "SELECT COUNT(*) FROM participants WHERE activity = ?",
+            (activity,),
+        ).fetchone()[0]
+        detail_count = conn.execute(
+            "SELECT COUNT(*) FROM participants WHERE activity = ? AND detail = ?",
+            (activity, detail),
+        ).fetchone()[0]
+    return activity_count, detail_count
 
 
 def parse_iso_datetime(value) -> datetime | None:
@@ -1075,6 +1161,39 @@ def render_study_summary(summary):
           今回は{safe_text(summary["total_label"])}、学習に取り組みました。
           <ul>{items_html}</ul>
         </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def render_quick_checkin_panel(request):
+    if not request or request.get("error"):
+        return
+
+    activity = request["activity"]
+    detail = request["detail"]
+    activity_count, detail_count = fetch_activity_detail_counts(activity, detail)
+    main_page_url = build_main_page_url(request["course_code"], detail)
+    st.markdown(
+        f"""
+        <section class="quick-checkin">
+          <h2>チェックインしました</h2>
+          <p class="quick-checkin-subject">{safe_text(activity)} {safe_text(detail)}</p>
+          <div class="quick-stats">
+            <div class="quick-stat">
+              <div class="quick-stat-label">この科目を学習中</div>
+              <div class="quick-stat-value">{activity_count}人</div>
+            </div>
+            <div class="quick-stat">
+              <div class="quick-stat-label">この授業回を学習中</div>
+              <div class="quick-stat-value">{detail_count}人</div>
+            </div>
+          </div>
+          <p>{QUICK_JOIN_TIMEOUT_MINUTES}分間、この授業回を学習中の人として表示されます。</p>
+          <p>授業動画のタブに戻って、学習を続けてください。このタブは閉じても大丈夫です。</p>
+          <p>より詳しく学習中の人を見たり、自分の学習時間を管理したい場合は、メインページを開いてください。</p>
+          <a class="quick-link" href="{safe_text(main_page_url)}" target="_self">詳しく見る・学習時間を記録する</a>
+        </section>
         """,
         unsafe_allow_html=True,
     )
@@ -1252,6 +1371,7 @@ if is_admin_route():
     st.stop()
 
 saved_preferences = load_saved_preferences()
+course_lesson_request = get_course_lesson_request()
 
 if "session_id" not in st.session_state:
     st.session_state.session_id = str(uuid.uuid4())
@@ -1284,6 +1404,7 @@ if "last_feedback_at" not in st.session_state:
 
 quick_join_request = get_quick_join_request()
 quick_join_error = None
+course_lesson_error = None
 if quick_join_request:
     quick_join_error = quick_join_request.get("error")
     if not quick_join_error:
@@ -1323,8 +1444,25 @@ if quick_join_request:
                 participation_type="quick",
                 expires_at=expires_at,
             )
+elif course_lesson_request:
+    course_lesson_error = course_lesson_request.get("error")
+    requested_key = (
+        f"{course_lesson_request['course_code']}:{course_lesson_request['detail']}"
+        if not course_lesson_error
+        else None
+    )
+    if not course_lesson_error:
+        if st.session_state.participation_type == "quick" and st.session_state.joined:
+            st.session_state.participation_type = "regular"
+            st.session_state.expires_at = None
+            st.session_state.activity = course_lesson_request["activity"]
+            st.session_state.detail = course_lesson_request["detail"]
+        elif not st.session_state.joined and st.session_state.quick_join_registered_key != requested_key:
+            st.session_state.activity = course_lesson_request["activity"]
+            st.session_state.detail = course_lesson_request["detail"]
+            st.session_state.quick_join_registered_key = requested_key
 
-if st.session_state.participation_type != "quick":
+if st.session_state.participation_type != "quick" and st.session_state.nickname != QUICK_JOIN_NICKNAME:
     persist_preferences_to_browser(current_preferences())
 
 with st.sidebar:
@@ -1367,6 +1505,8 @@ with st.sidebar:
 
     if quick_join_error:
         st.error(quick_join_error)
+    elif course_lesson_error:
+        st.error(course_lesson_error)
 
     if st.session_state.last_study_summary and not st.session_state.joined:
         render_study_summary(st.session_state.last_study_summary)
@@ -1727,5 +1867,8 @@ def live_area():
 
     st.caption("表示は10秒ごとに更新されます。顔・音声・学籍番号は表示しません。")
 
+
+if quick_join_request and not quick_join_error:
+    render_quick_checkin_panel(quick_join_request)
 
 live_area()
