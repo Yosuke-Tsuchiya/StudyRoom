@@ -1104,7 +1104,10 @@ with st.sidebar:
         unsafe_allow_html=True,
     )
     sidebar_status = st.empty()
-    st.caption("顔出し不要。今、一緒に学んでいる仲間の気配だけを感じられる場所です。")
+    st.caption(
+        "ここは発言しなくても参加できる自習室です。"
+        "顔出し・音声・チャットなしで、同じ時間に学んでいる人の気配だけを感じられます。"
+    )
     if st.session_state.participation_type == "quick" and st.session_state.joined:
         st.markdown(
             f"""
