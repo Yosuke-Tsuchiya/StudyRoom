@@ -29,7 +29,7 @@ ACTIVITY_OPTIONS = [
     "その他",
 ]
 DETAIL_OPTIONS = [f"第{i}回" for i in range(1, 9)] + ["その他"]
-MOOD_OPTIONS = ["集中して学習中", "ゆっくり学習中", "質問歓迎", "休憩中", "もうひと頑張り"]
+MOOD_OPTIONS = ["集中して学習中", "ゆっくり学習中", "小テスト実施中", "休憩中", "もうひと頑張り"]
 AVATAR_OPTIONS = ["🧑‍💻", "📖", "✏️", "🎧", "💻", "📝", "🧠", "☕"]
 
 st.set_page_config(
@@ -243,7 +243,7 @@ CUSTOM_CSS = """
 @media (max-width: 760px) {
     .room-members {grid-template-columns: repeat(2, minmax(0, 1fr));}
 }
-@media (max-width: 640px) {
+@media (max-width: 380px) {
     .room-members {grid-template-columns: 1fr;}
 }
 </style>
