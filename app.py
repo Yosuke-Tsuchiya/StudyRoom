@@ -257,6 +257,18 @@ CUSTOM_CSS = """
     line-height: 1.25;
     color: #1f2937;
 }
+.entry-badge {
+    display: inline-block;
+    margin-top: 4px;
+    border: 1px solid rgba(47,113,244,.26);
+    border-radius: 999px;
+    padding: 1px 7px;
+    font-size: .64rem;
+    font-weight: 700;
+    line-height: 1.35;
+    color: #175cd3;
+    background: rgba(47,113,244,.10);
+}
 .participant-detail {
     font-size: .82rem;
     line-height: 1.25;
@@ -1933,6 +1945,9 @@ def live_area():
                 difficulty_class = safe_text(difficulty_meta["class"])
                 difficulty_label = safe_text(difficulty_meta["label"])
                 difficulty_html = f'<span class="card-difficulty {difficulty_class}">{difficulty_label}</span>'
+            entry_badge_html = ""
+            if (p["participation_type"] or "regular") == "quick":
+                entry_badge_html = '<div><span class="entry-badge">授業ページからチェックイン</span></div>'
             member_cards.append(
                 '<div class="room-card">'
                 '<div class="card-top">'
@@ -1942,6 +1957,7 @@ def live_area():
                 '<div class="participant-name">'
                 f'<strong>{label}</strong>'
                 '</div>'
+                f'{entry_badge_html}'
                 '<div class="desk-line"></div>'
                 '<div class="card-meta-row">'
                 f'<div class="participant-detail">🗂️ {detail_text}</div>'
