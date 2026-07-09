@@ -1221,13 +1221,7 @@ def remaining_checkin_time(expires_at) -> str:
         return "あと1分未満"
 
     total_minutes = (remaining_seconds + 59) // 60
-    if total_minutes < 60:
-        return f"あと{total_minutes}分"
-
-    hours, minutes = divmod(total_minutes, 60)
-    if minutes == 0:
-        return f"あと{hours}時間"
-    return f"あと{hours}時間{minutes}分"
+    return f"あと{total_minutes}分"
 
 
 def render_study_summary(summary):
