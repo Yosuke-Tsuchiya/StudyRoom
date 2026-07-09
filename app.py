@@ -143,8 +143,9 @@ CUSTOM_CSS = """
     line-height: 1.5;
 }
 .quick-checkin-subject {
-    font-size: 1.05rem;
+    font-size: 1.3rem;
     font-weight: 700;
+    line-height: 1.3;
 }
 .quick-stats {
     display:grid;
@@ -1209,7 +1210,7 @@ def render_quick_checkin_panel(request):
               <div class="quick-stat-value">{detail_count}人</div>
             </div>
           </div>
-          <p>{QUICK_JOIN_TIMEOUT_MINUTES}分間、この授業回を学習中の人として表示されます。</p>
+          <p>{QUICK_JOIN_TIMEOUT_MINUTES}分間、この授業回を学習中の匿名の学生として表示されます。</p>
           <p>授業動画のタブに戻って、学習を続けてください。このタブは閉じても大丈夫です。</p>
           <p>より詳しく学習中の人を見たり、自分の学習時間を管理したい場合は、メインページを開いてください。</p>
           <a class="quick-link" href="{safe_text(main_page_url)}" target="_self">詳しく見る・学習時間を記録する</a>
