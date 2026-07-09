@@ -1837,10 +1837,10 @@ with st.sidebar:
         nickname = st.text_input(
             "ニックネーム",
             value=st.session_state.nickname,
-            max_chars=20,
             placeholder="例：でこぴん",
             help="本名や学籍番号は入力しない運用を想定しています。全角10文字、または半角20文字以内です。",
         )
+        st.caption("全角10文字、または半角20文字以内")
         activity = st.selectbox(
             "今取り組んでいること",
             ACTIVITY_OPTIONS,
@@ -1863,10 +1863,10 @@ with st.sidebar:
             comment = st.text_input(
                 "コメント",
                 value=st.session_state.comment or DEFAULT_COMMENT,
-                max_chars=COMMENT_MAX_WIDTH,
                 placeholder=DEFAULT_COMMENT,
                 help="参加者カードのアイコン横に表示されます。空欄の場合は「一緒に学習中」と表示します。",
             )
+            st.caption("全角20文字、または半角40文字以内")
             mood = st.selectbox(
                 "ひとこと状態",
                 MOOD_OPTIONS,
@@ -1974,10 +1974,10 @@ with st.sidebar:
         )
         feedback_body = st.text_area(
             "内容",
-            max_chars=FEEDBACK_MAX_CHARS,
             placeholder="気づいたこと、ほしい機能、使いにくい点など",
             height=110,
         )
+        st.caption(f"{FEEDBACK_MAX_CHARS}文字以内")
         feedback_submitted = st.form_submit_button("送信する", use_container_width=True)
 
     if feedback_submitted:
