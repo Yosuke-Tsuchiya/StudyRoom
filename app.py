@@ -110,6 +110,7 @@ CUSTOM_CSS = """
     color: #667085;
     font-size: .68rem;
     line-height: 1.2;
+    text-align: right;
 }
 [data-testid="InputInstructions"] {
     display: none;
