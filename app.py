@@ -105,6 +105,15 @@ CUSTOM_CSS = """
     font-size: .82rem;
     margin-bottom: 2px;
 }
+.limit-hint {
+    margin: -0.45rem 0 .35rem 0;
+    color: #667085;
+    font-size: .68rem;
+    line-height: 1.2;
+}
+[data-testid="InputInstructions"] {
+    display: none;
+}
 .study-summary {
     border: 1px solid rgba(46,204,113,.35);
     border-radius: 8px;
@@ -1840,7 +1849,7 @@ with st.sidebar:
             placeholder="例：でこぴん",
             help="本名や学籍番号は入力しない運用を想定しています。全角10文字、または半角20文字以内です。",
         )
-        st.caption("全角10文字、または半角20文字以内")
+        st.markdown('<div class="limit-hint">全角10文字、または半角20文字以内</div>', unsafe_allow_html=True)
         activity = st.selectbox(
             "今取り組んでいること",
             ACTIVITY_OPTIONS,
@@ -1866,7 +1875,7 @@ with st.sidebar:
                 placeholder=DEFAULT_COMMENT,
                 help="参加者カードのアイコン横に表示されます。空欄の場合は「一緒に学習中」と表示します。",
             )
-            st.caption("全角20文字、または半角40文字以内")
+            st.markdown('<div class="limit-hint">全角20文字、または半角40文字以内</div>', unsafe_allow_html=True)
             mood = st.selectbox(
                 "ひとこと状態",
                 MOOD_OPTIONS,
@@ -1977,7 +1986,7 @@ with st.sidebar:
             placeholder="気づいたこと、ほしい機能、使いにくい点など",
             height=110,
         )
-        st.caption(f"{FEEDBACK_MAX_CHARS}文字以内")
+        st.markdown(f'<div class="limit-hint">{FEEDBACK_MAX_CHARS}文字以内</div>', unsafe_allow_html=True)
         feedback_submitted = st.form_submit_button("送信する", use_container_width=True)
 
     if feedback_submitted:
