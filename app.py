@@ -248,9 +248,10 @@ CUSTOM_CSS = """
     height: 8px;
     border-radius: 0 0 8px 8px;
     background:
-        linear-gradient(90deg, #8b5a2b 0 9px, transparent 9px calc(100% - 9px), #8b5a2b calc(100% - 9px)),
-        linear-gradient(180deg, rgba(0,0,0,.08), rgba(0,0,0,0));
-    opacity: .75;
+        linear-gradient(90deg, #aeb6bf 0 8px, transparent 8px calc(100% - 8px), #aeb6bf calc(100% - 8px)),
+        linear-gradient(90deg, #7f8790 0 8px, transparent 8px calc(100% - 8px), #7f8790 calc(100% - 8px)),
+        linear-gradient(180deg, rgba(255,255,255,.35), rgba(71,84,103,.18));
+    opacity: .9;
 }
 .room-card.quick-checkin-card {
     border-style: dashed;
@@ -365,6 +366,33 @@ CUSTOM_CSS = """
     min-width: 0;
     overflow-wrap: anywhere;
 }
+.desk-info-row {
+    display: grid;
+    grid-template-columns: 1.15rem minmax(0, 1fr);
+    align-items: center;
+    column-gap: 2px;
+    color: #fff8e8;
+    font-size: .72rem;
+    line-height: 1.25;
+    opacity: .96;
+    text-shadow: 0 1px 0 rgba(70,38,16,.28);
+}
+.desk-info-icon {
+    width: 1.15rem;
+    text-align: center;
+    font-size: .74rem;
+    line-height: 1;
+}
+.desk-info-text {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+.desk-info-line {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
+}
 .desk-line {
     display: none;
 }
@@ -376,11 +404,7 @@ CUSTOM_CSS = """
     text-shadow: 0 1px 0 rgba(70,38,16,.28);
 }
 .card-meta-row {
-    display:flex;
-    align-items:center;
-    justify-content:flex-start;
-    gap: 5px;
-    flex-wrap: wrap;
+    display:block;
     margin-top: 4px;
 }
 .card-difficulty {
@@ -2280,11 +2304,22 @@ def live_area():
                 f'<div class="profile-comment">{comment_text}</div>'
                 f'{entry_badge_html}'
                 '<div class="card-meta-row">'
-                f'<div class="participant-detail">🗂️ {detail_text}</div>'
+                '<div class="desk-info-row">'
+                '<span class="desk-info-icon">🗂️</span>'
+                '<span class="desk-info-line">'
+                f'<span class="desk-info-text">{detail_text}</span>'
                 f'{difficulty_html}'
+                '</span>'
                 '</div>'
-                f'<div class="small-muted">💬 {mood_text}</div>'
-                f'<div class="small-muted">{time_icon} {time_text}</div>'
+                '</div>'
+                '<div class="desk-info-row">'
+                '<span class="desk-info-icon">💬</span>'
+                f'<span class="desk-info-text">{mood_text}</span>'
+                '</div>'
+                '<div class="desk-info-row">'
+                f'<span class="desk-info-icon">{time_icon}</span>'
+                f'<span class="desk-info-text">{time_text}</span>'
+                '</div>'
                 '</div>'
                 '</div>'
             )
