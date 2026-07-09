@@ -1245,29 +1245,6 @@ def fetch_activity_detail_counts(activity, detail):
     return total_count, activity_count, detail_count
 
 
-def fetch_recent_detail_entry_counts(activity, detail):
-    current = datetime.now(JST)
-    cutoffs = {
-        "24h": (current - timedelta(hours=24)).isoformat(timespec="seconds"),
-        "7d": (current - timedelta(days=7)).isoformat(timespec="seconds"),
-    }
-    with get_conn() as conn:
-        return {
-            key: conn.execute(
-                """
-                SELECT COUNT(*)
-                FROM presence_events
-                WHERE event_type = '入室'
-                  AND activity = ?
-                  AND detail = ?
-                  AND created_at >= ?
-                """,
-                (activity, detail, cutoff),
-            ).fetchone()[0]
-            for key, cutoff in cutoffs.items()
-        }
-
-
 def fetch_recent_activity_entry_counts(activity):
     current = datetime.now(JST)
     cutoffs = {
@@ -1373,7 +1350,7 @@ def render_quick_checkin_panel(request):
     activity = request["activity"]
     detail = request["detail"]
     total_count, activity_count, detail_count = fetch_activity_detail_counts(activity, detail)
-    recent_counts = fetch_recent_detail_entry_counts(activity, detail)
+    recent_counts = fetch_recent_activity_entry_counts(activity)
     main_page_url = build_main_page_url(request["course_code"], detail, st.session_state.session_id)
     st.markdown(
         f"""
@@ -1394,7 +1371,7 @@ def render_quick_checkin_panel(request):
               <div class="quick-stat-value">{detail_count}人</div>
             </div>
           </div>
-          <div class="quick-recent-title">この授業回の最近の入室</div>
+          <div class="quick-recent-title">この科目の最近の入室</div>
           <div class="quick-recent-stats">
             <div class="quick-stat">
               <div class="quick-stat-label">24時間以内</div>
