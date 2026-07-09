@@ -231,7 +231,7 @@ CUSTOM_CSS = """
     padding: 10px 10px 13px 10px;
     margin-bottom: 0;
     background:
-        linear-gradient(180deg, #d99a57 0 18px, #c5813f 18px 23px, #fffaf2 23px),
+        linear-gradient(180deg, #d99a57 0 78px, #bd7433 78px 84px, #fffaf2 84px),
         #fffaf2;
     min-height: 118px;
     box-shadow:
@@ -258,7 +258,7 @@ CUSTOM_CSS = """
     border-style: dashed;
     border-color: rgba(62,111,179,.58);
     background:
-        linear-gradient(180deg, #9ec5ef 0 18px, #77a9d9 18px 23px, #f3f8ff 23px),
+        linear-gradient(180deg, #9ec5ef 0 78px, #6fa2d0 78px 84px, #f3f8ff 84px),
         #f3f8ff;
     box-shadow:
         5px 7px 0 rgba(62,111,179,.16),
@@ -290,15 +290,15 @@ CUSTOM_CSS = """
     min-width: 0;
     font-size: .68rem;
     line-height: 1.3;
-    color: #344054;
-    opacity: .74;
+    color: #2f241b;
+    opacity: .86;
     overflow-wrap: anywhere;
 }
 .participant-name {
     margin-top: 8px;
     font-size: .9rem;
     line-height: 1.25;
-    color: #1f2937;
+    color: #241a12;
 }
 .entry-badge {
     display: inline-block;
@@ -320,10 +320,7 @@ CUSTOM_CSS = """
     overflow-wrap: anywhere;
 }
 .desk-line {
-    height: 6px;
-    border-radius: 999px;
-    background: rgba(128,128,128,.14);
-    margin: 8px 0 6px 0;
+    display: none;
 }
 .small-muted {color: #475467; opacity:.78; font-size:.78rem; line-height:1.25;}
 .card-meta-row {
@@ -439,6 +436,31 @@ CUSTOM_CSS = """
     padding: 12px 14px;
     margin-top: 16px;
     background: rgba(128,128,128,.035);
+}
+[data-testid="stMain"] [data-testid="stExpander"] details {
+    border: 1px solid rgba(115,88,55,.28);
+    border-radius: 14px;
+    overflow: hidden;
+    background:
+        linear-gradient(180deg, rgba(238,225,202,.72), rgba(221,203,173,.82)),
+        repeating-linear-gradient(90deg, rgba(255,255,255,.22) 0 1px, transparent 1px 42px);
+    box-shadow: 0 8px 18px rgba(82,61,38,.10);
+}
+[data-testid="stMain"] [data-testid="stExpander"] summary {
+    min-height: 46px;
+    border-left: 12px solid #8c6036;
+    background:
+        radial-gradient(circle at calc(100% - 34px) 50%, #f7d37b 0 4px, transparent 5px),
+        linear-gradient(90deg, #b98248 0 16px, #e7c793 16px 18px, #f3dfbd 18px),
+        #f3dfbd;
+    color: #3b2a1b;
+    font-weight: 700;
+}
+[data-testid="stMain"] [data-testid="stExpander"] summary:hover {
+    background:
+        radial-gradient(circle at calc(100% - 34px) 50%, #f7d37b 0 4px, transparent 5px),
+        linear-gradient(90deg, #a8733d 0 16px, #e7c793 16px 18px, #f7e7ca 18px),
+        #f7e7ca;
 }
 .room-desk-area {
     border: 0;
