@@ -224,6 +224,14 @@ CUSTOM_CSS = """
         inset 0 -3px 0 rgba(128,128,128,.14);
     color: #24303f;
 }
+.room-card.quick-checkin-card {
+    border-style: dashed;
+    border-color: rgba(47,113,244,.45);
+    box-shadow:
+        4px 5px 12px rgba(0,0,0,.10),
+        inset -2px 0 0 rgba(47,113,244,.16),
+        inset 0 -3px 0 rgba(47,113,244,.14);
+}
 .avatar {
     font-size: 1.5rem;
     width: 38px;
@@ -1946,10 +1954,12 @@ def live_area():
                 difficulty_label = safe_text(difficulty_meta["label"])
                 difficulty_html = f'<span class="card-difficulty {difficulty_class}">{difficulty_label}</span>'
             entry_badge_html = ""
+            card_class = "room-card"
             if (p["participation_type"] or "regular") == "quick":
                 entry_badge_html = '<div><span class="entry-badge">授業ページからチェックイン</span></div>'
+                card_class = "room-card quick-checkin-card"
             member_cards.append(
-                '<div class="room-card">'
+                f'<div class="{card_class}">'
                 '<div class="card-top">'
                 f'<div class="avatar">{avatar_text}</div>'
                 f'<div class="profile-comment">{comment_text}</div>'
