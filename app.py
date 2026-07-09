@@ -263,12 +263,12 @@ CUSTOM_CSS = """
         inset 0 -4px 0 rgba(47,113,244,.14);
 }
 .desk-surface {
-    border-radius: 9px 9px 0 0;
-    padding: 10px 10px 8px 10px;
+    border-radius: 0 0 8px 8px;
+    padding: 10px 10px 11px 10px;
     background:
         linear-gradient(180deg, rgba(255,255,255,.10), rgba(0,0,0,.06)),
         #cf8847;
-    border-bottom: 6px solid #bd7433;
+    border-top: 6px solid #bd7433;
 }
 .quick-checkin-card .desk-surface {
     background:
@@ -306,14 +306,14 @@ CUSTOM_CSS = """
 }
 .participant-name {
     margin: 0;
-    padding: 8px 10px 10px 10px;
+    padding: 9px 10px 8px 10px;
     font-size: .9rem;
     line-height: 1.25;
     color: #241a12;
     background: #fffaf2;
-    border-radius: 0 0 8px 8px;
+    border-radius: 8px 8px 0 0;
     text-align: center;
-    border-top: 1px solid rgba(135,92,52,.16);
+    border-bottom: 1px solid rgba(135,92,52,.16);
 }
 .quick-checkin-card .participant-name {
     background: #f3f8ff;
@@ -2239,6 +2239,9 @@ def live_area():
                 card_class = "room-card quick-checkin-card"
             member_cards.append(
                 f'<div class="{card_class}">'
+                '<div class="participant-name">'
+                f'<strong>{label}</strong>'
+                '</div>'
                 '<div class="desk-surface">'
                 '<div class="card-top">'
                 f'<div class="avatar">{avatar_text}</div>'
@@ -2251,9 +2254,6 @@ def live_area():
                 '</div>'
                 f'<div class="small-muted">💬 {mood_text}</div>'
                 f'<div class="small-muted">{time_icon} {time_text}</div>'
-                '</div>'
-                '<div class="participant-name">'
-                f'<strong>{label}</strong>'
                 '</div>'
                 '</div>'
             )
