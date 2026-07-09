@@ -226,30 +226,45 @@ CUSTOM_CSS = """
 }
 .room-card {
     position: relative;
-    border: 1px solid rgba(128,128,128,.26);
-    border-radius: 8px;
-    padding: 10px;
+    border: 1px solid rgba(135,92,52,.45);
+    border-radius: 10px 10px 8px 8px;
+    padding: 10px 10px 13px 10px;
     margin-bottom: 0;
     background:
-        linear-gradient(180deg, #f8faf9 0 52px, #ffffff 52px),
-        #ffffff;
-    min-height: 112px;
+        linear-gradient(180deg, #d99a57 0 18px, #c5813f 18px 23px, #fffaf2 23px),
+        #fffaf2;
+    min-height: 118px;
     box-shadow:
-        4px 5px 12px rgba(0,0,0,.12),
-        inset -2px 0 0 rgba(128,128,128,.14),
-        inset 0 -3px 0 rgba(128,128,128,.14);
+        5px 7px 0 rgba(120,76,38,.18),
+        0 12px 18px rgba(75,48,24,.16),
+        inset -2px 0 0 rgba(120,76,38,.16),
+        inset 0 -4px 0 rgba(120,76,38,.18);
     color: #24303f;
+}
+.room-card::after {
+    content: "";
+    position: absolute;
+    left: 18px;
+    right: 18px;
+    bottom: -7px;
+    height: 8px;
+    border-radius: 0 0 8px 8px;
+    background:
+        linear-gradient(90deg, #8b5a2b 0 9px, transparent 9px calc(100% - 9px), #8b5a2b calc(100% - 9px)),
+        linear-gradient(180deg, rgba(0,0,0,.08), rgba(0,0,0,0));
+    opacity: .75;
 }
 .room-card.quick-checkin-card {
     border-style: dashed;
-    border-color: rgba(47,113,244,.45);
+    border-color: rgba(62,111,179,.58);
     background:
-        linear-gradient(180deg, #eef5ff 0 52px, #f8fbff 52px),
-        #f8fbff;
+        linear-gradient(180deg, #9ec5ef 0 18px, #77a9d9 18px 23px, #f3f8ff 23px),
+        #f3f8ff;
     box-shadow:
-        4px 5px 12px rgba(0,0,0,.10),
+        5px 7px 0 rgba(62,111,179,.16),
+        0 12px 18px rgba(35,78,130,.14),
         inset -2px 0 0 rgba(47,113,244,.16),
-        inset 0 -3px 0 rgba(47,113,244,.14);
+        inset 0 -4px 0 rgba(47,113,244,.14);
 }
 .avatar {
     font-size: 1.5rem;
@@ -260,9 +275,10 @@ CUSTOM_CSS = """
     display:flex;
     align-items:center;
     justify-content:center;
-    border-radius: 12px;
-    background: rgba(100,120,255,.13);
-    border: 1px solid rgba(128,128,128,.18);
+    border-radius: 50%;
+    background: #fff7df;
+    border: 2px solid rgba(143,96,45,.30);
+    box-shadow: 0 2px 0 rgba(143,96,45,.18);
     color: #24303f;
 }
 .card-top {
@@ -344,23 +360,57 @@ CUSTOM_CSS = """
     border-color: rgba(240,68,56,.28);
 }
 .activity-room {
-    border: 1px solid rgba(128,128,128,.22);
-    border-radius: 12px;
-    padding: 14px 14px 4px 14px;
-    margin: 16px 0 14px 0;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(104,82,58,.24);
+    border-radius: 16px;
+    padding: 14px 16px 10px 16px;
+    margin: 18px 0 18px 0;
     background:
-        linear-gradient(rgba(128,128,128,.035) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(128,128,128,.028) 1px, transparent 1px),
-        rgba(128,128,128,.03);
-    background-size: 28px 28px;
+        linear-gradient(180deg, rgba(247,241,225,.96) 0 120px, rgba(226,199,160,.95) 120px),
+        linear-gradient(90deg, rgba(255,255,255,.45) 0 1px, transparent 1px),
+        #f6efdd;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.70), 0 12px 28px rgba(65,50,34,.12);
+}
+.activity-room::before {
+    content: "";
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    width: min(28%, 190px);
+    height: 56px;
+    border: 5px solid rgba(255,255,255,.88);
+    border-radius: 8px;
+    background:
+        linear-gradient(90deg, transparent calc(50% - 2px), rgba(255,255,255,.90) calc(50% - 2px) calc(50% + 2px), transparent calc(50% + 2px)),
+        linear-gradient(180deg, #c7e8ff 0 48%, #8dc7ef 48% 52%, #d8f0ff 52%);
+    box-shadow: 0 4px 10px rgba(91,116,137,.18);
+    opacity: .8;
+}
+.activity-room::after {
+    content: "";
+    position: absolute;
+    left: -8%;
+    right: -8%;
+    bottom: -18px;
+    height: 52%;
+    background:
+        repeating-linear-gradient(90deg, rgba(128,88,45,.12) 0 2px, transparent 2px 72px),
+        linear-gradient(180deg, rgba(205,157,96,.16), rgba(151,93,43,.22));
+    transform: perspective(620px) rotateX(58deg);
+    transform-origin: bottom;
+    pointer-events: none;
+}
+.activity-room > * {
+    position: relative;
+    z-index: 1;
 }
 .activity-room.mine {
-    border-color: rgba(46,204,113,.55);
+    border-color: rgba(35,142,92,.42);
     background:
-        linear-gradient(rgba(46,204,113,.07) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(46,204,113,.05) 1px, transparent 1px),
-        rgba(46,204,113,.08);
-    background-size: 28px 28px;
+        linear-gradient(180deg, rgba(241,248,229,.98) 0 120px, rgba(219,202,153,.94) 120px),
+        #f4f3dc;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.74), 0 14px 30px rgba(33,111,72,.13);
 }
 .activity-room.empty {
     opacity: .7;
@@ -393,7 +443,7 @@ CUSTOM_CSS = """
 .room-desk-area {
     border: 0;
     border-radius: 0;
-    padding: 8px 0 0 0;
+    padding: 12px 0 0 0;
     margin-bottom: 14px;
     background: transparent;
 }
@@ -402,18 +452,30 @@ CUSTOM_CSS = """
     align-items:center;
     justify-content:space-between;
     gap:12px;
-    margin-bottom: 10px;
+    margin-bottom: 14px;
+    min-height: 58px;
+    padding: 10px 12px;
+    border: 6px solid #a67c52;
+    border-radius: 12px;
+    background:
+        linear-gradient(180deg, rgba(255,255,255,.08), rgba(0,0,0,.06)),
+        #295f4e;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.18), 0 5px 0 rgba(96,64,35,.22);
+    color: #fff8dc;
 }
 .room-heading h3 {
     margin:0;
-    font-size:1.1rem;
+    font-size:1.08rem;
+    color: #fff8dc;
+    text-shadow: 0 1px 0 rgba(0,0,0,.18);
 }
 .room-count {
-    border: 1px solid rgba(128,128,128,.26);
+    border: 1px solid rgba(255,255,255,.28);
     border-radius: 999px;
     padding: 2px 10px;
     font-size: .82rem;
-    opacity: .78;
+    background: rgba(255,255,255,.14);
+    color: #fff8dc;
     white-space: nowrap;
 }
 .room-tags {
@@ -427,21 +489,22 @@ CUSTOM_CSS = """
     border-radius: 999px;
     padding: 2px 9px;
     font-size: .78rem;
-    background: rgba(99,102,241,.12);
+    background: rgba(255,255,255,.13);
+    color: #fff8dc;
     white-space: nowrap;
 }
 .room-tag.mine {
-    background: rgba(46,204,113,.18);
+    background: rgba(255,236,153,.24);
 }
 .room-tag.recent {
-    background: rgba(128,128,128,.10);
-    color: #475467;
+    background: rgba(255,255,255,.10);
+    color: #e6f5ee;
 }
 .room-members {
     display:grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 8px;
-    margin-bottom: 14px;
+    gap: 18px 12px;
+    margin: 18px 0 16px 0;
 }
 @media (max-width: 1280px) {
     .room-members {grid-template-columns: repeat(4, minmax(0, 1fr));}
