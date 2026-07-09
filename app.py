@@ -306,20 +306,40 @@ CUSTOM_CSS = """
     gap: 8px;
 }
 .profile-comment {
+    position: relative;
     min-width: 0;
     font-size: .68rem;
     line-height: 1.3;
     color: #2f241b;
-    opacity: .86;
+    background: rgba(255,250,242,.88);
+    border: 1px solid rgba(101,63,29,.22);
+    border-radius: 11px;
+    padding: 6px 8px;
+    margin-bottom: 7px;
+    box-shadow: 0 2px 0 rgba(101,63,29,.10);
     overflow-wrap: anywhere;
 }
+.profile-comment::before {
+    content: "";
+    position: absolute;
+    left: 14px;
+    top: -6px;
+    width: 10px;
+    height: 10px;
+    background: rgba(255,250,242,.88);
+    border-left: 1px solid rgba(101,63,29,.22);
+    border-top: 1px solid rgba(101,63,29,.22);
+    transform: rotate(45deg);
+}
 .participant-name {
-    margin: 0 0 5px 0;
+    margin: 0;
     padding: 0;
     font-size: .9rem;
     line-height: 1.25;
     color: #241a12;
     text-align: left;
+    min-width: 0;
+    overflow-wrap: anywhere;
 }
 .entry-badge {
     display: inline-block;
@@ -2245,13 +2265,13 @@ def live_area():
                 '<div class="seat-note">'
                 '<div class="card-top">'
                 f'<div class="avatar">{avatar_text}</div>'
-                f'<div class="profile-comment">{comment_text}</div>'
-                '</div>'
-                '</div>'
-                '<div class="desk-surface">'
                 '<div class="participant-name">'
                 f'<strong>{label}</strong>'
                 '</div>'
+                '</div>'
+                '</div>'
+                '<div class="desk-surface">'
+                f'<div class="profile-comment">{comment_text}</div>'
                 f'{entry_badge_html}'
                 '<div class="card-meta-row">'
                 f'<div class="participant-detail">🗂️ {detail_text}</div>'
