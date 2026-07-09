@@ -227,6 +227,9 @@ CUSTOM_CSS = """
 .room-card.quick-checkin-card {
     border-style: dashed;
     border-color: rgba(47,113,244,.45);
+    background:
+        linear-gradient(180deg, #eef5ff 0 52px, #f8fbff 52px),
+        #f8fbff;
     box-shadow:
         4px 5px 12px rgba(0,0,0,.10),
         inset -2px 0 0 rgba(47,113,244,.16),
