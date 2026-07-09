@@ -430,6 +430,10 @@ CUSTOM_CSS = """
 .room-tag.mine {
     background: rgba(46,204,113,.18);
 }
+.room-tag.recent {
+    background: rgba(128,128,128,.10);
+    color: #475467;
+}
 .room-members {
     display:grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -1264,6 +1268,28 @@ def fetch_recent_detail_entry_counts(activity, detail):
         }
 
 
+def fetch_recent_activity_entry_counts(activity):
+    current = datetime.now(JST)
+    cutoffs = {
+        "24h": (current - timedelta(hours=24)).isoformat(timespec="seconds"),
+        "7d": (current - timedelta(days=7)).isoformat(timespec="seconds"),
+    }
+    with get_conn() as conn:
+        return {
+            key: conn.execute(
+                """
+                SELECT COUNT(*)
+                FROM presence_events
+                WHERE event_type = '入室'
+                  AND activity = ?
+                  AND created_at >= ?
+                """,
+                (activity, cutoff),
+            ).fetchone()[0]
+            for key, cutoff in cutoffs.items()
+        }
+
+
 def fetch_participant(session_id):
     if not session_id:
         return None
@@ -2086,7 +2112,12 @@ def live_area():
         is_my_room = st.session_state.joined and activity == st.session_state.activity
         room_classes = "activity-room mine" if is_my_room else "activity-room"
         room_count_text = f"{len(room_members)}人が学習中"
+        recent_counts = fetch_recent_activity_entry_counts(activity)
+        recent_24h_text = f"最近24h {recent_counts['24h']}人"
+        recent_7d_text = f"最近7日 {recent_counts['7d']}人"
         tags = [f'<span class="room-count">{room_count_text}</span>']
+        tags.append(f'<span class="room-tag recent">{safe_text(recent_24h_text)}</span>')
+        tags.append(f'<span class="room-tag recent">{safe_text(recent_7d_text)}</span>')
         if is_my_room:
             tags.append('<span class="room-tag mine">あなたの部屋</span>')
         tags_html = "".join(tags)
@@ -2151,7 +2182,7 @@ def live_area():
         if is_my_room:
             st.markdown(room_html, unsafe_allow_html=True)
         else:
-            expander_label = f"📘 {activity}　{room_count_text}"
+            expander_label = f"📘 {activity}　{room_count_text}　{recent_24h_text} / {recent_7d_text}"
             with st.expander(expander_label, expanded=False):
                 st.markdown(
                     f'<div class="room-desk-area"><div class="room-members">{members_html}</div></div>',
