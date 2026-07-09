@@ -228,11 +228,9 @@ CUSTOM_CSS = """
     position: relative;
     border: 1px solid rgba(135,92,52,.45);
     border-radius: 10px 10px 8px 8px;
-    padding: 10px 10px 13px 10px;
+    padding: 0;
     margin-bottom: 0;
-    background:
-        linear-gradient(180deg, #d99a57 0 78px, #bd7433 78px 84px, #fffaf2 84px),
-        #fffaf2;
+    background: #fffaf2;
     min-height: 118px;
     box-shadow:
         5px 7px 0 rgba(120,76,38,.18),
@@ -257,14 +255,26 @@ CUSTOM_CSS = """
 .room-card.quick-checkin-card {
     border-style: dashed;
     border-color: rgba(62,111,179,.58);
-    background:
-        linear-gradient(180deg, #9ec5ef 0 78px, #6fa2d0 78px 84px, #f3f8ff 84px),
-        #f3f8ff;
+    background: #f3f8ff;
     box-shadow:
         5px 7px 0 rgba(62,111,179,.16),
         0 12px 18px rgba(35,78,130,.14),
         inset -2px 0 0 rgba(47,113,244,.16),
         inset 0 -4px 0 rgba(47,113,244,.14);
+}
+.desk-surface {
+    border-radius: 9px 9px 0 0;
+    padding: 10px 10px 8px 10px;
+    background:
+        linear-gradient(180deg, rgba(255,255,255,.10), rgba(0,0,0,.06)),
+        #cf8847;
+    border-bottom: 6px solid #bd7433;
+}
+.quick-checkin-card .desk-surface {
+    background:
+        linear-gradient(180deg, rgba(255,255,255,.12), rgba(0,0,0,.05)),
+        #9ec5ef;
+    border-bottom-color: #6fa2d0;
 }
 .avatar {
     font-size: 1.5rem;
@@ -295,10 +305,18 @@ CUSTOM_CSS = """
     overflow-wrap: anywhere;
 }
 .participant-name {
-    margin-top: 8px;
+    margin: 0;
+    padding: 8px 10px 10px 10px;
     font-size: .9rem;
     line-height: 1.25;
     color: #241a12;
+    background: #fffaf2;
+    border-radius: 0 0 8px 8px;
+    text-align: center;
+    border-top: 1px solid rgba(135,92,52,.16);
+}
+.quick-checkin-card .participant-name {
+    background: #f3f8ff;
 }
 .entry-badge {
     display: inline-block;
@@ -323,6 +341,11 @@ CUSTOM_CSS = """
     display: none;
 }
 .small-muted {color: #475467; opacity:.78; font-size:.78rem; line-height:1.25;}
+.desk-surface .small-muted,
+.desk-surface .participant-detail {
+    color: #2f241b;
+    opacity: .86;
+}
 .card-meta-row {
     display:flex;
     align-items:center;
@@ -2216,21 +2239,22 @@ def live_area():
                 card_class = "room-card quick-checkin-card"
             member_cards.append(
                 f'<div class="{card_class}">'
+                '<div class="desk-surface">'
                 '<div class="card-top">'
                 f'<div class="avatar">{avatar_text}</div>'
                 f'<div class="profile-comment">{comment_text}</div>'
                 '</div>'
-                '<div class="participant-name">'
-                f'<strong>{label}</strong>'
-                '</div>'
                 f'{entry_badge_html}'
-                '<div class="desk-line"></div>'
                 '<div class="card-meta-row">'
                 f'<div class="participant-detail">🗂️ {detail_text}</div>'
                 f'{difficulty_html}'
                 '</div>'
                 f'<div class="small-muted">💬 {mood_text}</div>'
                 f'<div class="small-muted">{time_icon} {time_text}</div>'
+                '</div>'
+                '<div class="participant-name">'
+                f'<strong>{label}</strong>'
+                '</div>'
                 '</div>'
             )
 
