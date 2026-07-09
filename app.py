@@ -154,6 +154,18 @@ CUSTOM_CSS = """
     gap: 8px;
     margin: 12px 0;
 }
+.quick-recent-title {
+    margin: 14px 0 6px 0;
+    font-size: .9rem;
+    font-weight: 700;
+    color: #1f2937;
+}
+.quick-recent-stats {
+    display:grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin: 6px 0 12px 0;
+}
 .quick-stat {
     border: 1px solid rgba(128,128,128,.22);
     border-radius: 8px;
@@ -178,6 +190,7 @@ CUSTOM_CSS = """
 }
 @media (max-width: 640px) {
     .quick-stats {grid-template-columns: 1fr;}
+    .quick-recent-stats {grid-template-columns: 1fr;}
 }
 .sidebar-stats {
     display:grid;
@@ -1228,6 +1241,29 @@ def fetch_activity_detail_counts(activity, detail):
     return total_count, activity_count, detail_count
 
 
+def fetch_recent_detail_entry_counts(activity, detail):
+    current = datetime.now(JST)
+    cutoffs = {
+        "24h": (current - timedelta(hours=24)).isoformat(timespec="seconds"),
+        "7d": (current - timedelta(days=7)).isoformat(timespec="seconds"),
+    }
+    with get_conn() as conn:
+        return {
+            key: conn.execute(
+                """
+                SELECT COUNT(*)
+                FROM presence_events
+                WHERE event_type = '入室'
+                  AND activity = ?
+                  AND detail = ?
+                  AND created_at >= ?
+                """,
+                (activity, detail, cutoff),
+            ).fetchone()[0]
+            for key, cutoff in cutoffs.items()
+        }
+
+
 def fetch_participant(session_id):
     if not session_id:
         return None
@@ -1311,6 +1347,7 @@ def render_quick_checkin_panel(request):
     activity = request["activity"]
     detail = request["detail"]
     total_count, activity_count, detail_count = fetch_activity_detail_counts(activity, detail)
+    recent_counts = fetch_recent_detail_entry_counts(activity, detail)
     main_page_url = build_main_page_url(request["course_code"], detail, st.session_state.session_id)
     st.markdown(
         f"""
@@ -1329,6 +1366,17 @@ def render_quick_checkin_panel(request):
             <div class="quick-stat">
               <div class="quick-stat-label">この授業回を学習中</div>
               <div class="quick-stat-value">{detail_count}人</div>
+            </div>
+          </div>
+          <div class="quick-recent-title">この授業回の最近の入室</div>
+          <div class="quick-recent-stats">
+            <div class="quick-stat">
+              <div class="quick-stat-label">24時間以内</div>
+              <div class="quick-stat-value">{recent_counts["24h"]}人</div>
+            </div>
+            <div class="quick-stat">
+              <div class="quick-stat-label">7日以内</div>
+              <div class="quick-stat-value">{recent_counts["7d"]}人</div>
             </div>
           </div>
           <p>{QUICK_JOIN_TIMEOUT_MINUTES}分間、この授業回を学習中の匿名の学生として表示されます。</p>
