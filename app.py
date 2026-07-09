@@ -1049,6 +1049,20 @@ def query_value(name) -> str:
     return str(value or "")
 
 
+def valid_session_id(value) -> str | None:
+    try:
+        return str(uuid.UUID(str(value or "")))
+    except ValueError:
+        return None
+
+
+def sync_session_id_to_url():
+    if query_value("quick").lower() in {"1", "true", "yes"}:
+        return
+    if query_value("sid") != st.session_state.session_id:
+        st.query_params["sid"] = st.session_state.session_id
+
+
 def lesson_to_detail(value) -> str | None:
     cleaned = value.strip()
     if cleaned.isdigit():
@@ -1417,11 +1431,9 @@ saved_preferences = load_saved_preferences()
 course_lesson_request = get_course_lesson_request()
 
 if "session_id" not in st.session_state:
-    saved_session_id = saved_value(saved_preferences, "session_id", "")
-    try:
-        st.session_state.session_id = str(uuid.UUID(saved_session_id))
-    except ValueError:
-        st.session_state.session_id = str(uuid.uuid4())
+    query_session_id = valid_session_id(query_value("sid"))
+    saved_session_id = valid_session_id(saved_value(saved_preferences, "session_id", ""))
+    st.session_state.session_id = query_session_id or saved_session_id or str(uuid.uuid4())
 if "joined" not in st.session_state:
     st.session_state.joined = False
 if "nickname" not in st.session_state:
@@ -1552,6 +1564,8 @@ if st.session_state.participation_type != "quick" and st.session_state.nickname 
 if quick_join_request:
     render_quick_checkin_page(quick_join_request, quick_join_error)
     st.stop()
+
+sync_session_id_to_url()
 
 with st.sidebar:
     st.markdown(
