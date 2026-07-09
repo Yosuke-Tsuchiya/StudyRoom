@@ -143,9 +143,10 @@ CUSTOM_CSS = """
     line-height: 1.5;
 }
 .quick-checkin-subject {
-    font-size: 1.3rem;
-    font-weight: 700;
-    line-height: 1.3;
+    font-size: 1.65rem;
+    font-weight: 800;
+    line-height: 1.25;
+    margin: 10px 0 8px 0;
 }
 .quick-stats {
     display:grid;
