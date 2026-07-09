@@ -1031,6 +1031,7 @@ def persist_preferences_to_browser(preferences):
 
 def current_preferences() -> dict:
     return {
+        "session_id": st.session_state.session_id,
         "nickname": st.session_state.nickname,
         "avatar": st.session_state.avatar,
         "comment": st.session_state.comment,
@@ -1416,7 +1417,11 @@ saved_preferences = load_saved_preferences()
 course_lesson_request = get_course_lesson_request()
 
 if "session_id" not in st.session_state:
-    st.session_state.session_id = str(uuid.uuid4())
+    saved_session_id = saved_value(saved_preferences, "session_id", "")
+    try:
+        st.session_state.session_id = str(uuid.UUID(saved_session_id))
+    except ValueError:
+        st.session_state.session_id = str(uuid.uuid4())
 if "joined" not in st.session_state:
     st.session_state.joined = False
 if "nickname" not in st.session_state:
@@ -1445,6 +1450,19 @@ if "last_study_summary" not in st.session_state:
     st.session_state.last_study_summary = None
 if "last_feedback_at" not in st.session_state:
     st.session_state.last_feedback_at = None
+
+existing_participant = fetch_participant(st.session_state.session_id)
+if existing_participant and not st.session_state.joined:
+    st.session_state.nickname = existing_participant["nickname"] or st.session_state.nickname
+    st.session_state.avatar = existing_participant["avatar"] or st.session_state.avatar
+    st.session_state.comment = existing_participant["comment"] or st.session_state.comment
+    st.session_state.activity = existing_participant["activity"] or st.session_state.activity
+    st.session_state.detail = existing_participant["detail"] or st.session_state.detail
+    st.session_state.mood = existing_participant["mood"] or st.session_state.mood
+    st.session_state.difficulty = normalize_difficulty(existing_participant["difficulty"])
+    st.session_state.participation_type = existing_participant["participation_type"] or "regular"
+    st.session_state.expires_at = existing_participant["expires_at"]
+    st.session_state.joined = True
 
 takeover_id = query_value("takeover").strip()
 if (
