@@ -231,7 +231,7 @@ CUSTOM_CSS = """
     padding: 0;
     margin-bottom: 0;
     background: #fffaf2;
-    min-height: 118px;
+    min-height: 108px;
     box-shadow:
         5px 7px 0 rgba(120,76,38,.18),
         0 12px 18px rgba(75,48,24,.16),
@@ -264,7 +264,7 @@ CUSTOM_CSS = """
 }
 .desk-surface {
     border-radius: 0 0 8px 8px;
-    padding: 10px 10px 11px 10px;
+    padding: 8px 9px 10px 9px;
     background:
         linear-gradient(180deg, rgba(255,255,255,.10), rgba(0,0,0,.06)),
         #cf8847;
@@ -277,7 +277,7 @@ CUSTOM_CSS = """
     border-bottom-color: #6fa2d0;
 }
 .seat-note {
-    padding: 9px 10px 8px 10px;
+    padding: 7px 9px 6px 9px;
     background: #fffaf2;
     border-radius: 8px 8px 0 0;
     border-bottom: 1px solid rgba(135,92,52,.16);
@@ -286,11 +286,11 @@ CUSTOM_CSS = """
     background: #f3f8ff;
 }
 .avatar {
-    font-size: 1.5rem;
-    width: 38px;
-    height: 38px;
-    min-width: 38px;
-    flex: 0 0 38px;
+    font-size: 1.32rem;
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    flex: 0 0 34px;
     display:flex;
     align-items:center;
     justify-content:center;
@@ -308,14 +308,14 @@ CUSTOM_CSS = """
 .profile-comment {
     position: relative;
     min-width: 0;
-    font-size: .68rem;
+    font-size: .64rem;
     line-height: 1.3;
     color: #2f241b;
-    background: rgba(255,250,242,.88);
+    background: #fffaf2;
     border: 1px solid rgba(101,63,29,.22);
     border-radius: 11px;
-    padding: 6px 8px;
-    margin-bottom: 7px;
+    padding: 5px 7px;
+    margin-bottom: 6px;
     box-shadow: 0 2px 0 rgba(101,63,29,.10);
     overflow-wrap: anywhere;
 }
@@ -323,18 +323,23 @@ CUSTOM_CSS = """
     content: "";
     position: absolute;
     left: 14px;
-    top: -6px;
-    width: 10px;
-    height: 10px;
-    background: rgba(255,250,242,.88);
+    top: -7px;
+    width: 13px;
+    height: 8px;
+    background: #fffaf2;
     border-left: 1px solid rgba(101,63,29,.22);
     border-top: 1px solid rgba(101,63,29,.22);
-    transform: rotate(45deg);
+    border-radius: 12px 0 0 0;
+    transform: skewX(-28deg);
+}
+.quick-checkin-card .profile-comment,
+.quick-checkin-card .profile-comment::before {
+    background: #f3f8ff;
 }
 .participant-name {
     margin: 0;
     padding: 0;
-    font-size: .9rem;
+    font-size: .82rem;
     line-height: 1.25;
     color: #241a12;
     text-align: left;
@@ -354,7 +359,7 @@ CUSTOM_CSS = """
     background: rgba(47,113,244,.10);
 }
 .participant-detail {
-    font-size: .82rem;
+    font-size: .76rem;
     line-height: 1.25;
     color: #344054;
     min-width: 0;
@@ -363,7 +368,7 @@ CUSTOM_CSS = """
 .desk-line {
     display: none;
 }
-.small-muted {color: #475467; opacity:.78; font-size:.78rem; line-height:1.25;}
+.small-muted {color: #475467; opacity:.78; font-size:.72rem; line-height:1.25;}
 .desk-surface .small-muted,
 .desk-surface .participant-detail {
     color: #2f241b;
@@ -375,7 +380,7 @@ CUSTOM_CSS = """
     justify-content:flex-start;
     gap: 5px;
     flex-wrap: wrap;
-    margin-top: 5px;
+    margin-top: 4px;
 }
 .card-difficulty {
     display:inline-block;
@@ -389,17 +394,17 @@ CUSTOM_CSS = """
 }
 .card-difficulty.easy {
     color: #067647;
-    background: rgba(18,183,106,.13);
+    background: #d9f8e8;
     border-color: rgba(18,183,106,.30);
 }
 .card-difficulty.normal {
     color: #175cd3;
-    background: rgba(47,113,244,.12);
+    background: #dceaff;
     border-color: rgba(47,113,244,.26);
 }
 .card-difficulty.hard {
     color: #b42318;
-    background: rgba(240,68,56,.12);
+    background: #ffe1de;
     border-color: rgba(240,68,56,.28);
 }
 .activity-room {
@@ -571,7 +576,7 @@ CUSTOM_CSS = """
 .room-members {
     display:grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 18px 12px;
+    gap: 16px 10px;
     margin: 18px 0 16px 0;
 }
 @media (max-width: 1280px) {
