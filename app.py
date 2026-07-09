@@ -430,38 +430,6 @@ CUSTOM_CSS = """
 .room-tag.mine {
     background: rgba(46,204,113,.18);
 }
-.lesson-group {
-    border: 1px solid rgba(128,128,128,.20);
-    border-radius: 10px;
-    padding: 10px 10px 0 10px;
-    margin: 10px 0 12px 0;
-    background: rgba(255,255,255,.45);
-}
-.lesson-group.mine {
-    border-color: rgba(46,204,113,.42);
-    background: rgba(46,204,113,.07);
-}
-.lesson-heading {
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap: 8px;
-    margin-bottom: 8px;
-}
-.lesson-heading h4 {
-    margin: 0;
-    font-size: .92rem;
-    line-height: 1.25;
-}
-.lesson-count {
-    border: 1px solid rgba(128,128,128,.22);
-    border-radius: 999px;
-    padding: 1px 8px;
-    font-size: .72rem;
-    color: #475467;
-    background: rgba(255,255,255,.42);
-    white-space: nowrap;
-}
 .room-members {
     display:grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -2122,7 +2090,7 @@ def live_area():
         if is_my_room:
             tags.append('<span class="room-tag mine">あなたの部屋</span>')
         tags_html = "".join(tags)
-        cards_by_detail = {}
+        member_cards = []
         for p in room_members:
             mine = p["session_id"] == st.session_state.session_id
             label = f'{p["nickname"]}（あなた）' if mine else p["nickname"]
@@ -2150,8 +2118,7 @@ def live_area():
             if is_quick_checkin:
                 entry_badge_html = '<div><span class="entry-badge">授業ページからチェックイン</span></div>'
                 card_class = "room-card quick-checkin-card"
-            detail_key = p["detail"] if p["detail"] in DETAIL_OPTIONS else "その他"
-            cards_by_detail.setdefault(detail_key, []).append(
+            member_cards.append(
                 f'<div class="{card_class}">'
                 '<div class="card-top">'
                 f'<div class="avatar">{avatar_text}</div>'
@@ -2171,34 +2138,14 @@ def live_area():
                 '</div>'
             )
 
-        lesson_groups = []
-        sorted_details = sorted(
-            cards_by_detail.items(),
-            key=lambda item: DETAIL_OPTIONS.index(item[0]) if item[0] in DETAIL_OPTIONS else len(DETAIL_OPTIONS),
-        )
-        for detail, cards in sorted_details:
-            detail_text = safe_text(detail)
-            lesson_count_text = f"{len(cards)}人"
-            lesson_class = "lesson-group"
-            if is_my_room and detail == st.session_state.detail:
-                lesson_class = "lesson-group mine"
-            lesson_groups.append(
-                f'<section class="{lesson_class}">'
-                '<div class="lesson-heading">'
-                f'<h4>{detail_text}</h4>'
-                f'<span class="lesson-count">{lesson_count_text}</span>'
-                '</div>'
-                f'<div class="room-members">{"".join(cards)}</div>'
-                '</section>'
-            )
-        members_html = "".join(lesson_groups)
+        members_html = "".join(member_cards)
         room_html = (
             f'<section class="{room_classes}">'
             '<div class="room-heading">'
             f'<h3>📘 {activity_text}</h3>'
             f'<div class="room-tags">{tags_html}</div>'
             '</div>'
-            f'{members_html}'
+            f'<div class="room-members">{members_html}</div>'
             '</section>'
         )
         if is_my_room:
@@ -2207,7 +2154,7 @@ def live_area():
             expander_label = f"📘 {activity}　{room_count_text}"
             with st.expander(expander_label, expanded=False):
                 st.markdown(
-                    f'<div class="room-desk-area">{members_html}</div>',
+                    f'<div class="room-desk-area"><div class="room-members">{members_html}</div></div>',
                     unsafe_allow_html=True,
                 )
 
