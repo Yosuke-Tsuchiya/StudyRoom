@@ -829,6 +829,61 @@ def leave_room(session_id):
     return None
 
 
+def quick_cleanup_where(activity=None, detail=None):
+    clauses = ["COALESCE(participation_type, 'regular') = 'quick'"]
+    params = []
+    if activity:
+        clauses.append("activity = ?")
+        params.append(activity)
+    if detail:
+        clauses.append("detail = ?")
+        params.append(detail)
+    return " AND ".join(clauses), params
+
+
+def count_quick_participants(activity=None, detail=None):
+    where_sql, params = quick_cleanup_where(activity, detail)
+    with get_conn() as conn:
+        return conn.execute(
+            f"SELECT COUNT(*) FROM participants WHERE {where_sql}",
+            params,
+        ).fetchone()[0]
+
+
+def force_leave_quick_participants(activity=None, detail=None):
+    where_sql, params = quick_cleanup_where(activity, detail)
+    with get_conn() as conn:
+        rows = conn.execute(
+            f"SELECT * FROM participants WHERE {where_sql} ORDER BY activity, detail, joined_at",
+            params,
+        ).fetchall()
+        if not rows:
+            return 0
+
+        session_ids = [row["session_id"] for row in rows]
+        placeholders = ",".join("?" for _ in session_ids)
+        conn.execute(
+            f"DELETE FROM participants WHERE session_id IN ({placeholders})",
+            session_ids,
+        )
+        closed_at = now_iso()
+        for row in rows:
+            close_open_study_segment(conn, row["session_id"], closed_at)
+            log_presence_event(
+                conn,
+                "管理者退室",
+                row["session_id"],
+                row["nickname"],
+                row["activity"],
+                row["detail"],
+                row["comment"],
+                row["mood"],
+                row["difficulty"],
+                row["participation_type"] or "quick",
+            )
+        return len(rows)
+
+
 def fetch_participants():
     cleanup_stale()
     with get_conn() as conn:
@@ -1388,6 +1443,9 @@ def render_admin_dashboard():
     c1.metric("現在の入室者", f"{current_total}人", f"通常 {current_regular} / 簡易 {current_quick}")
     c2.metric("意見・要望", f"{feedback_total}件")
     c3.metric("入退室履歴", f"{event_total}件")
+    cleanup_message = st.session_state.pop("admin_cleanup_message", None)
+    if cleanup_message:
+        st.success(cleanup_message)
 
     overview_tab, events_tab, feedback_tab = st.tabs(["利用状況", "入退室履歴", "意見・要望"])
 
@@ -1421,6 +1479,36 @@ def render_admin_dashboard():
                 )
             else:
                 st.caption("入室履歴はまだありません。")
+
+        st.divider()
+        st.subheader("簡易参加の整理")
+        st.caption("授業ページからチェックインした匿名学生だけを対象に、強制的に退室扱いにします。通常入室の学生には影響しません。")
+        cleanup_scope = st.radio(
+            "対象範囲",
+            ["すべての簡易参加", "科目を指定", "科目と授業回を指定"],
+            horizontal=True,
+        )
+        cleanup_activity = None
+        cleanup_detail = None
+        if cleanup_scope in {"科目を指定", "科目と授業回を指定"}:
+            cleanup_activity = st.selectbox("科目", ACTIVITY_OPTIONS, key="admin_cleanup_activity")
+        if cleanup_scope == "科目と授業回を指定":
+            cleanup_detail = st.selectbox("授業回", DETAIL_OPTIONS, key="admin_cleanup_detail")
+
+        target_count = count_quick_participants(cleanup_activity, cleanup_detail)
+        st.info(f"対象の簡易参加: {target_count}人")
+        confirm_cleanup = st.checkbox(
+            "対象の簡易参加を退室させることを確認しました",
+            key="admin_cleanup_confirm",
+        )
+        if st.button(
+            "対象の簡易参加を退室させる",
+            disabled=(target_count == 0 or not confirm_cleanup),
+            use_container_width=True,
+        ):
+            removed_count = force_leave_quick_participants(cleanup_activity, cleanup_detail)
+            st.session_state.admin_cleanup_message = f"{removed_count}人の簡易参加を退室扱いにしました。"
+            st.rerun()
 
     with events_tab:
         event_rows = fetch_presence_events(limit=500)
