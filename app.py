@@ -52,7 +52,7 @@ QUICK_JOIN_NICKNAME = "匿名学生さん"
 QUICK_JOIN_AVATAR = "📖"
 QUICK_JOIN_COMMENT = DEFAULT_COMMENT
 QUICK_JOIN_MOOD = DEFAULT_MOOD
-QUICK_JOIN_DIFFICULTY = "ふつう"
+QUICK_JOIN_DIFFICULTY = "表示なし"
 QUICK_COURSE_CODES = {
     "info-basic": "情報基礎A・B",
     "internet-tech": "インターネット技術Ⅰ・Ⅱ",
