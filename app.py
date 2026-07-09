@@ -322,24 +322,24 @@ CUSTOM_CSS = """
 .profile-comment::before {
     content: "";
     position: absolute;
-    left: 14px;
-    top: -7px;
-    width: 13px;
-    height: 8px;
-    background: #fffaf2;
-    border-left: 1px solid rgba(101,63,29,.22);
-    border-top: 1px solid rgba(101,63,29,.22);
-    border-radius: 12px 0 0 0;
-    transform: skewX(-28deg);
+    left: 15px;
+    top: -8px;
+    width: 0;
+    height: 0;
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-bottom: 8px solid #fffaf2;
 }
-.quick-checkin-card .profile-comment,
-.quick-checkin-card .profile-comment::before {
+.quick-checkin-card .profile-comment {
     background: #f3f8ff;
+}
+.quick-checkin-card .profile-comment::before {
+    border-bottom-color: #f3f8ff;
 }
 .participant-name {
     margin: 0;
     padding: 0;
-    font-size: .82rem;
+    font-size: .76rem;
     line-height: 1.25;
     color: #241a12;
     text-align: left;
@@ -371,8 +371,9 @@ CUSTOM_CSS = """
 .small-muted {color: #475467; opacity:.78; font-size:.72rem; line-height:1.25;}
 .desk-surface .small-muted,
 .desk-surface .participant-detail {
-    color: #2f241b;
-    opacity: .86;
+    color: #fff8e8;
+    opacity: .96;
+    text-shadow: 0 1px 0 rgba(70,38,16,.28);
 }
 .card-meta-row {
     display:flex;
@@ -387,8 +388,8 @@ CUSTOM_CSS = """
     flex: 0 0 auto;
     border: 1px solid rgba(128,128,128,.22);
     border-radius: 999px;
-    padding: 1px 6px;
-    font-size: .64rem;
+    padding: 1px 5px;
+    font-size: .58rem;
     font-weight: 700;
     line-height: 1.25;
 }
