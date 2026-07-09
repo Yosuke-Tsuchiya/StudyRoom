@@ -276,6 +276,15 @@ CUSTOM_CSS = """
         #9ec5ef;
     border-bottom-color: #6fa2d0;
 }
+.seat-note {
+    padding: 9px 10px 8px 10px;
+    background: #fffaf2;
+    border-radius: 8px 8px 0 0;
+    border-bottom: 1px solid rgba(135,92,52,.16);
+}
+.quick-checkin-card .seat-note {
+    background: #f3f8ff;
+}
 .avatar {
     font-size: 1.5rem;
     width: 38px;
@@ -305,18 +314,12 @@ CUSTOM_CSS = """
     overflow-wrap: anywhere;
 }
 .participant-name {
-    margin: 0;
-    padding: 9px 10px 8px 10px;
+    margin: 0 0 5px 0;
+    padding: 0;
     font-size: .9rem;
     line-height: 1.25;
     color: #241a12;
-    background: #fffaf2;
-    border-radius: 8px 8px 0 0;
-    text-align: center;
-    border-bottom: 1px solid rgba(135,92,52,.16);
-}
-.quick-checkin-card .participant-name {
-    background: #f3f8ff;
+    text-align: left;
 }
 .entry-badge {
     display: inline-block;
@@ -2239,13 +2242,15 @@ def live_area():
                 card_class = "room-card quick-checkin-card"
             member_cards.append(
                 f'<div class="{card_class}">'
-                '<div class="participant-name">'
-                f'<strong>{label}</strong>'
-                '</div>'
-                '<div class="desk-surface">'
+                '<div class="seat-note">'
                 '<div class="card-top">'
                 f'<div class="avatar">{avatar_text}</div>'
                 f'<div class="profile-comment">{comment_text}</div>'
+                '</div>'
+                '</div>'
+                '<div class="desk-surface">'
+                '<div class="participant-name">'
+                f'<strong>{label}</strong>'
                 '</div>'
                 f'{entry_badge_html}'
                 '<div class="card-meta-row">'
