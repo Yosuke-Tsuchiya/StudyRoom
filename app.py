@@ -1210,6 +1210,26 @@ def elapsed_study_time(joined_at) -> str:
     return f"入室から{hours}時間{minutes}分"
 
 
+def remaining_checkin_time(expires_at) -> str:
+    expires_dt = parse_iso_datetime(str(expires_at or ""))
+    if not expires_dt:
+        return "残り時間を確認中"
+
+    remaining = expires_dt - datetime.now(JST)
+    remaining_seconds = max(0, int(remaining.total_seconds()))
+    if remaining_seconds < 60:
+        return "あと1分未満"
+
+    total_minutes = (remaining_seconds + 59) // 60
+    if total_minutes < 60:
+        return f"あと{total_minutes}分"
+
+    hours, minutes = divmod(total_minutes, 60)
+    if minutes == 0:
+        return f"あと{hours}時間"
+    return f"あと{hours}時間{minutes}分"
+
+
 def render_study_summary(summary):
     if not summary:
         return
@@ -1949,7 +1969,14 @@ def live_area():
             comment_text = safe_text(p["comment"] or "一緒に学習中")
             detail_text = safe_text(p["detail"] or "学習中")
             mood_text = safe_text(p["mood"] or "学習中")
-            elapsed_text = safe_text(elapsed_study_time(p["joined_at"]))
+            is_quick_checkin = (p["participation_type"] or "regular") == "quick"
+            time_icon = "⏳" if is_quick_checkin else "⏱"
+            time_text = (
+                remaining_checkin_time(p["expires_at"])
+                if is_quick_checkin
+                else elapsed_study_time(p["joined_at"])
+            )
+            time_text = safe_text(time_text)
             difficulty_meta = DIFFICULTY_META.get(normalize_difficulty(p["difficulty"]))
             difficulty_html = ""
             if difficulty_meta:
@@ -1958,7 +1985,7 @@ def live_area():
                 difficulty_html = f'<span class="card-difficulty {difficulty_class}">{difficulty_label}</span>'
             entry_badge_html = ""
             card_class = "room-card"
-            if (p["participation_type"] or "regular") == "quick":
+            if is_quick_checkin:
                 entry_badge_html = '<div><span class="entry-badge">授業ページからチェックイン</span></div>'
                 card_class = "room-card quick-checkin-card"
             member_cards.append(
@@ -1977,7 +2004,7 @@ def live_area():
                 f'{difficulty_html}'
                 '</div>'
                 f'<div class="small-muted">💬 {mood_text}</div>'
-                f'<div class="small-muted">⏱ {elapsed_text}</div>'
+                f'<div class="small-muted">{time_icon} {time_text}</div>'
                 '</div>'
             )
 
