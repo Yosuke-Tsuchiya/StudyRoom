@@ -960,10 +960,23 @@ def fetch_admin_stats():
     cleanup_stale()
     with get_conn() as conn:
         current_total = conn.execute("SELECT COUNT(*) FROM participants").fetchone()[0]
+        current_quick = conn.execute(
+            "SELECT COUNT(*) FROM participants WHERE COALESCE(participation_type, 'regular') = 'quick'"
+        ).fetchone()[0]
+        current_regular = current_total - current_quick
         feedback_total = conn.execute("SELECT COUNT(*) FROM feedback").fetchone()[0]
         event_total = conn.execute("SELECT COUNT(*) FROM presence_events").fetchone()[0]
         active_rooms = conn.execute(
-            "SELECT activity, COUNT(*) AS count FROM participants GROUP BY activity ORDER BY count DESC, activity"
+            """
+            SELECT
+                activity,
+                COUNT(*) AS count,
+                SUM(CASE WHEN COALESCE(participation_type, 'regular') = 'quick' THEN 1 ELSE 0 END) AS quick_count,
+                SUM(CASE WHEN COALESCE(participation_type, 'regular') != 'quick' THEN 1 ELSE 0 END) AS regular_count
+            FROM participants
+            GROUP BY activity
+            ORDER BY count DESC, activity
+            """
         ).fetchall()
         join_counts = conn.execute(
             """
@@ -974,7 +987,7 @@ def fetch_admin_stats():
             ORDER BY count DESC, activity
             """
         ).fetchall()
-    return current_total, feedback_total, event_total, active_rooms, join_counts
+    return current_total, current_regular, current_quick, feedback_total, event_total, active_rooms, join_counts
 
 
 def safe_text(value) -> str:
@@ -1333,9 +1346,9 @@ def render_admin_dashboard():
             st.session_state.admin_authenticated = False
             st.rerun()
 
-    current_total, feedback_total, event_total, active_rooms, join_counts = fetch_admin_stats()
+    current_total, current_regular, current_quick, feedback_total, event_total, active_rooms, join_counts = fetch_admin_stats()
     c1, c2, c3 = st.columns(3)
-    c1.metric("現在の入室者", f"{current_total}人")
+    c1.metric("現在の入室者", f"{current_total}人", f"通常 {current_regular} / 簡易 {current_quick}")
     c2.metric("意見・要望", f"{feedback_total}件")
     c3.metric("入退室履歴", f"{event_total}件")
 
@@ -1347,7 +1360,15 @@ def render_admin_dashboard():
             st.subheader("現在の部屋別人数")
             if active_rooms:
                 st.dataframe(
-                    [{"部屋": row["activity"], "人数": row["count"]} for row in active_rooms],
+                    [
+                        {
+                            "部屋": row["activity"],
+                            "合計": row["count"],
+                            "通常入室": row["regular_count"],
+                            "簡易入室": row["quick_count"],
+                        }
+                        for row in active_rooms
+                    ],
                     use_container_width=True,
                     hide_index=True,
                 )
