@@ -2198,7 +2198,7 @@ def live_area():
             f'<h3>📘 {activity_text}</h3>'
             f'<div class="room-tags">{tags_html}</div>'
             '</div>'
-            f'<div class="room-members">{members_html}</div>'
+            f'{members_html}'
             '</section>'
         )
         if is_my_room:
@@ -2207,7 +2207,7 @@ def live_area():
             expander_label = f"📘 {activity}　{room_count_text}"
             with st.expander(expander_label, expanded=False):
                 st.markdown(
-                    f'<div class="room-desk-area"><div class="room-members">{members_html}</div></div>',
+                    f'<div class="room-desk-area">{members_html}</div>',
                     unsafe_allow_html=True,
                 )
 
