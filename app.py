@@ -148,7 +148,7 @@ CUSTOM_CSS = """
 }
 .quick-stats {
     display:grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 8px;
     margin: 12px 0;
 }
@@ -1106,6 +1106,9 @@ def build_main_page_url(course_code, detail, takeover_id=None) -> str:
 def fetch_activity_detail_counts(activity, detail):
     cleanup_stale()
     with get_conn() as conn:
+        total_count = conn.execute(
+            "SELECT COUNT(*) FROM participants",
+        ).fetchone()[0]
         activity_count = conn.execute(
             "SELECT COUNT(*) FROM participants WHERE activity = ?",
             (activity,),
@@ -1114,7 +1117,7 @@ def fetch_activity_detail_counts(activity, detail):
             "SELECT COUNT(*) FROM participants WHERE activity = ? AND detail = ?",
             (activity, detail),
         ).fetchone()[0]
-    return activity_count, detail_count
+    return total_count, activity_count, detail_count
 
 
 def fetch_participant(session_id):
@@ -1185,7 +1188,7 @@ def render_quick_checkin_panel(request):
 
     activity = request["activity"]
     detail = request["detail"]
-    activity_count, detail_count = fetch_activity_detail_counts(activity, detail)
+    total_count, activity_count, detail_count = fetch_activity_detail_counts(activity, detail)
     main_page_url = build_main_page_url(request["course_code"], detail, st.session_state.session_id)
     st.markdown(
         f"""
@@ -1193,6 +1196,10 @@ def render_quick_checkin_panel(request):
           <h2>チェックインしました</h2>
           <p class="quick-checkin-subject">{safe_text(activity)} {safe_text(detail)}</p>
           <div class="quick-stats">
+            <div class="quick-stat">
+              <div class="quick-stat-label">StudyRoom全体</div>
+              <div class="quick-stat-value">{total_count}人</div>
+            </div>
             <div class="quick-stat">
               <div class="quick-stat-label">この科目を学習中</div>
               <div class="quick-stat-value">{activity_count}人</div>
