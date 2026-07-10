@@ -239,19 +239,26 @@ CUSTOM_CSS = """
         inset 0 -4px 0 rgba(120,76,38,.18);
     color: #24303f;
 }
+.room-card::before,
 .room-card::after {
     content: "";
     position: absolute;
-    left: 18px;
-    right: 18px;
-    bottom: -7px;
-    height: 8px;
-    border-radius: 0 0 8px 8px;
+    bottom: -13px;
+    width: 10px;
+    height: 18px;
+    border-radius: 999px;
     background:
-        linear-gradient(90deg, #aeb6bf 0 8px, transparent 8px calc(100% - 8px), #aeb6bf calc(100% - 8px)),
-        linear-gradient(90deg, #7f8790 0 8px, transparent 8px calc(100% - 8px), #7f8790 calc(100% - 8px)),
-        linear-gradient(180deg, rgba(255,255,255,.35), rgba(71,84,103,.18));
-    opacity: .9;
+        linear-gradient(90deg, #6f7781 0%, #d5dbe2 32%, #f7f9fb 48%, #9da6b1 74%, #68717b 100%);
+    box-shadow:
+        0 2px 4px rgba(52,64,84,.22),
+        inset 0 -2px 0 rgba(52,64,84,.18);
+    opacity: .95;
+}
+.room-card::before {
+    left: 22px;
+}
+.room-card::after {
+    right: 22px;
 }
 .room-card.quick-checkin-card {
     border-style: dashed;
