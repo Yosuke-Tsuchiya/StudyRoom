@@ -650,7 +650,7 @@ CUSTOM_CSS = """
     z-index: 1;
 }
 .room-desk-area .room-members {
-    margin-top: -28px;
+    margin-top: -12px;
 }
 .room-heading {
     display:flex;
