@@ -1881,7 +1881,7 @@ def render_quick_checkin_panel(request):
           </div>
           <p>{QUICK_JOIN_TIMEOUT_MINUTES}分間、この授業回を学習中の匿名の学生として表示されます。</p>
           <p>授業動画のタブに戻って、学習を続けてください。このタブは閉じても大丈夫です。</p>
-          <p>表示名をニックネームに変更したり、学習時間を記録したい場合は、StudyRoomを開いてください。</p>
+          <p>StudyRoomを開くと、同じ時間に学んでいる人の気配を感じながら、学習を続けられます。退室時には今回の学習時間も確認できます。</p>
           <a class="quick-link" href="{safe_text(main_page_url)}" target="_self">StudyRoomを開く</a>
         </section>
         """,
