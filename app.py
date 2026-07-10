@@ -158,6 +158,27 @@ CUSTOM_CSS = """
         inset 0 1px 3px rgba(69,42,20,.22),
         0 1px 4px rgba(91,62,35,.10) !important;
 }
+[data-testid="stSidebar"] .stButton > button[kind="secondary"] {
+    border-color: rgba(137,54,43,.36) !important;
+    background:
+        linear-gradient(180deg, #b85f4f, #8f3f35) !important;
+    color: #fff8f2 !important;
+}
+[data-testid="stSidebar"] .stButton > button[kind="secondary"]:hover {
+    border-color: rgba(122,43,34,.46) !important;
+    background:
+        linear-gradient(180deg, #c76d5c, #7e352d) !important;
+    color: #fff8f2 !important;
+    opacity: 1 !important;
+}
+.leave-room-note {
+    border-top: 1px solid rgba(139,96,54,.22);
+    margin: 1.05rem 0 .45rem 0;
+    padding-top: .7rem;
+    color: #7a4d2f;
+    font-size: .76rem;
+    line-height: 1.4;
+}
 [data-testid="stSidebar"] [data-testid="stExpander"] details {
     border: 1px solid rgba(139,96,54,.20);
     border-radius: 8px;
@@ -2331,7 +2352,7 @@ with st.sidebar:
                     )
                     st.rerun()
         else:
-            if st.button("学習内容を更新", use_container_width=True):
+            if st.button("学習内容を更新", type="primary", use_container_width=True):
                 cleaned = nickname.strip() or st.session_state.nickname
                 cleaned_comment = comment.strip() or DEFAULT_COMMENT
                 nickname_error = validate_nickname(cleaned)
@@ -2369,7 +2390,11 @@ with st.sidebar:
                     persist_preferences_to_browser(current_preferences())
                     st.success("表示を更新しました。")
 
-            if st.button("退室する", use_container_width=True):
+            st.markdown(
+                '<div class="leave-room-note">退室すると、今回の学習時間を確認できます。</div>',
+                unsafe_allow_html=True,
+            )
+            if st.button("退室して学習時間を確認", type="secondary", use_container_width=True):
                 st.session_state.last_study_summary = leave_room(st.session_state.session_id)
                 st.session_state.joined = False
                 st.session_state.participation_type = "regular"
