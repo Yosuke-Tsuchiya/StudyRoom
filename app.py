@@ -26,6 +26,7 @@ FEEDBACK_MAX_CHARS = 1000
 FEEDBACK_COOLDOWN_SECONDS = 30
 JST = timezone(timedelta(hours=9))
 ACTIVITY_OPTIONS = [
+    "フリールーム",
     "情報基礎A・B",
     "インターネット技術Ⅰ・Ⅱ",
     "データ構造とアルゴリズムⅠ・Ⅱ",
@@ -33,7 +34,6 @@ ACTIVITY_OPTIONS = [
     "初級セキュアプログラミング",
     "基礎ゼミA・B",
     "資格勉強",
-    "その他",
 ]
 DETAIL_OPTIONS = [f"第{i}回" for i in range(1, 9)] + ["その他"]
 MOOD_OPTIONS = ["集中して学習中", "ゆっくり学習中", "小テスト実施中", "休憩中", "もうひと頑張り"]
@@ -54,6 +54,7 @@ QUICK_JOIN_COMMENT = DEFAULT_COMMENT
 QUICK_JOIN_MOOD = DEFAULT_MOOD
 QUICK_JOIN_DIFFICULTY = "表示なし"
 QUICK_COURSE_CODES = {
+    "free-room": "フリールーム",
     "info-basic": "情報基礎A・B",
     "internet-tech": "インターネット技術Ⅰ・Ⅱ",
     "data-algorithms": "データ構造とアルゴリズムⅠ・Ⅱ",
@@ -61,7 +62,7 @@ QUICK_COURSE_CODES = {
     "secure-programming": "初級セキュアプログラミング",
     "seminar": "基礎ゼミA・B",
     "certification": "資格勉強",
-    "other": "その他",
+    "other": "フリールーム",
 }
 
 st.set_page_config(
@@ -72,6 +73,9 @@ st.set_page_config(
 
 CUSTOM_CSS = """
 <style>
+.stApp {
+    background: #fffdf7;
+}
 .block-container {padding-top: 2rem; padding-bottom: 3rem;}
 [data-testid="stSidebar"] {
     background:
@@ -857,6 +861,11 @@ def init_db():
             conn.execute("ALTER TABLE presence_events ADD COLUMN difficulty TEXT")
         if "participation_type" not in event_columns:
             conn.execute("ALTER TABLE presence_events ADD COLUMN participation_type TEXT")
+        for table_name in ("participants", "feedback", "presence_events", "study_segments"):
+            conn.execute(
+                f"UPDATE {table_name} SET activity = ? WHERE activity = ?",
+                ("フリールーム", "その他"),
+            )
 
 
 def cleanup_stale():

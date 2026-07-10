@@ -136,6 +136,7 @@ https://studyroom.streamlit.app/?quick=1&course=info-basic&lesson=1
 
 | course | 表示される部屋名 |
 | --- | --- |
+| `free-room` | フリールーム |
 | `info-basic` | 情報基礎A・B |
 | `internet-tech` | インターネット技術Ⅰ・Ⅱ |
 | `data-algorithms` | データ構造とアルゴリズムⅠ・Ⅱ |
@@ -143,7 +144,7 @@ https://studyroom.streamlit.app/?quick=1&course=info-basic&lesson=1
 | `secure-programming` | 初級セキュアプログラミング |
 | `seminar` | 基礎ゼミA・B |
 | `certification` | 資格勉強 |
-| `other` | その他 |
+| `other` | フリールーム |
 
 ### lesson指定
 
