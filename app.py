@@ -608,7 +608,7 @@ CUSTOM_CSS = """
 }
 [data-testid="stMain"] [data-testid="stExpander"] details:has(.room-desk-area) {
     background:
-        linear-gradient(180deg, rgba(250,246,234,.92) 0 205px, rgba(213,193,161,.48) 205px 208px, rgba(235,222,201,.78) 208px),
+        linear-gradient(180deg, rgba(250,246,234,.92) 0 230px, rgba(213,193,161,.48) 230px 233px, rgba(235,222,201,.78) 233px),
         #f6efe1;
 }
 .room-desk-area {
@@ -650,7 +650,7 @@ CUSTOM_CSS = """
     z-index: 1;
 }
 .room-desk-area .room-members {
-    margin-top: 18px;
+    margin-top: 4px;
 }
 .room-heading {
     display:flex;
