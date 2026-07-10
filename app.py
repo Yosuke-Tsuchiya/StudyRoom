@@ -574,18 +574,20 @@ CUSTOM_CSS = """
 }
 [data-testid="stMain"] [data-testid="stExpander"] summary {
     min-height: 46px;
-    border-left: 12px solid #8c6036;
+    border-left: 0;
     background:
-        radial-gradient(circle at calc(100% - 34px) 50%, #f7d37b 0 4px, transparent 5px),
-        linear-gradient(90deg, #b98248 0 16px, #e7c793 16px 18px, #f3dfbd 18px),
+        linear-gradient(90deg, transparent 0 7px, rgba(248,224,174,.86) 7px 10px, transparent 10px 18px),
+        linear-gradient(180deg, transparent calc(50% - 11px), rgba(255,239,190,.78) calc(50% - 11px) calc(50% + 11px), transparent calc(50% + 11px)),
+        linear-gradient(90deg, #8c6036 0 18px, #e7c793 18px 20px, #f3dfbd 20px),
         #f3dfbd;
     color: #3b2a1b;
     font-weight: 700;
 }
 [data-testid="stMain"] [data-testid="stExpander"] summary:hover {
     background:
-        radial-gradient(circle at calc(100% - 34px) 50%, #f7d37b 0 4px, transparent 5px),
-        linear-gradient(90deg, #a8733d 0 16px, #e7c793 16px 18px, #f7e7ca 18px),
+        linear-gradient(90deg, transparent 0 7px, rgba(255,234,185,.88) 7px 10px, transparent 10px 18px),
+        linear-gradient(180deg, transparent calc(50% - 11px), rgba(255,244,207,.80) calc(50% - 11px) calc(50% + 11px), transparent calc(50% + 11px)),
+        linear-gradient(90deg, #7f562f 0 18px, #e7c793 18px 20px, #f7e7ca 20px),
         #f7e7ca;
 }
 [data-testid="stMain"] [data-testid="stExpander"] details:has(.empty-rooms-panel) {
