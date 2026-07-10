@@ -626,10 +626,24 @@ CUSTOM_CSS = """
 .room-desk-area::before {
     content: "";
     position: absolute;
+    top: 24px;
+    left: 18px;
+    right: 18px;
+    height: 104px;
+    background:
+        linear-gradient(115deg, transparent 0 12%, rgba(255,255,255,.34) 12% 18%, transparent 18% 32%, rgba(255,255,255,.22) 32% 38%, transparent 38%),
+        radial-gradient(circle at 12% 14%, rgba(255,255,255,.30), transparent 18%);
+    background-repeat: repeat-x;
+    background-size: 158px 104px;
+    pointer-events: none;
+}
+.room-desk-area::after {
+    content: "";
+    position: absolute;
     top: 18px;
     left: 18px;
     right: 18px;
-    height: 108px;
+    height: 112px;
     background:
         linear-gradient(90deg, transparent 0 4px, rgba(199,207,216,.92) 4px 124px, transparent 124px),
         linear-gradient(90deg, transparent 0 4px, rgba(174,150,118,.34) 4px 124px, transparent 124px),
@@ -637,23 +651,9 @@ CUSTOM_CSS = """
         linear-gradient(90deg, transparent 0 4px, rgba(185,196,207,.70) 4px 124px, transparent 124px),
         linear-gradient(90deg, transparent 0 4px, rgba(222,240,248,.70) 4px 60px, rgba(255,255,255,.38) 60px 68px, rgba(222,240,248,.58) 68px 120px, transparent 120px);
     background-repeat: repeat-x;
-    background-size: 158px 6px, 158px 8px, 158px 108px, 158px 4px, 158px 108px;
-    background-position: 0 0, 0 94px, 0 0, 0 51px, 0 0;
+    background-size: 158px 6px, 158px 8px, 158px 112px, 158px 4px, 158px 112px;
+    background-position: 0 0, 0 100px, 0 0, 0 51px, 0 0;
     filter: drop-shadow(0 8px 12px rgba(73,63,50,.08));
-    pointer-events: none;
-}
-.room-desk-area::after {
-    content: "";
-    position: absolute;
-    top: 24px;
-    left: 18px;
-    right: 18px;
-    height: 102px;
-    background:
-        linear-gradient(115deg, transparent 0 12%, rgba(255,255,255,.34) 12% 18%, transparent 18% 32%, rgba(255,255,255,.22) 32% 38%, transparent 38%),
-        radial-gradient(circle at 12% 14%, rgba(255,255,255,.30), transparent 18%);
-    background-repeat: repeat-x;
-    background-size: 158px 102px;
     pointer-events: none;
 }
 .room-desk-area > * {
