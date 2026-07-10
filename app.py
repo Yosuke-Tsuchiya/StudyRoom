@@ -1704,6 +1704,56 @@ def render_study_summary(summary):
         """,
         unsafe_allow_html=True,
     )
+    copy_text = build_study_summary_copy_text(summary)
+    copy_text_json = json.dumps(copy_text, ensure_ascii=False)
+    components.html(
+        f"""
+        <div style="display:flex; gap:8px; align-items:center; margin: -4px 0 14px 0;">
+          <button id="copy-study-summary" type="button" style="
+            border:1px solid rgba(120,76,35,.34);
+            border-radius:8px;
+            padding:7px 12px;
+            background:linear-gradient(180deg, #c9955d, #a86f38);
+            color:#fffaf0;
+            font-weight:700;
+            cursor:pointer;
+            box-shadow:inset 0 1px 0 rgba(255,255,255,.28), 0 3px 8px rgba(91,62,35,.14);
+          ">学習時間をコピー</button>
+          <span id="copy-study-summary-status" style="font-size:12px; color:#6f4a27;"></span>
+        </div>
+        <script>
+          const button = document.getElementById("copy-study-summary");
+          const status = document.getElementById("copy-study-summary-status");
+          button.addEventListener("click", async () => {{
+            try {{
+              await navigator.clipboard.writeText({copy_text_json});
+              status.textContent = "コピーしました";
+            }} catch (error) {{
+              status.textContent = "コピーできませんでした";
+            }}
+          }});
+        </script>
+        """,
+        height=48,
+    )
+
+
+def build_study_summary_copy_text(summary):
+    date_text = datetime.now(JST).strftime("%Y/%m/%d")
+    lines = ["日付\t部屋\t授業回\t学習時間"]
+    for item in summary["items"]:
+        lines.append(
+            "\t".join(
+                [
+                    date_text,
+                    str(item["activity"]),
+                    str(item["detail"]),
+                    str(item["duration_label"]),
+                ]
+            )
+        )
+    lines.append("\t".join([date_text, "合計", "", str(summary["total_label"])]))
+    return "\n".join(lines)
 
 
 def render_quick_checkin_panel(request):
@@ -2172,9 +2222,6 @@ with st.sidebar:
     elif course_lesson_error:
         st.error(course_lesson_error)
 
-    if st.session_state.last_study_summary and not st.session_state.joined:
-        render_study_summary(st.session_state.last_study_summary)
-
     if st.session_state.participation_type == "quick" and st.session_state.joined:
         st.header("簡易参加中")
         st.caption("授業ページから自動で入室しています。名前や状態は固定表示です。")
@@ -2424,6 +2471,9 @@ def live_area():
             """,
             unsafe_allow_html=True,
         )
+
+    if st.session_state.last_study_summary and not st.session_state.joined:
+        render_study_summary(st.session_state.last_study_summary)
 
     st.subheader("学習中の部屋")
     st.markdown(
