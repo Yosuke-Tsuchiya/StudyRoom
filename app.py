@@ -608,7 +608,7 @@ CUSTOM_CSS = """
 }
 [data-testid="stMain"] [data-testid="stExpander"] details:has(.room-desk-area) {
     background:
-        linear-gradient(180deg, rgba(250,246,234,.92) 0 170px, rgba(213,193,161,.48) 170px 173px, rgba(235,222,201,.78) 173px),
+        linear-gradient(180deg, rgba(250,246,234,.92) 0 205px, rgba(213,193,161,.48) 205px 208px, rgba(235,222,201,.78) 208px),
         #f6efe1;
 }
 .room-desk-area {
