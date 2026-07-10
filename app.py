@@ -297,6 +297,7 @@ CUSTOM_CSS = """
     background: #f3f8ff;
 }
 .avatar {
+    position: relative;
     font-size: 1.32rem;
     width: 34px;
     height: 34px;
@@ -310,6 +311,22 @@ CUSTOM_CSS = """
     border: 2px solid rgba(143,96,45,.30);
     box-shadow: 0 2px 0 rgba(143,96,45,.18);
     color: #24303f;
+}
+.you-badge {
+    position: absolute;
+    left: 50%;
+    bottom: -7px;
+    transform: translateX(-50%);
+    border: 1px solid rgba(35,142,92,.32);
+    border-radius: 999px;
+    padding: 0 4px;
+    background: #e4f8ed;
+    color: #067647;
+    font-size: .48rem;
+    font-weight: 800;
+    line-height: 1.25;
+    white-space: nowrap;
+    box-shadow: 0 1px 2px rgba(16,24,40,.12);
 }
 .quick-checkin-card .avatar {
     background: #e3f0ff;
@@ -378,7 +395,7 @@ CUSTOM_CSS = """
     white-space: normal;
 }
 .entry-badge {
-    display: block;
+    display: inline-block;
     margin: 0 0 2px 0;
     border: 1px solid rgba(181,118,32,.34);
     border-radius: 999px;
@@ -2304,9 +2321,9 @@ def live_area():
         member_cards = []
         for p in room_members:
             mine = p["session_id"] == st.session_state.session_id
-            label = f'{p["nickname"]}（あなた）' if mine else p["nickname"]
-            label = safe_text(label)
+            label = safe_text(p["nickname"])
             avatar_text = safe_text(p["avatar"] if p["avatar"] in AVATAR_OPTIONS else AVATAR_OPTIONS[0])
+            you_badge_html = '<span class="you-badge">あなた</span>' if mine else ""
             comment_text = safe_text(p["comment"] or "一緒に学習中")
             detail_text = safe_text(p["detail"] or "学習中")
             mood_text = safe_text(p["mood"] or "学習中")
@@ -2328,14 +2345,16 @@ def live_area():
                 difficulty_html = '<span class="card-difficulty placeholder">体感</span>'
             entry_badge_html = ""
             card_class = "room-card"
+            if mine:
+                card_class += " my-card"
             if is_quick_checkin:
                 entry_badge_html = '<span class="entry-badge">チェックイン</span>'
-                card_class = "room-card quick-checkin-card"
+                card_class += " quick-checkin-card"
             member_cards.append(
                 f'<div class="{card_class}">'
                 '<div class="seat-note">'
                 '<div class="card-top">'
-                f'<div class="avatar">{avatar_text}</div>'
+                f'<div class="avatar">{avatar_text}{you_badge_html}</div>'
                 '<div class="participant-name">'
                 f'{entry_badge_html}'
                 '<div>'
