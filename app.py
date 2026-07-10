@@ -611,40 +611,63 @@ CUSTOM_CSS = """
 .room-desk-area {
     position: relative;
     overflow: hidden;
-    border: 12px solid #d8dde3;
+    border: 1px solid rgba(151,122,84,.24);
     border-radius: 16px;
-    padding: 22px 16px 6px 16px;
+    padding: 18px 16px 6px 16px;
     margin-bottom: 14px;
     background:
-        linear-gradient(90deg, transparent calc(50% - 3px), rgba(214,221,230,.95) calc(50% - 3px) calc(50% + 3px), transparent calc(50% + 3px)),
-        linear-gradient(180deg, transparent 0 46%, rgba(214,221,230,.90) 46% calc(46% + 6px), transparent calc(46% + 6px)),
-        linear-gradient(180deg, rgba(213,232,244,.58) 0 50%, rgba(246,240,224,.70) 50%),
-        #edf4f8;
+        linear-gradient(180deg, rgba(250,246,234,.92) 0 54%, rgba(213,193,161,.48) 54% 55%, rgba(235,222,201,.78) 55%),
+        #f6efe1;
     box-shadow:
-        inset 0 0 0 1px rgba(255,255,255,.75),
-        inset 0 0 0 7px rgba(255,255,255,.42),
+        inset 0 0 0 1px rgba(255,255,255,.62),
         0 12px 22px rgba(52,64,84,.14);
 }
 .room-desk-area::before {
     content: "";
     position: absolute;
-    inset: 0;
+    top: 18px;
+    left: 18px;
+    right: 18px;
+    height: 108px;
     background:
-        linear-gradient(115deg, transparent 0 10%, rgba(255,255,255,.45) 10% 18%, transparent 18% 31%, rgba(255,255,255,.28) 31% 38%, transparent 38%),
-        radial-gradient(circle at 15% 12%, rgba(255,255,255,.35), transparent 18%);
+        repeating-linear-gradient(
+            90deg,
+            transparent 0 10px,
+            rgba(185,196,207,.90) 10px 14px,
+            rgba(222,240,248,.72) 14px 70px,
+            rgba(255,255,255,.42) 70px 78px,
+            rgba(222,240,248,.62) 78px 134px,
+            rgba(185,196,207,.90) 134px 138px,
+            transparent 138px 154px
+        ),
+        linear-gradient(180deg, transparent 0 49%, rgba(185,196,207,.76) 49% 53%, transparent 53%);
+    border-top: 6px solid rgba(199,207,216,.92);
+    border-bottom: 8px solid rgba(174,150,118,.42);
+    border-radius: 10px 10px 6px 6px;
+    box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,.74),
+        0 8px 16px rgba(73,63,50,.08);
     pointer-events: none;
 }
 .room-desk-area::after {
     content: "";
     position: absolute;
-    inset: 8px;
-    border: 1px solid rgba(255,255,255,.72);
+    top: 24px;
+    left: 18px;
+    right: 18px;
+    height: 102px;
+    background:
+        linear-gradient(115deg, transparent 0 12%, rgba(255,255,255,.34) 12% 18%, transparent 18% 32%, rgba(255,255,255,.22) 32% 38%, transparent 38%),
+        radial-gradient(circle at 12% 14%, rgba(255,255,255,.30), transparent 18%);
     border-radius: 8px;
     pointer-events: none;
 }
 .room-desk-area > * {
     position: relative;
     z-index: 1;
+}
+.room-desk-area .room-members {
+    margin-top: 126px;
 }
 .room-heading {
     display:flex;
