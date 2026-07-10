@@ -26,6 +26,7 @@ FEEDBACK_MAX_CHARS = 1000
 FEEDBACK_COOLDOWN_SECONDS = 30
 JST = timezone(timedelta(hours=9))
 ACTIVITY_OPTIONS = [
+    "フリールーム",
     "情報基礎A・B",
     "インターネット技術Ⅰ・Ⅱ",
     "データ構造とアルゴリズムⅠ・Ⅱ",
@@ -33,7 +34,6 @@ ACTIVITY_OPTIONS = [
     "初級セキュアプログラミング",
     "基礎ゼミA・B",
     "資格勉強",
-    "その他",
 ]
 DETAIL_OPTIONS = [f"第{i}回" for i in range(1, 9)] + ["その他"]
 MOOD_OPTIONS = ["集中して学習中", "ゆっくり学習中", "小テスト実施中", "休憩中", "もうひと頑張り"]
@@ -54,6 +54,7 @@ QUICK_JOIN_COMMENT = DEFAULT_COMMENT
 QUICK_JOIN_MOOD = DEFAULT_MOOD
 QUICK_JOIN_DIFFICULTY = "表示なし"
 QUICK_COURSE_CODES = {
+    "free-room": "フリールーム",
     "info-basic": "情報基礎A・B",
     "internet-tech": "インターネット技術Ⅰ・Ⅱ",
     "data-algorithms": "データ構造とアルゴリズムⅠ・Ⅱ",
@@ -61,7 +62,7 @@ QUICK_COURSE_CODES = {
     "secure-programming": "初級セキュアプログラミング",
     "seminar": "基礎ゼミA・B",
     "certification": "資格勉強",
-    "other": "その他",
+    "other": "フリールーム",
 }
 
 st.set_page_config(
@@ -72,50 +73,189 @@ st.set_page_config(
 
 CUSTOM_CSS = """
 <style>
+.stApp {
+    background: #fffdf7;
+    color: #2f241b;
+}
+header[data-testid="stHeader"] {
+    background: #fffdf7;
+}
+.stApp h1,
+.stApp h2,
+.stApp h3,
+.stApp p,
+.stApp li,
+.stApp label,
+.stApp [data-testid="stMarkdownContainer"],
+[data-testid="stSidebar"],
+[data-testid="stSidebar"] label,
+[data-testid="stSidebar"] p,
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] {
+    color: #2f241b;
+}
+[data-testid="stSidebar"] input,
+[data-testid="stSidebar"] textarea,
+[data-testid="stSidebar"] [data-baseweb="select"] > div {
+    background: #fffdf7;
+    color: #2f241b;
+}
+[data-testid="stSidebar"] input::placeholder,
+[data-testid="stSidebar"] textarea::placeholder {
+    color: #8a735c;
+}
 .block-container {padding-top: 2rem; padding-bottom: 3rem;}
+[data-testid="stSidebar"] {
+    background:
+        repeating-linear-gradient(90deg, rgba(139,96,54,.045) 0 1px, transparent 1px 34px),
+        #fff8ea;
+}
 [data-testid="stSidebar"] .block-container {
     padding-top: .9rem;
 }
 .sidebar-brand {
-    margin-bottom: .8rem;
+    position: relative;
+    margin: .1rem 0 .85rem 0;
+    padding: 12px 13px 13px 13px;
+    border: 1px solid rgba(139,96,54,.28);
+    border-radius: 10px;
+    background:
+        linear-gradient(180deg, rgba(255,255,255,.16), rgba(104,68,32,.10)),
+        linear-gradient(90deg, #c8945d, #e2bc84 42%, #c2874d);
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.36),
+        0 6px 14px rgba(91,62,35,.12);
+    color: #3f2b1a;
 }
 .sidebar-brand h1 {
-    font-size: 2rem;
+    font-size: 2.05rem;
     margin: 0;
     line-height: 1;
     font-weight: 800;
     letter-spacing: 0;
+    text-shadow: 0 1px 0 rgba(255,255,255,.30);
 }
 .sidebar-brand p {
     margin: .35rem 0 0 0;
-    opacity: .75;
+    opacity: .82;
     font-size: .88rem;
 }
 .sidebar-notice {
-    border: 1px solid rgba(128,128,128,.22);
+    border: 1px solid rgba(139,96,54,.20);
     border-radius: 8px;
-    padding: 8px 10px;
+    padding: 9px 10px;
     margin: .75rem 0 1rem 0;
-    background: rgba(128,128,128,.045);
+    background:
+        linear-gradient(180deg, rgba(255,255,255,.78), rgba(255,252,244,.84)),
+        #fffdf7;
     font-size: .78rem;
     line-height: 1.45;
+    box-shadow: 0 2px 8px rgba(91,62,35,.06);
 }
 .sidebar-notice strong {
     display: block;
     font-size: .82rem;
     margin-bottom: 2px;
+    color: #6f4a27;
+}
+[data-testid="stSidebar"] .stButton > button,
+[data-testid="stSidebar"] [data-testid="stFormSubmitButton"] button {
+    border: 1px solid rgba(120,76,35,.34) !important;
+    border-radius: 8px !important;
+    background:
+        linear-gradient(180deg, #c9955d, #a86f38) !important;
+    color: #fffaf0 !important;
+    font-weight: 700 !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.28),
+        0 3px 8px rgba(91,62,35,.14) !important;
+    opacity: 1 !important;
+}
+[data-testid="stSidebar"] .stButton > button:hover,
+[data-testid="stSidebar"] [data-testid="stFormSubmitButton"] button:hover {
+    border-color: rgba(104,64,28,.45) !important;
+    background:
+        linear-gradient(180deg, #d1a06c, #99602f) !important;
+    color: #fffaf0 !important;
+    opacity: 1 !important;
+}
+[data-testid="stSidebar"] .stButton > button:active,
+[data-testid="stSidebar"] [data-testid="stFormSubmitButton"] button:active {
+    transform: translateY(1px);
+    box-shadow:
+        inset 0 1px 3px rgba(69,42,20,.22),
+        0 1px 4px rgba(91,62,35,.10) !important;
+}
+[data-testid="stSidebar"] .stButton > button[kind="secondary"] {
+    border-color: rgba(137,54,43,.36) !important;
+    background:
+        linear-gradient(180deg, #b85f4f, #8f3f35) !important;
+    color: #fff8f2 !important;
+}
+[data-testid="stSidebar"] .stButton > button[kind="secondary"]:hover {
+    border-color: rgba(122,43,34,.46) !important;
+    background:
+        linear-gradient(180deg, #c76d5c, #7e352d) !important;
+    color: #fff8f2 !important;
+    opacity: 1 !important;
+}
+.leave-room-note {
+    border-top: 1px solid rgba(139,96,54,.22);
+    margin: 1.05rem 0 .45rem 0;
+    padding-top: .7rem;
+    color: #7a4d2f;
+    font-size: .76rem;
+    line-height: 1.4;
+}
+[data-testid="stSidebar"] [data-testid="stExpander"] details {
+    border: 1px solid rgba(139,96,54,.20);
+    border-radius: 8px;
+    background:
+        linear-gradient(180deg, rgba(242,222,190,.78), rgba(232,207,170,.82)),
+        #ead3ac;
+    box-shadow: 0 2px 8px rgba(91,62,35,.06);
+}
+[data-testid="stSidebar"] [data-testid="stExpander"] summary {
+    color: #5d3b20;
+    font-weight: 700;
+    opacity: 1;
+}
+[data-testid="stSidebar"] [data-testid="stExpander"] summary:hover {
+    color: #4a2f1a;
+    background: rgba(232,200,159,.20);
+    opacity: 1;
+}
+[data-testid="stSidebar"] [data-testid="stAlert"] {
+    border: 1px solid rgba(77,145,103,.34);
+    border-radius: 8px;
+    background: #e4f5df;
+    color: #264b32;
+    box-shadow: 0 2px 8px rgba(91,62,35,.06);
+}
+[data-testid="stSidebar"] [data-testid="stAlert"] * {
+    color: inherit;
 }
 [data-testid="InputInstructions"] {
     display: none;
 }
+.room-caption {
+    margin: -.2rem 0 .45rem 0;
+    color: #667085;
+    font-size: .82rem;
+    line-height: 1.35;
+}
+.room-caption div + div {
+    margin-top: 1px;
+}
 .study-summary {
-    border: 1px solid rgba(46,204,113,.35);
+    border: 1px solid rgba(77,145,103,.34);
     border-radius: 8px;
     padding: 9px 10px;
     margin: .75rem 0 1rem 0;
-    background: rgba(46,204,113,.08);
+    background: #e4f5df;
+    color: #264b32;
     font-size: .78rem;
     line-height: 1.45;
+    box-shadow: 0 2px 8px rgba(91,62,35,.06);
 }
 .study-summary strong {
     display:block;
@@ -130,26 +270,49 @@ CUSTOM_CSS = """
     margin: 2px 0;
 }
 .quick-checkin {
-    border: 1px solid rgba(47,113,244,.30);
-    border-radius: 10px;
-    padding: 14px 16px;
+    border: 1px solid rgba(139,96,54,.24);
+    border-radius: 12px;
+    padding: 0 16px 16px 16px;
     margin-bottom: 16px;
-    background: rgba(47,113,244,.08);
+    background:
+        linear-gradient(180deg, rgba(255,255,255,.80), rgba(255,248,235,.90)),
+        #fff8ea;
+    box-shadow: 0 10px 24px rgba(91,62,35,.10);
+    color: #2f241b;
+}
+.quick-page-spacer {
+    height: 1.2rem;
 }
 .quick-checkin h2 {
-    margin: 0 0 6px 0;
-    font-size: 1.35rem;
+    margin: 0 -16px 12px -16px;
+    padding: 12px 16px;
+    border-radius: 12px 12px 0 0;
+    border-bottom: 1px solid rgba(139,96,54,.22);
+    background:
+        linear-gradient(180deg, rgba(255,255,255,.16), rgba(104,68,32,.10)),
+        linear-gradient(90deg, #c8945d, #e2bc84 42%, #c2874d);
+    color: #3f2b1a;
+    font-size: 1.4rem;
     line-height: 1.25;
+    text-shadow: 0 1px 0 rgba(255,255,255,.30);
 }
 .quick-checkin p {
     margin: 6px 0;
     line-height: 1.5;
+    color: #4f3825;
+}
+.quick-main-page-prompt {
+    margin-top: 14px !important;
+}
+.quick-main-page-prompt span {
+    display: block;
 }
 .quick-checkin-subject {
     font-size: 1.65rem;
     font-weight: 800;
     line-height: 1.25;
     margin: 10px 0 8px 0;
+    color: #2f241b;
 }
 .quick-stats {
     display:grid;
@@ -161,7 +324,7 @@ CUSTOM_CSS = """
     margin: 14px 0 6px 0;
     font-size: .9rem;
     font-weight: 700;
-    color: #1f2937;
+    color: #6f4a27;
 }
 .quick-recent-stats {
     display:grid;
@@ -170,26 +333,41 @@ CUSTOM_CSS = """
     margin: 6px 0 12px 0;
 }
 .quick-stat {
-    border: 1px solid rgba(128,128,128,.22);
+    border: 1px solid rgba(139,96,54,.20);
     border-radius: 8px;
     padding: 10px;
-    background: rgba(255,255,255,.55);
-    color: #1f2937;
+    background:
+        linear-gradient(180deg, rgba(255,255,255,.82), rgba(255,249,238,.88)),
+        #fffaf0;
+    color: #2f241b;
+    box-shadow: 0 2px 8px rgba(91,62,35,.06);
 }
 .quick-stat-label {
     font-size: .78rem;
-    opacity: .75;
+    color: #7a5a3a;
 }
 .quick-stat-value {
     font-size: 1.35rem;
     font-weight: 800;
     line-height: 1.2;
     margin-top: 2px;
+    color: #4d321d;
 }
 .quick-link {
     display:inline-block;
     margin-top: 8px;
+    border: 1px solid rgba(120,76,35,.34);
+    border-radius: 8px;
+    padding: 8px 13px;
+    background: linear-gradient(180deg, #c9955d, #a86f38);
+    color: #fffaf0 !important;
     font-weight: 700;
+    text-decoration: none !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.28), 0 3px 8px rgba(91,62,35,.14);
+}
+.quick-link:hover {
+    background: linear-gradient(180deg, #d1a06c, #99602f);
+    color: #fffaf0 !important;
 }
 @media (max-width: 640px) {
     .quick-stats {grid-template-columns: 1fr;}
@@ -202,14 +380,17 @@ CUSTOM_CSS = """
     margin: .75rem 0 1rem 0;
 }
 .sidebar-stat {
-    border: 1px solid rgba(128,128,128,.22);
+    border: 1px solid rgba(139,96,54,.22);
     border-radius: 8px;
     padding: 7px 6px;
-    background: rgba(128,128,128,.045);
+    background:
+        linear-gradient(180deg, rgba(255,255,255,.80), rgba(255,249,238,.86)),
+        #fffaf0;
+    box-shadow: 0 2px 7px rgba(91,62,35,.07);
 }
 .sidebar-stat-label {
     font-size: .68rem;
-    opacity: .68;
+    color: #7a5a3a;
     line-height: 1.2;
 }
 .sidebar-stat-value {
@@ -217,170 +398,335 @@ CUSTOM_CSS = """
     font-weight: 700;
     line-height: 1.25;
     margin-top: 2px;
+    color: #4d321d;
 }
 .sidebar-credit {
-    opacity: .55;
+    color: #8a735c;
     font-size: .74rem;
     margin-top: 1.25rem;
     text-align: center;
 }
 .room-card {
     position: relative;
-    border: 1px solid rgba(128,128,128,.26);
-    border-radius: 8px;
-    padding: 10px;
+    z-index: 0;
+    border: 1px solid rgba(135,92,52,.45);
+    border-radius: 10px 10px 8px 8px;
+    padding: 0;
     margin-bottom: 0;
-    background:
-        linear-gradient(180deg, #f8faf9 0 52px, #ffffff 52px),
-        #ffffff;
-    min-height: 112px;
+    background: #fffaf2;
+    min-height: 108px;
     box-shadow:
-        4px 5px 12px rgba(0,0,0,.12),
-        inset -2px 0 0 rgba(128,128,128,.14),
-        inset 0 -3px 0 rgba(128,128,128,.14);
+        5px 7px 0 rgba(120,76,38,.18),
+        0 12px 18px rgba(75,48,24,.16),
+        inset -2px 0 0 rgba(120,76,38,.16),
+        inset 0 -4px 0 rgba(120,76,38,.18);
     color: #24303f;
 }
-.room-card.quick-checkin-card {
-    border-style: dashed;
-    border-color: rgba(47,113,244,.45);
+.room-card::before,
+.room-card::after {
+    content: "";
+    position: absolute;
+    bottom: -11px;
+    width: 9px;
+    height: 16px;
+    border-radius: 999px;
     background:
-        linear-gradient(180deg, #eef5ff 0 52px, #f8fbff 52px),
-        #f8fbff;
+        linear-gradient(90deg, #6f7680 0%, #a9b0b8 32%, #c8cdd3 48%, #8e98a3 74%, #626b75 100%);
     box-shadow:
-        4px 5px 12px rgba(0,0,0,.10),
-        inset -2px 0 0 rgba(47,113,244,.16),
-        inset 0 -3px 0 rgba(47,113,244,.14);
+        0 2px 3px rgba(52,64,84,.18),
+        inset 0 -2px 0 rgba(52,64,84,.18);
+    opacity: .72;
+    z-index: -1;
+}
+.room-card::before {
+    left: 24px;
+}
+.room-card::after {
+    right: 24px;
+}
+.room-card.quick-checkin-card {
+    border-color: rgba(102,112,133,.46);
+    background: #f6f7f9;
+    box-shadow:
+        5px 7px 0 rgba(102,112,133,.14),
+        0 12px 18px rgba(52,64,84,.12),
+        inset -2px 0 0 rgba(102,112,133,.14),
+        inset 0 -4px 0 rgba(102,112,133,.12);
+}
+.desk-surface {
+    border-radius: 0 0 8px 8px;
+    padding: 8px 9px 10px 9px;
+    background:
+        linear-gradient(180deg, rgba(255,255,255,.10), rgba(0,0,0,.06)),
+        #cf8847;
+    border-top: 6px solid #bd7433;
+}
+.quick-checkin-card .desk-surface {
+    background:
+        linear-gradient(180deg, rgba(255,255,255,.12), rgba(0,0,0,.06)),
+        #7f8790;
+    border-top-color: #667085;
+}
+.seat-note {
+    box-sizing: border-box;
+    height: 58px;
+    padding: 7px 9px 6px 9px;
+    background: #fffaf2;
+    border-radius: 8px 8px 0 0;
+    border-bottom: 1px solid rgba(135,92,52,.16);
+}
+.quick-checkin-card .seat-note {
+    background: #f2f2ef;
 }
 .avatar {
-    font-size: 1.5rem;
-    width: 38px;
-    height: 38px;
-    min-width: 38px;
-    flex: 0 0 38px;
+    position: relative;
+    font-size: 1.32rem;
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    flex: 0 0 34px;
     display:flex;
     align-items:center;
     justify-content:center;
-    border-radius: 12px;
-    background: rgba(100,120,255,.13);
-    border: 1px solid rgba(128,128,128,.18);
+    border-radius: 50%;
+    background: #fff7df;
+    border: 2px solid rgba(143,96,45,.30);
+    box-shadow: 0 2px 0 rgba(143,96,45,.18);
     color: #24303f;
+}
+.you-badge {
+    position: absolute;
+    left: 50%;
+    bottom: -7px;
+    transform: translateX(-50%);
+    border: 1px solid rgba(181,118,32,.40);
+    border-radius: 999px;
+    padding: 0 4px;
+    background: #fff1c6;
+    color: #8a4b0f;
+    font-size: .48rem;
+    font-weight: 800;
+    line-height: 1.25;
+    white-space: nowrap;
+    box-shadow: 0 1px 2px rgba(16,24,40,.12);
+}
+.quick-checkin-card .avatar {
+    background: #e7e5df;
+    border-color: rgba(92,88,80,.30);
+    box-shadow: 0 2px 0 rgba(92,88,80,.14);
 }
 .card-top {
     display:flex;
     align-items:center;
     gap: 8px;
+    height: 100%;
+    min-width: 0;
 }
 .profile-comment {
+    position: relative;
+    z-index: 1;
     min-width: 0;
-    font-size: .68rem;
+    box-sizing: border-box;
+    height: 2.55rem;
+    display: flex;
+    align-items: center;
+    font-size: .64rem;
     line-height: 1.3;
-    color: #344054;
-    opacity: .74;
+    color: #2f241b;
+    background: #fffaf2;
+    border: 1px solid rgba(101,63,29,.22);
+    border-radius: 11px;
+    padding: 5px 7px;
+    margin-bottom: 6px;
+    box-shadow: 0 2px 0 rgba(101,63,29,.10);
     overflow-wrap: anywhere;
+    overflow: visible;
+}
+.profile-comment::before {
+    content: "";
+    position: absolute;
+    left: 15px;
+    top: -8px;
+    width: 0;
+    height: 0;
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-bottom: 8px solid #fffaf2;
+    z-index: 2;
+    filter: drop-shadow(0 -1px 0 rgba(101,63,29,.16));
+}
+.quick-checkin-card .profile-comment {
+    background: #f2f2ef;
+}
+.quick-checkin-card .profile-comment::before {
+    border-bottom-color: #f2f2ef;
 }
 .participant-name {
-    margin-top: 8px;
-    font-size: .9rem;
+    margin: 0;
+    padding: 0;
+    font-size: .76rem;
     line-height: 1.25;
-    color: #1f2937;
+    color: #241a12;
+    text-align: left;
+    min-width: 0;
+    flex: 1 1 auto;
+    overflow-wrap: anywhere;
 }
-.entry-badge {
-    display: inline-block;
-    margin-top: 4px;
-    border: 1px solid rgba(47,113,244,.26);
-    border-radius: 999px;
-    padding: 1px 7px;
-    font-size: .64rem;
-    font-weight: 700;
-    line-height: 1.35;
-    color: #175cd3;
-    background: rgba(47,113,244,.10);
+.participant-name strong {
+    display: block;
+    white-space: normal;
 }
 .participant-detail {
-    font-size: .82rem;
+    font-size: .76rem;
     line-height: 1.25;
     color: #344054;
     min-width: 0;
     overflow-wrap: anywhere;
 }
-.desk-line {
-    height: 6px;
-    border-radius: 999px;
-    background: rgba(128,128,128,.14);
-    margin: 8px 0 6px 0;
+.desk-info-row {
+    display: grid;
+    grid-template-columns: 1.15rem minmax(0, 1fr);
+    align-items: center;
+    column-gap: 2px;
+    color: #fff8e8;
+    font-size: .72rem;
+    line-height: 1.25;
+    opacity: .96;
+    text-shadow: 0 1px 0 rgba(70,38,16,.28);
+    min-height: 1.1rem;
 }
-.small-muted {color: #475467; opacity:.78; font-size:.78rem; line-height:1.25;}
-.card-meta-row {
-    display:flex;
-    align-items:center;
-    justify-content:flex-start;
-    gap: 5px;
+.desk-info-icon {
+    width: 1.15rem;
+    text-align: center;
+    font-size: .74rem;
+    line-height: 1;
+}
+.desk-info-text {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+.desk-info-line {
+    display: flex;
+    align-items: center;
+    gap: 4px;
     flex-wrap: wrap;
-    margin-top: 5px;
+    min-height: 1.1rem;
+}
+.desk-line {
+    display: none;
+}
+.small-muted {color: #475467; opacity:.78; font-size:.72rem; line-height:1.25;}
+.desk-surface .small-muted,
+.desk-surface .participant-detail {
+    color: #fff8e8;
+    opacity: .96;
+    text-shadow: 0 1px 0 rgba(70,38,16,.28);
+}
+.card-meta-row {
+    display:block;
+    margin-top: 4px;
 }
 .card-difficulty {
     display:inline-block;
     flex: 0 0 auto;
     border: 1px solid rgba(128,128,128,.22);
     border-radius: 999px;
-    padding: 1px 6px;
-    font-size: .64rem;
+    padding: 1px 5px;
+    font-size: .58rem;
     font-weight: 700;
     line-height: 1.25;
 }
+.card-difficulty.placeholder {
+    visibility: hidden;
+}
 .card-difficulty.easy {
     color: #067647;
-    background: rgba(18,183,106,.13);
+    background: #d9f8e8;
     border-color: rgba(18,183,106,.30);
 }
 .card-difficulty.normal {
     color: #175cd3;
-    background: rgba(47,113,244,.12);
+    background: #dceaff;
     border-color: rgba(47,113,244,.26);
 }
 .card-difficulty.hard {
     color: #b42318;
-    background: rgba(240,68,56,.12);
+    background: #ffe1de;
     border-color: rgba(240,68,56,.28);
 }
 .activity-room {
-    border: 1px solid rgba(128,128,128,.22);
-    border-radius: 12px;
-    padding: 14px 14px 4px 14px;
-    margin: 16px 0 14px 0;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(104,82,58,.24);
+    border-radius: 16px;
+    padding: 14px 16px 10px 16px;
+    margin: 18px 0 18px 0;
     background:
-        linear-gradient(rgba(128,128,128,.035) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(128,128,128,.028) 1px, transparent 1px),
-        rgba(128,128,128,.03);
-    background-size: 28px 28px;
+        linear-gradient(180deg, rgba(247,241,225,.96) 0 260px, rgba(226,199,160,.95) 260px),
+        linear-gradient(90deg, rgba(255,255,255,.45) 0 1px, transparent 1px),
+        #f6efdd;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.70), 0 12px 28px rgba(65,50,34,.12);
+}
+.activity-room::before {
+    content: "";
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    width: min(28%, 190px);
+    height: 56px;
+    border: 5px solid rgba(255,255,255,.88);
+    border-radius: 8px;
+    background:
+        linear-gradient(90deg, transparent calc(50% - 2px), rgba(255,255,255,.90) calc(50% - 2px) calc(50% + 2px), transparent calc(50% + 2px)),
+        linear-gradient(180deg, #c7e8ff 0 48%, #8dc7ef 48% 52%, #d8f0ff 52%);
+    box-shadow: 0 4px 10px rgba(91,116,137,.18);
+    opacity: .8;
+}
+.activity-room::after {
+    content: "";
+    position: absolute;
+    left: -8%;
+    right: -8%;
+    bottom: -28px;
+    height: 42%;
+    background:
+        repeating-linear-gradient(90deg, rgba(128,88,45,.12) 0 2px, transparent 2px 72px),
+        linear-gradient(180deg, rgba(205,157,96,.16), rgba(151,93,43,.22));
+    transform: perspective(620px) rotateX(58deg);
+    transform-origin: bottom;
+    pointer-events: none;
+}
+.activity-room > * {
+    position: relative;
+    z-index: 1;
 }
 .activity-room.mine {
-    border-color: rgba(46,204,113,.55);
+    border-color: rgba(181,118,32,.44);
     background:
-        linear-gradient(rgba(46,204,113,.07) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(46,204,113,.05) 1px, transparent 1px),
-        rgba(46,204,113,.08);
-    background-size: 28px 28px;
+        linear-gradient(180deg, rgba(250,244,230,.98) 0 260px, rgba(222,199,157,.94) 260px),
+        #f7eed8;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.74), 0 14px 30px rgba(120,76,38,.13);
 }
 .activity-room.empty {
     opacity: .7;
 }
 .empty-room {
-    border: 1px solid rgba(128,128,128,.18);
+    border: 1px solid rgba(152,162,179,.18);
     border-radius: 8px;
-    padding: 8px 10px;
+    padding: 7px 9px;
     margin-bottom: 8px;
-    background: rgba(128,128,128,.025);
+    background: rgba(152,162,179,.045);
+    color: #667085;
 }
 .empty-room-title {
     margin: 0;
-    font-size: .86rem;
+    font-size: .8rem;
     line-height: 1.25;
-    font-weight: 600;
+    font-weight: 500;
 }
 .empty-room-count {
-    opacity: .65;
-    font-size: .72rem;
+    opacity: .58;
+    font-size: .68rem;
     margin-top: 3px;
 }
 .activity-room-header {
@@ -390,30 +736,124 @@ CUSTOM_CSS = """
     margin-top: 16px;
     background: rgba(128,128,128,.035);
 }
+[data-testid="stMain"] [data-testid="stExpander"] details {
+    border: 1px solid rgba(115,88,55,.28);
+    border-radius: 14px;
+    overflow: hidden;
+    background:
+        linear-gradient(180deg, rgba(238,225,202,.72), rgba(221,203,173,.82)),
+        repeating-linear-gradient(90deg, rgba(255,255,255,.22) 0 1px, transparent 1px 42px);
+    box-shadow: 0 8px 18px rgba(82,61,38,.10);
+}
+[data-testid="stMain"] [data-testid="stExpander"] summary {
+    min-height: 46px;
+    border-left: 12px solid #8c6036;
+    background:
+        linear-gradient(90deg, #b98248 0 16px, #e7c793 16px 18px, #f3dfbd 18px),
+        #f3dfbd;
+    color: #3b2a1b;
+    font-weight: 700;
+}
+[data-testid="stMain"] [data-testid="stExpander"] summary:hover {
+    background:
+        linear-gradient(90deg, #a8733d 0 16px, #e7c793 16px 18px, #f7e7ca 18px),
+        #f7e7ca;
+}
+[data-testid="stMain"] [data-testid="stExpander"] details:has(.empty-rooms-panel) {
+    border: 1px solid rgba(152,162,179,.24);
+    border-radius: 12px;
+    background: linear-gradient(180deg, rgba(248,250,252,.86), rgba(238,242,247,.88));
+    box-shadow: 0 6px 14px rgba(52,64,84,.08);
+}
+[data-testid="stMain"] [data-testid="stExpander"] details:has(.empty-rooms-panel) summary {
+    min-height: 42px;
+    border-left: 8px solid rgba(102,112,133,.38);
+    background: rgba(248,250,252,.94);
+    color: #475467;
+    font-weight: 650;
+}
+[data-testid="stMain"] [data-testid="stExpander"] details:has(.empty-rooms-panel) summary:hover {
+    background: rgba(242,244,247,.96);
+}
+.empty-rooms-panel {
+    height: 0;
+    overflow: hidden;
+}
+[data-testid="stMain"] [data-testid="stExpander"] details:has(.room-desk-area) {
+    background:
+        linear-gradient(180deg, rgba(250,246,234,.92) 0 230px, rgba(213,193,161,.48) 230px 233px, rgba(235,222,201,.78) 233px),
+        #f6efe1;
+}
 .room-desk-area {
+    position: relative;
+    overflow: hidden;
     border: 0;
     border-radius: 0;
-    padding: 8px 0 0 0;
-    margin-bottom: 14px;
+    padding: 18px 16px 6px 16px;
+    margin: 0 0 14px 0;
     background: transparent;
+    box-shadow: none;
+}
+.room-desk-area::before {
+    content: none;
+}
+.room-desk-area::after {
+    content: "";
+    position: absolute;
+    top: 18px;
+    left: 18px;
+    right: 18px;
+    height: 112px;
+    background:
+        linear-gradient(90deg, transparent 0 4px, rgba(199,207,216,.92) 4px 124px, transparent 124px),
+        linear-gradient(90deg, transparent 0 4px, rgba(174,150,118,.34) 4px 124px, transparent 124px),
+        linear-gradient(90deg, rgba(185,196,207,.90) 0 4px, transparent 4px 60px, rgba(185,196,207,.72) 60px 64px, transparent 64px 120px, rgba(185,196,207,.90) 120px 124px, transparent 124px),
+        linear-gradient(90deg, transparent 0 4px, rgba(185,196,207,.70) 4px 124px, transparent 124px),
+        linear-gradient(115deg, transparent 0 12%, rgba(255,255,255,.38) 12% 18%, transparent 18% 32%, rgba(255,255,255,.26) 32% 38%, transparent 38%),
+        radial-gradient(circle at 12% 14%, rgba(255,255,255,.32), transparent 18%),
+        linear-gradient(90deg, transparent 0 4px, rgba(222,240,248,.70) 4px 60px, rgba(255,255,255,.38) 60px 68px, rgba(222,240,248,.58) 68px 120px, transparent 120px);
+    background-repeat: repeat-x;
+    background-size: 158px 6px, 158px 8px, 158px 112px, 158px 4px, 158px 112px, 158px 112px, 158px 112px;
+    background-position: 0 0, 0 104px, 0 0, 0 51px, 0 0, 0 0, 0 0;
+    filter: drop-shadow(0 8px 12px rgba(73,63,50,.08));
+    pointer-events: none;
+}
+.room-desk-area > * {
+    position: relative;
+    z-index: 1;
+}
+.room-desk-area .room-members {
+    margin-top: -12px;
 }
 .room-heading {
     display:flex;
     align-items:center;
     justify-content:space-between;
     gap:12px;
-    margin-bottom: 10px;
+    margin-bottom: 14px;
+    min-height: 58px;
+    padding: 10px 12px;
+    border: 6px solid #a67c52;
+    border-radius: 12px;
+    background:
+        linear-gradient(180deg, rgba(255,255,255,.08), rgba(0,0,0,.06)),
+        #295f4e;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.18), 0 5px 0 rgba(96,64,35,.22);
+    color: #fff8dc;
 }
 .room-heading h3 {
     margin:0;
-    font-size:1.1rem;
+    font-size:1.08rem;
+    color: #fff8dc;
+    text-shadow: 0 1px 0 rgba(0,0,0,.18);
 }
 .room-count {
-    border: 1px solid rgba(128,128,128,.26);
+    border: 1px solid rgba(255,255,255,.28);
     border-radius: 999px;
     padding: 2px 10px;
     font-size: .82rem;
-    opacity: .78;
+    background: rgba(255,255,255,.14);
+    color: #fff8dc;
     white-space: nowrap;
 }
 .room-tags {
@@ -427,21 +867,22 @@ CUSTOM_CSS = """
     border-radius: 999px;
     padding: 2px 9px;
     font-size: .78rem;
-    background: rgba(99,102,241,.12);
+    background: rgba(255,255,255,.13);
+    color: #fff8dc;
     white-space: nowrap;
 }
 .room-tag.mine {
-    background: rgba(46,204,113,.18);
+    background: rgba(255,236,153,.24);
 }
 .room-tag.recent {
-    background: rgba(128,128,128,.10);
-    color: #475467;
+    background: rgba(255,255,255,.10);
+    color: #e6f5ee;
 }
 .room-members {
     display:grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 8px;
-    margin-bottom: 14px;
+    gap: 16px 10px;
+    margin: 18px 0 16px 0;
 }
 @media (max-width: 1280px) {
     .room-members {grid-template-columns: repeat(4, minmax(0, 1fr));}
@@ -564,6 +1005,11 @@ def init_db():
             conn.execute("ALTER TABLE presence_events ADD COLUMN difficulty TEXT")
         if "participation_type" not in event_columns:
             conn.execute("ALTER TABLE presence_events ADD COLUMN participation_type TEXT")
+        for table_name in ("participants", "feedback", "presence_events", "study_segments"):
+            conn.execute(
+                f"UPDATE {table_name} SET activity = ? WHERE activity = ?",
+                ("フリールーム", "その他"),
+            )
 
 
 def cleanup_stale():
@@ -751,9 +1197,11 @@ def study_summary_from_segments(session_id, since) -> dict | None:
                 "activity": activity,
                 "detail": detail,
                 "duration_label": format_duration_seconds(seconds),
+                "duration_minutes": seconds // 60,
             }
             for (activity, detail), seconds in breakdown.items()
         ],
+        "total_minutes": total_seconds // 60,
     }
 
 
@@ -1344,6 +1792,61 @@ def render_study_summary(summary):
         """,
         unsafe_allow_html=True,
     )
+    copy_text = build_study_summary_copy_text(summary)
+    copy_text_json = json.dumps(copy_text, ensure_ascii=False)
+    components.html(
+        f"""
+        <div style="margin: -4px 0 10px 0;">
+          <div style="display:flex; gap:8px; align-items:center;">
+            <button id="copy-study-summary" type="button" style="
+              border:1px solid rgba(120,76,35,.34);
+              border-radius:8px;
+              padding:7px 12px;
+              background:linear-gradient(180deg, #c9955d, #a86f38);
+              color:#fffaf0;
+              font-weight:700;
+              cursor:pointer;
+              box-shadow:inset 0 1px 0 rgba(255,255,255,.28), 0 3px 8px rgba(91,62,35,.14);
+            ">学習時間をコピー</button>
+            <span id="copy-study-summary-status" style="font-size:12px; color:#6f4a27;"></span>
+          </div>
+          <div style="margin-top:5px; font-size:12px; line-height:1.4; color:#6f4a27;">
+            コピーした内容は、スプレッドシートに貼り付けるなどして、ご自身の学習時間の管理に活用できます。
+          </div>
+        </div>
+        <script>
+          const button = document.getElementById("copy-study-summary");
+          const status = document.getElementById("copy-study-summary-status");
+          button.addEventListener("click", async () => {{
+            try {{
+              await navigator.clipboard.writeText({copy_text_json});
+              status.textContent = "コピーしました";
+            }} catch (error) {{
+              status.textContent = "コピーできませんでした";
+            }}
+          }});
+        </script>
+        """,
+        height=76,
+    )
+
+
+def build_study_summary_copy_text(summary):
+    date_text = datetime.now(JST).strftime("%Y/%m/%d")
+    lines = ["日付\t部屋\t授業回\t集計時間（分）"]
+    for item in summary["items"]:
+        lines.append(
+            "\t".join(
+                [
+                    date_text,
+                    str(item["activity"]),
+                    str(item["detail"]),
+                    str(item.get("duration_minutes", 0)),
+                ]
+            )
+        )
+    lines.append("\t".join([date_text, "合計", "", str(summary.get("total_minutes", 0))]))
+    return "\n".join(lines)
 
 
 def render_quick_checkin_panel(request):
@@ -1387,7 +1890,11 @@ def render_quick_checkin_panel(request):
           </div>
           <p>{QUICK_JOIN_TIMEOUT_MINUTES}分間、この授業回を学習中の匿名の学生として表示されます。</p>
           <p>授業動画のタブに戻って、学習を続けてください。このタブは閉じても大丈夫です。</p>
-          <p>表示名をニックネームに変更したり、学習時間を記録したい場合は、StudyRoomを開いてください。</p>
+          <p class="quick-main-page-prompt">
+            <span>よければStudyRoomのメインページも開いてみてください。</span>
+            <span>同じ時間に学んでいる人の気配を感じながら、学習を続けられます。</span>
+            <span>退室時には今回の学習時間も確認できます。</span>
+          </p>
           <a class="quick-link" href="{safe_text(main_page_url)}" target="_self">StudyRoomを開く</a>
         </section>
         """,
@@ -1398,6 +1905,7 @@ def render_quick_checkin_panel(request):
 def render_quick_checkin_page(request, error=None):
     st.markdown(
         """
+        <div class="quick-page-spacer"></div>
         <div class="sidebar-brand">
           <h1>📚 StudyRoom</h1>
           <p>みんなのオンライン自習室</p>
@@ -1812,9 +2320,6 @@ with st.sidebar:
     elif course_lesson_error:
         st.error(course_lesson_error)
 
-    if st.session_state.last_study_summary and not st.session_state.joined:
-        render_study_summary(st.session_state.last_study_summary)
-
     if st.session_state.participation_type == "quick" and st.session_state.joined:
         st.header("簡易参加中")
         st.caption("授業ページから自動で入室しています。名前や状態は固定表示です。")
@@ -1844,7 +2349,7 @@ with st.sidebar:
             help="本名や学籍番号は入力しない運用を想定しています。全角10文字、または半角20文字以内です。",
         )
         activity = st.selectbox(
-            "今取り組んでいること",
+            "入室する部屋",
             ACTIVITY_OPTIONS,
             index=ACTIVITY_OPTIONS.index(st.session_state.activity)
             if st.session_state.activity in ACTIVITY_OPTIONS else 0,
@@ -1917,7 +2422,7 @@ with st.sidebar:
                     )
                     st.rerun()
         else:
-            if st.button("学習内容を更新", use_container_width=True):
+            if st.button("学習内容を更新", type="primary", use_container_width=True):
                 cleaned = nickname.strip() or st.session_state.nickname
                 cleaned_comment = comment.strip() or DEFAULT_COMMENT
                 nickname_error = validate_nickname(cleaned)
@@ -1955,7 +2460,11 @@ with st.sidebar:
                     persist_preferences_to_browser(current_preferences())
                     st.success("表示を更新しました。")
 
-            if st.button("退室する", use_container_width=True):
+            st.markdown(
+                '<div class="leave-room-note">退室すると、今回の学習時間を確認できます。</div>',
+                unsafe_allow_html=True,
+            )
+            if st.button("退室して学習時間を確認", type="secondary", use_container_width=True):
                 st.session_state.last_study_summary = leave_room(st.session_state.session_id)
                 st.session_state.joined = False
                 st.session_state.participation_type = "regular"
@@ -2065,8 +2574,19 @@ def live_area():
             unsafe_allow_html=True,
         )
 
+    if st.session_state.last_study_summary and not st.session_state.joined:
+        render_study_summary(st.session_state.last_study_summary)
+
     st.subheader("学習中の部屋")
-    st.caption("ここには入室中の参加者のニックネーム、コメント、授業回、状態が表示されます。")
+    st.markdown(
+        """
+        <div class="room-caption">
+          <div>ここには入室中の参加者のニックネーム、コメント、授業回、状態が表示されます。</div>
+          <div>グレーの机は、授業ページからチェックインした参加者を表しています。</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
     if not participants:
         st.info("現在はまだ誰もいません。最初の一人として入室してみてください。")
 
@@ -2104,9 +2624,9 @@ def live_area():
         member_cards = []
         for p in room_members:
             mine = p["session_id"] == st.session_state.session_id
-            label = f'{p["nickname"]}（あなた）' if mine else p["nickname"]
-            label = safe_text(label)
+            label = safe_text(p["nickname"])
             avatar_text = safe_text(p["avatar"] if p["avatar"] in AVATAR_OPTIONS else AVATAR_OPTIONS[0])
+            you_badge_html = '<span class="you-badge">あなた</span>' if mine else ""
             comment_text = safe_text(p["comment"] or "一緒に学習中")
             detail_text = safe_text(p["detail"] or "学習中")
             mood_text = safe_text(p["mood"] or "学習中")
@@ -2124,28 +2644,45 @@ def live_area():
                 difficulty_class = safe_text(difficulty_meta["class"])
                 difficulty_label = safe_text(difficulty_meta["label"])
                 difficulty_html = f'<span class="card-difficulty {difficulty_class}">{difficulty_label}</span>'
-            entry_badge_html = ""
+            else:
+                difficulty_html = '<span class="card-difficulty placeholder">体感</span>'
             card_class = "room-card"
+            if mine:
+                card_class += " my-card"
             if is_quick_checkin:
-                entry_badge_html = '<div><span class="entry-badge">授業ページからチェックイン</span></div>'
-                card_class = "room-card quick-checkin-card"
+                card_class += " quick-checkin-card"
             member_cards.append(
                 f'<div class="{card_class}">'
+                '<div class="seat-note">'
                 '<div class="card-top">'
-                f'<div class="avatar">{avatar_text}</div>'
-                f'<div class="profile-comment">{comment_text}</div>'
-                '</div>'
+                f'<div class="avatar">{avatar_text}{you_badge_html}</div>'
                 '<div class="participant-name">'
+                '<div>'
                 f'<strong>{label}</strong>'
                 '</div>'
-                f'{entry_badge_html}'
-                '<div class="desk-line"></div>'
-                '<div class="card-meta-row">'
-                f'<div class="participant-detail">🗂️ {detail_text}</div>'
-                f'{difficulty_html}'
                 '</div>'
-                f'<div class="small-muted">💬 {mood_text}</div>'
-                f'<div class="small-muted">{time_icon} {time_text}</div>'
+                '</div>'
+                '</div>'
+                '<div class="desk-surface">'
+                f'<div class="profile-comment">{comment_text}</div>'
+                '<div class="card-meta-row">'
+                '<div class="desk-info-row">'
+                '<span class="desk-info-icon">🗂️</span>'
+                '<span class="desk-info-line">'
+                f'<span class="desk-info-text">{detail_text}</span>'
+                f'{difficulty_html}'
+                '</span>'
+                '</div>'
+                '</div>'
+                '<div class="desk-info-row">'
+                '<span class="desk-info-icon">💬</span>'
+                f'<span class="desk-info-text">{mood_text}</span>'
+                '</div>'
+                '<div class="desk-info-row">'
+                f'<span class="desk-info-icon">{time_icon}</span>'
+                f'<span class="desk-info-text">{time_text}</span>'
+                '</div>'
+                '</div>'
                 '</div>'
             )
 
@@ -2171,6 +2708,7 @@ def live_area():
 
     if empty_rooms:
         with st.expander("空き部屋を見る", expanded=False):
+            st.markdown('<div class="empty-rooms-panel"></div>', unsafe_allow_html=True)
             cols = st.columns(3)
             for i, (activity, _) in enumerate(empty_rooms):
                 activity_text = safe_text(activity)
