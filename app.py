@@ -1708,7 +1708,7 @@ def render_study_summary(summary):
     copy_text_json = json.dumps(copy_text, ensure_ascii=False)
     components.html(
         f"""
-        <div style="margin: -4px 0 14px 0;">
+        <div style="margin: -4px 0 10px 0;">
           <div style="display:flex; gap:8px; align-items:center;">
             <button id="copy-study-summary" type="button" style="
               border:1px solid rgba(120,76,35,.34);
@@ -1739,7 +1739,7 @@ def render_study_summary(summary):
           }});
         </script>
         """,
-        height=48,
+        height=76,
     )
 
 
