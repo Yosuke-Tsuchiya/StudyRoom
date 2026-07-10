@@ -610,7 +610,7 @@ CUSTOM_CSS = """
 }
 [data-testid="stMain"] [data-testid="stExpander"] details:has(.room-desk-area) {
     background:
-        linear-gradient(180deg, rgba(250,246,234,.92) 0 54%, rgba(213,193,161,.48) 54% 55%, rgba(235,222,201,.78) 55%),
+        linear-gradient(180deg, rgba(250,246,234,.92) 0 68%, rgba(213,193,161,.48) 68% 69%, rgba(235,222,201,.78) 69%),
         #f6efe1;
 }
 .room-desk-area {
@@ -631,23 +631,13 @@ CUSTOM_CSS = """
     right: 18px;
     height: 108px;
     background:
-        repeating-linear-gradient(
-            90deg,
-            transparent 0 10px,
-            rgba(185,196,207,.90) 10px 14px,
-            rgba(222,240,248,.72) 14px 70px,
-            rgba(255,255,255,.42) 70px 78px,
-            rgba(222,240,248,.62) 78px 134px,
-            rgba(185,196,207,.90) 134px 138px,
-            transparent 138px 154px
-        ),
-        linear-gradient(180deg, transparent 0 49%, rgba(185,196,207,.76) 49% 53%, transparent 53%);
-    border-top: 6px solid rgba(199,207,216,.92);
-    border-bottom: 8px solid rgba(174,150,118,.42);
-    border-radius: 10px 10px 6px 6px;
-    box-shadow:
-        inset 0 0 0 1px rgba(255,255,255,.74),
-        0 8px 16px rgba(73,63,50,.08);
+        linear-gradient(180deg, rgba(199,207,216,.92) 0 6px, transparent 6px 94px, rgba(174,150,118,.34) 94px 102px, transparent 102px),
+        linear-gradient(90deg, rgba(185,196,207,.90) 0 4px, transparent 4px 60px, rgba(185,196,207,.72) 60px 64px, transparent 64px 120px, rgba(185,196,207,.90) 120px 124px, transparent 124px),
+        linear-gradient(180deg, transparent 0 47%, rgba(185,196,207,.70) 47% 51%, transparent 51%),
+        linear-gradient(90deg, transparent 0 4px, rgba(222,240,248,.70) 4px 60px, rgba(255,255,255,.38) 60px 68px, rgba(222,240,248,.58) 68px 120px, transparent 120px);
+    background-repeat: repeat-x;
+    background-size: 158px 108px;
+    filter: drop-shadow(0 8px 12px rgba(73,63,50,.08));
     pointer-events: none;
 }
 .room-desk-area::after {
@@ -660,7 +650,8 @@ CUSTOM_CSS = """
     background:
         linear-gradient(115deg, transparent 0 12%, rgba(255,255,255,.34) 12% 18%, transparent 18% 32%, rgba(255,255,255,.22) 32% 38%, transparent 38%),
         radial-gradient(circle at 12% 14%, rgba(255,255,255,.30), transparent 18%);
-    border-radius: 8px;
+    background-repeat: repeat-x;
+    background-size: 158px 102px;
     pointer-events: none;
 }
 .room-desk-area > * {
