@@ -317,11 +317,11 @@ CUSTOM_CSS = """
     left: 50%;
     bottom: -7px;
     transform: translateX(-50%);
-    border: 1px solid rgba(35,142,92,.32);
+    border: 1px solid rgba(181,118,32,.40);
     border-radius: 999px;
     padding: 0 4px;
-    background: #e4f8ed;
-    color: #067647;
+    background: #fff1c6;
+    color: #8a4b0f;
     font-size: .48rem;
     font-weight: 800;
     line-height: 1.25;
