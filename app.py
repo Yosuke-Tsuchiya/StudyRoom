@@ -221,6 +221,12 @@ CUSTOM_CSS = """
 .study-summary li {
     margin: 2px 0;
 }
+.study-summary-note {
+    margin-top: 8px;
+    font-size: .76rem;
+    line-height: 1.4;
+    color: #3d6548;
+}
 .quick-checkin {
     border: 1px solid rgba(47,113,244,.30);
     border-radius: 10px;
@@ -1700,6 +1706,7 @@ def render_study_summary(summary):
           <strong>おつかれさまでした</strong>
           今回は{safe_text(summary["total_label"])}、学習に取り組みました。
           <ul>{items_html}</ul>
+          <div class="study-summary-note">コピーした内容は、スプレッドシートに貼り付けるなどして、ご自身の学習時間の管理に活用できます。</div>
         </div>
         """,
         unsafe_allow_html=True,
