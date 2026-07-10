@@ -76,6 +76,9 @@ CUSTOM_CSS = """
 .stApp {
     background: #fffdf7;
 }
+header[data-testid="stHeader"] {
+    background: #fffdf7;
+}
 .block-container {padding-top: 2rem; padding-bottom: 3rem;}
 [data-testid="stSidebar"] {
     background:
