@@ -573,20 +573,30 @@ CUSTOM_CSS = """
     box-shadow: 0 8px 18px rgba(82,61,38,.10);
 }
 [data-testid="stMain"] [data-testid="stExpander"] summary {
+    position: relative;
     min-height: 46px;
     border-left: 0;
     background:
-        linear-gradient(90deg, transparent 0 7px, rgba(248,224,174,.86) 7px 10px, transparent 10px 18px),
-        linear-gradient(180deg, transparent calc(50% - 11px), rgba(255,239,190,.78) calc(50% - 11px) calc(50% + 11px), transparent calc(50% + 11px)),
         linear-gradient(90deg, #8c6036 0 18px, #e7c793 18px 20px, #f3dfbd 20px),
         #f3dfbd;
     color: #3b2a1b;
     font-weight: 700;
 }
+[data-testid="stMain"] [data-testid="stExpander"] summary::before {
+    content: "";
+    position: absolute;
+    left: 7px;
+    top: 50%;
+    width: 3px;
+    height: 22px;
+    transform: translateY(-50%);
+    border-radius: 999px;
+    background: rgba(255,239,190,.86);
+    box-shadow: 0 0 0 1px rgba(89,58,28,.14);
+    pointer-events: none;
+}
 [data-testid="stMain"] [data-testid="stExpander"] summary:hover {
     background:
-        linear-gradient(90deg, transparent 0 7px, rgba(255,234,185,.88) 7px 10px, transparent 10px 18px),
-        linear-gradient(180deg, transparent calc(50% - 11px), rgba(255,244,207,.80) calc(50% - 11px) calc(50% + 11px), transparent calc(50% + 11px)),
         linear-gradient(90deg, #7f562f 0 18px, #e7c793 18px 20px, #f7e7ca 20px),
         #f7e7ca;
 }
@@ -605,6 +615,9 @@ CUSTOM_CSS = """
 }
 [data-testid="stMain"] [data-testid="stExpander"] details:has(.empty-rooms-panel) summary:hover {
     background: rgba(242,244,247,.96);
+}
+[data-testid="stMain"] [data-testid="stExpander"] details:has(.empty-rooms-panel) summary::before {
+    content: none;
 }
 .empty-rooms-panel {
     height: 0;
