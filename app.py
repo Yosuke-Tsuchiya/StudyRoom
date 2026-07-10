@@ -287,7 +287,7 @@ CUSTOM_CSS = """
 }
 .seat-note {
     box-sizing: border-box;
-    height: 48px;
+    height: 58px;
     padding: 7px 9px 6px 9px;
     background: #fffaf2;
     border-radius: 8px 8px 0 0;
@@ -371,13 +371,11 @@ CUSTOM_CSS = """
     text-align: left;
     min-width: 0;
     flex: 1 1 auto;
-    overflow: hidden;
+    overflow-wrap: anywhere;
 }
 .participant-name strong {
     display: block;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    white-space: normal;
 }
 .entry-badge {
     display: block;
@@ -2331,7 +2329,7 @@ def live_area():
             entry_badge_html = ""
             card_class = "room-card"
             if is_quick_checkin:
-                entry_badge_html = '<span class="entry-badge">授業ページからチェックイン</span>'
+                entry_badge_html = '<span class="entry-badge">チェックイン</span>'
                 card_class = "room-card quick-checkin-card"
             member_cards.append(
                 f'<div class="{card_class}">'
