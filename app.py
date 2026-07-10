@@ -538,21 +538,22 @@ CUSTOM_CSS = """
     opacity: .7;
 }
 .empty-room {
-    border: 1px solid rgba(128,128,128,.18);
+    border: 1px solid rgba(152,162,179,.18);
     border-radius: 8px;
-    padding: 8px 10px;
+    padding: 7px 9px;
     margin-bottom: 8px;
-    background: rgba(128,128,128,.025);
+    background: rgba(152,162,179,.045);
+    color: #667085;
 }
 .empty-room-title {
     margin: 0;
-    font-size: .86rem;
+    font-size: .8rem;
     line-height: 1.25;
-    font-weight: 600;
+    font-weight: 500;
 }
 .empty-room-count {
-    opacity: .65;
-    font-size: .72rem;
+    opacity: .58;
+    font-size: .68rem;
     margin-top: 3px;
 }
 .activity-room-header {
@@ -563,36 +564,48 @@ CUSTOM_CSS = """
     background: rgba(128,128,128,.035);
 }
 [data-testid="stMain"] [data-testid="stExpander"] details {
-    border: 1px solid rgba(115,88,55,.28);
-    border-radius: 14px;
+    border: 1px solid rgba(152,162,179,.24);
+    border-radius: 12px;
     overflow: hidden;
     background:
-        linear-gradient(180deg, rgba(238,225,202,.72), rgba(221,203,173,.82)),
-        repeating-linear-gradient(90deg, rgba(255,255,255,.22) 0 1px, transparent 1px 42px);
-    box-shadow: 0 8px 18px rgba(82,61,38,.10);
+        linear-gradient(180deg, rgba(248,250,252,.86), rgba(238,242,247,.88));
+    box-shadow: 0 6px 14px rgba(52,64,84,.08);
 }
 [data-testid="stMain"] [data-testid="stExpander"] summary {
-    min-height: 46px;
-    border-left: 12px solid #8c6036;
-    background:
-        radial-gradient(circle at calc(100% - 34px) 50%, #f7d37b 0 4px, transparent 5px),
-        linear-gradient(90deg, #b98248 0 16px, #e7c793 16px 18px, #f3dfbd 18px),
-        #f3dfbd;
-    color: #3b2a1b;
-    font-weight: 700;
+    min-height: 42px;
+    border-left: 8px solid rgba(102,112,133,.38);
+    background: rgba(248,250,252,.94);
+    color: #475467;
+    font-weight: 650;
 }
 [data-testid="stMain"] [data-testid="stExpander"] summary:hover {
-    background:
-        radial-gradient(circle at calc(100% - 34px) 50%, #f7d37b 0 4px, transparent 5px),
-        linear-gradient(90deg, #a8733d 0 16px, #e7c793 16px 18px, #f7e7ca 18px),
-        #f7e7ca;
+    background: rgba(242,244,247,.96);
 }
 .room-desk-area {
-    border: 0;
-    border-radius: 0;
-    padding: 12px 0 0 0;
+    position: relative;
+    overflow: hidden;
+    border: 8px solid rgba(255,255,255,.82);
+    border-radius: 14px;
+    padding: 18px 14px 4px 14px;
     margin-bottom: 14px;
-    background: transparent;
+    background:
+        linear-gradient(90deg, transparent calc(50% - 2px), rgba(255,255,255,.70) calc(50% - 2px) calc(50% + 2px), transparent calc(50% + 2px)),
+        linear-gradient(180deg, transparent calc(50% - 2px), rgba(255,255,255,.62) calc(50% - 2px) calc(50% + 2px), transparent calc(50% + 2px)),
+        linear-gradient(180deg, rgba(229,241,249,.68), rgba(245,238,220,.72));
+    box-shadow:
+        inset 0 0 0 1px rgba(152,162,179,.20),
+        0 10px 22px rgba(52,64,84,.10);
+}
+.room-desk-area::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(115deg, rgba(255,255,255,.42) 0 18%, transparent 18% 100%);
+    pointer-events: none;
+}
+.room-desk-area > * {
+    position: relative;
+    z-index: 1;
 }
 .room-heading {
     display:flex;
