@@ -280,6 +280,12 @@ CUSTOM_CSS = """
         #cf8847;
     border-top: 6px solid #bd7433;
 }
+.quick-checkin-card .desk-surface {
+    background:
+        linear-gradient(180deg, rgba(255,255,255,.12), rgba(0,0,0,.06)),
+        #6f9fc7;
+    border-top-color: #517fa8;
+}
 .seat-note {
     padding: 7px 9px 6px 9px;
     background: #fffaf2;
