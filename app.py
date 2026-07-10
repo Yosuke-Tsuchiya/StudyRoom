@@ -108,6 +108,15 @@ CUSTOM_CSS = """
 [data-testid="InputInstructions"] {
     display: none;
 }
+.room-caption {
+    margin: -.2rem 0 .45rem 0;
+    color: #667085;
+    font-size: .82rem;
+    line-height: 1.35;
+}
+.room-caption div + div {
+    margin-top: 1px;
+}
 .study-summary {
     border: 1px solid rgba(46,204,113,.35);
     border-radius: 8px;
@@ -2267,8 +2276,15 @@ def live_area():
         )
 
     st.subheader("学習中の部屋")
-    st.caption("ここには入室中の参加者のニックネーム、コメント、授業回、状態が表示されます。")
-    st.caption("グレーの机は、授業ページからチェックインした参加者を表しています。")
+    st.markdown(
+        """
+        <div class="room-caption">
+          <div>ここには入室中の参加者のニックネーム、コメント、授業回、状態が表示されます。</div>
+          <div>グレーの机は、授業ページからチェックインした参加者を表しています。</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
     if not participants:
         st.info("現在はまだ誰もいません。最初の一人として入室してみてください。")
 
