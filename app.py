@@ -162,8 +162,8 @@ CUSTOM_CSS = """
     border: 1px solid rgba(139,96,54,.20);
     border-radius: 8px;
     background:
-        linear-gradient(180deg, rgba(255,255,255,.74), rgba(255,250,240,.86)),
-        #fffaf0;
+        linear-gradient(180deg, rgba(242,222,190,.78), rgba(232,207,170,.82)),
+        #ead3ac;
     box-shadow: 0 2px 8px rgba(91,62,35,.06);
 }
 [data-testid="stSidebar"] [data-testid="stExpander"] summary {
