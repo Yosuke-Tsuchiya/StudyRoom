@@ -75,7 +75,6 @@ CUSTOM_CSS = """
 .block-container {padding-top: 2rem; padding-bottom: 3rem;}
 [data-testid="stSidebar"] {
     background:
-        linear-gradient(180deg, rgba(255,250,239,.94) 0 72%, rgba(236,221,195,.92) 72%),
         repeating-linear-gradient(90deg, rgba(139,96,54,.045) 0 1px, transparent 1px 34px),
         #fff8ea;
 }
