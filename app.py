@@ -608,37 +608,60 @@ CUSTOM_CSS = """
     height: 0;
     overflow: hidden;
 }
+[data-testid="stMain"] [data-testid="stExpander"] details:has(.room-desk-area) {
+    background:
+        linear-gradient(180deg, rgba(250,246,234,.92) 0 54%, rgba(213,193,161,.48) 54% 55%, rgba(235,222,201,.78) 55%),
+        #f6efe1;
+}
 .room-desk-area {
     position: relative;
     overflow: hidden;
-    border: 1px solid rgba(151,122,84,.24);
-    border-radius: 16px;
+    border: 0;
+    border-radius: 0;
     padding: 18px 16px 6px 16px;
-    margin-bottom: 14px;
+    margin: 0 0 14px 0;
+    background: transparent;
+    box-shadow: none;
+}
+.room-desk-area::before {
+    content: "";
+    position: absolute;
+    top: 18px;
+    left: 18px;
+    right: 18px;
+    height: 108px;
     background:
-        linear-gradient(115deg, transparent 0 12%, rgba(255,255,255,.18) 12% 17%, transparent 17% 30%, rgba(255,255,255,.12) 30% 36%, transparent 36%),
         repeating-linear-gradient(
             90deg,
-            transparent 0 22px,
-            rgba(190,200,209,.58) 22px 26px,
-            rgba(221,239,247,.46) 26px 76px,
-            rgba(255,255,255,.24) 76px 84px,
-            rgba(221,239,247,.38) 84px 132px,
-            rgba(190,200,209,.58) 132px 136px,
-            transparent 136px 168px
+            transparent 0 10px,
+            rgba(185,196,207,.90) 10px 14px,
+            rgba(222,240,248,.72) 14px 70px,
+            rgba(255,255,255,.42) 70px 78px,
+            rgba(222,240,248,.62) 78px 134px,
+            rgba(185,196,207,.90) 134px 138px,
+            transparent 138px 154px
         ),
-        linear-gradient(180deg, transparent 0 23px, rgba(205,213,221,.48) 23px 28px, transparent 28px 112px, rgba(177,151,116,.28) 112px 119px, transparent 119px),
-        linear-gradient(180deg, rgba(250,246,234,.92) 0 58%, rgba(213,193,161,.48) 58% 59%, rgba(235,222,201,.78) 59%),
-        #f6efe1;
-    background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, repeat;
-    background-size: 100% 126px, 100% 126px, 100% 126px, auto, auto;
+        linear-gradient(180deg, transparent 0 49%, rgba(185,196,207,.76) 49% 53%, transparent 53%);
+    border-top: 6px solid rgba(199,207,216,.92);
+    border-bottom: 8px solid rgba(174,150,118,.42);
+    border-radius: 10px 10px 6px 6px;
     box-shadow:
-        inset 0 0 0 1px rgba(255,255,255,.62),
-        0 12px 22px rgba(52,64,84,.14);
+        inset 0 0 0 1px rgba(255,255,255,.74),
+        0 8px 16px rgba(73,63,50,.08);
+    pointer-events: none;
 }
-.room-desk-area::before,
 .room-desk-area::after {
-    content: none;
+    content: "";
+    position: absolute;
+    top: 24px;
+    left: 18px;
+    right: 18px;
+    height: 102px;
+    background:
+        linear-gradient(115deg, transparent 0 12%, rgba(255,255,255,.34) 12% 18%, transparent 18% 32%, rgba(255,255,255,.22) 32% 38%, transparent 38%),
+        radial-gradient(circle at 12% 14%, rgba(255,255,255,.30), transparent 18%);
+    border-radius: 8px;
+    pointer-events: none;
 }
 .room-desk-area > * {
     position: relative;
