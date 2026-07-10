@@ -370,11 +370,11 @@ CUSTOM_CSS = """
 }
 .entry-badge {
     display: inline-block;
-    margin-left: 2px;
+    margin: 0 0 2px 0;
     border: 1px solid rgba(181,118,32,.34);
     border-radius: 999px;
     padding: 1px 5px;
-    font-size: .56rem;
+    font-size: .52rem;
     font-weight: 700;
     line-height: 1.25;
     color: #8a4b0f;
@@ -2316,7 +2316,7 @@ def live_area():
             entry_badge_html = ""
             card_class = "room-card"
             if is_quick_checkin:
-                entry_badge_html = '<span class="entry-badge">チェックイン</span>'
+                entry_badge_html = '<span class="entry-badge">授業ページからのチェックイン</span>'
                 card_class = "room-card quick-checkin-card"
             member_cards.append(
                 f'<div class="{card_class}">'
@@ -2324,7 +2324,10 @@ def live_area():
                 '<div class="card-top">'
                 f'<div class="avatar">{avatar_text}</div>'
                 '<div class="participant-name">'
+                f'{entry_badge_html}'
+                '<div>'
                 f'<strong>{label}</strong>'
+                '</div>'
                 '</div>'
                 '</div>'
                 '</div>'
@@ -2335,7 +2338,6 @@ def live_area():
                 '<span class="desk-info-icon">🗂️</span>'
                 '<span class="desk-info-line">'
                 f'<span class="desk-info-text">{detail_text}</span>'
-                f'{entry_badge_html}'
                 f'{difficulty_html}'
                 '</span>'
                 '</div>'
