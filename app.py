@@ -309,7 +309,8 @@ CUSTOM_CSS = """
 .profile-comment {
     position: relative;
     min-width: 0;
-    min-height: calc(.64rem * 1.3 * 2 + 10px);
+    box-sizing: border-box;
+    height: 2.55rem;
     display: flex;
     align-items: center;
     font-size: .64rem;
@@ -322,6 +323,7 @@ CUSTOM_CSS = """
     margin-bottom: 6px;
     box-shadow: 0 2px 0 rgba(101,63,29,.10);
     overflow-wrap: anywhere;
+    overflow: hidden;
 }
 .profile-comment::before {
     content: "";
@@ -379,6 +381,7 @@ CUSTOM_CSS = """
     line-height: 1.25;
     opacity: .96;
     text-shadow: 0 1px 0 rgba(70,38,16,.28);
+    min-height: 1.1rem;
 }
 .desk-info-icon {
     width: 1.15rem;
@@ -395,6 +398,7 @@ CUSTOM_CSS = """
     align-items: center;
     gap: 4px;
     flex-wrap: wrap;
+    min-height: 1.1rem;
 }
 .desk-line {
     display: none;
@@ -419,6 +423,9 @@ CUSTOM_CSS = """
     font-size: .58rem;
     font-weight: 700;
     line-height: 1.25;
+}
+.card-difficulty.placeholder {
+    visibility: hidden;
 }
 .card-difficulty.easy {
     color: #067647;
@@ -2288,6 +2295,8 @@ def live_area():
                 difficulty_class = safe_text(difficulty_meta["class"])
                 difficulty_label = safe_text(difficulty_meta["label"])
                 difficulty_html = f'<span class="card-difficulty {difficulty_class}">{difficulty_label}</span>'
+            else:
+                difficulty_html = '<span class="card-difficulty placeholder">体感</span>'
             entry_badge_html = ""
             card_class = "room-card"
             if is_quick_checkin:
