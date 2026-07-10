@@ -73,37 +73,59 @@ st.set_page_config(
 CUSTOM_CSS = """
 <style>
 .block-container {padding-top: 2rem; padding-bottom: 3rem;}
+[data-testid="stSidebar"] {
+    background:
+        linear-gradient(180deg, rgba(255,250,239,.94) 0 72%, rgba(236,221,195,.92) 72%),
+        repeating-linear-gradient(90deg, rgba(139,96,54,.045) 0 1px, transparent 1px 34px),
+        #fff8ea;
+}
 [data-testid="stSidebar"] .block-container {
     padding-top: .9rem;
 }
 .sidebar-brand {
-    margin-bottom: .8rem;
+    position: relative;
+    margin: .1rem 0 .85rem 0;
+    padding: 12px 13px 13px 13px;
+    border: 1px solid rgba(139,96,54,.28);
+    border-radius: 10px;
+    background:
+        linear-gradient(180deg, rgba(255,255,255,.16), rgba(104,68,32,.10)),
+        linear-gradient(90deg, #c8945d, #e2bc84 42%, #c2874d);
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.36),
+        0 6px 14px rgba(91,62,35,.12);
+    color: #3f2b1a;
 }
 .sidebar-brand h1 {
-    font-size: 2rem;
+    font-size: 2.05rem;
     margin: 0;
     line-height: 1;
     font-weight: 800;
     letter-spacing: 0;
+    text-shadow: 0 1px 0 rgba(255,255,255,.30);
 }
 .sidebar-brand p {
     margin: .35rem 0 0 0;
-    opacity: .75;
+    opacity: .82;
     font-size: .88rem;
 }
 .sidebar-notice {
-    border: 1px solid rgba(128,128,128,.22);
+    border: 1px solid rgba(139,96,54,.20);
     border-radius: 8px;
-    padding: 8px 10px;
+    padding: 9px 10px;
     margin: .75rem 0 1rem 0;
-    background: rgba(128,128,128,.045);
+    background:
+        linear-gradient(180deg, rgba(255,255,255,.78), rgba(255,252,244,.84)),
+        #fffdf7;
     font-size: .78rem;
     line-height: 1.45;
+    box-shadow: 0 2px 8px rgba(91,62,35,.06);
 }
 .sidebar-notice strong {
     display: block;
     font-size: .82rem;
     margin-bottom: 2px;
+    color: #6f4a27;
 }
 [data-testid="InputInstructions"] {
     display: none;
@@ -211,14 +233,17 @@ CUSTOM_CSS = """
     margin: .75rem 0 1rem 0;
 }
 .sidebar-stat {
-    border: 1px solid rgba(128,128,128,.22);
+    border: 1px solid rgba(139,96,54,.22);
     border-radius: 8px;
     padding: 7px 6px;
-    background: rgba(128,128,128,.045);
+    background:
+        linear-gradient(180deg, rgba(255,255,255,.80), rgba(255,249,238,.86)),
+        #fffaf0;
+    box-shadow: 0 2px 7px rgba(91,62,35,.07);
 }
 .sidebar-stat-label {
     font-size: .68rem;
-    opacity: .68;
+    color: #7a5a3a;
     line-height: 1.2;
 }
 .sidebar-stat-value {
@@ -226,9 +251,10 @@ CUSTOM_CSS = """
     font-weight: 700;
     line-height: 1.25;
     margin-top: 2px;
+    color: #4d321d;
 }
 .sidebar-credit {
-    opacity: .55;
+    color: #8a735c;
     font-size: .74rem;
     margin-top: 1.25rem;
     text-align: center;
