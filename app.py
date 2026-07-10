@@ -221,12 +221,6 @@ CUSTOM_CSS = """
 .study-summary li {
     margin: 2px 0;
 }
-.study-summary-note {
-    margin-top: 8px;
-    font-size: .76rem;
-    line-height: 1.4;
-    color: #3d6548;
-}
 .quick-checkin {
     border: 1px solid rgba(47,113,244,.30);
     border-radius: 10px;
@@ -1706,7 +1700,6 @@ def render_study_summary(summary):
           <strong>おつかれさまでした</strong>
           今回は{safe_text(summary["total_label"])}、学習に取り組みました。
           <ul>{items_html}</ul>
-          <div class="study-summary-note">コピーした内容は、スプレッドシートに貼り付けるなどして、ご自身の学習時間の管理に活用できます。</div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -1715,18 +1708,23 @@ def render_study_summary(summary):
     copy_text_json = json.dumps(copy_text, ensure_ascii=False)
     components.html(
         f"""
-        <div style="display:flex; gap:8px; align-items:center; margin: -4px 0 14px 0;">
-          <button id="copy-study-summary" type="button" style="
-            border:1px solid rgba(120,76,35,.34);
-            border-radius:8px;
-            padding:7px 12px;
-            background:linear-gradient(180deg, #c9955d, #a86f38);
-            color:#fffaf0;
-            font-weight:700;
-            cursor:pointer;
-            box-shadow:inset 0 1px 0 rgba(255,255,255,.28), 0 3px 8px rgba(91,62,35,.14);
-          ">学習時間をコピー</button>
-          <span id="copy-study-summary-status" style="font-size:12px; color:#6f4a27;"></span>
+        <div style="margin: -4px 0 14px 0;">
+          <div style="display:flex; gap:8px; align-items:center;">
+            <button id="copy-study-summary" type="button" style="
+              border:1px solid rgba(120,76,35,.34);
+              border-radius:8px;
+              padding:7px 12px;
+              background:linear-gradient(180deg, #c9955d, #a86f38);
+              color:#fffaf0;
+              font-weight:700;
+              cursor:pointer;
+              box-shadow:inset 0 1px 0 rgba(255,255,255,.28), 0 3px 8px rgba(91,62,35,.14);
+            ">学習時間をコピー</button>
+            <span id="copy-study-summary-status" style="font-size:12px; color:#6f4a27;"></span>
+          </div>
+          <div style="margin-top:5px; font-size:12px; line-height:1.4; color:#6f4a27;">
+            コピーした内容は、スプレッドシートに貼り付けるなどして、ご自身の学習時間の管理に活用できます。
+          </div>
         </div>
         <script>
           const button = document.getElementById("copy-study-summary");
