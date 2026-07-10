@@ -631,12 +631,14 @@ CUSTOM_CSS = """
     right: 18px;
     height: 108px;
     background:
-        linear-gradient(180deg, rgba(199,207,216,.92) 0 6px, transparent 6px 94px, rgba(174,150,118,.34) 94px 102px, transparent 102px),
+        linear-gradient(90deg, transparent 0 4px, rgba(199,207,216,.92) 4px 124px, transparent 124px),
+        linear-gradient(90deg, transparent 0 4px, rgba(174,150,118,.34) 4px 124px, transparent 124px),
         linear-gradient(90deg, rgba(185,196,207,.90) 0 4px, transparent 4px 60px, rgba(185,196,207,.72) 60px 64px, transparent 64px 120px, rgba(185,196,207,.90) 120px 124px, transparent 124px),
-        linear-gradient(180deg, transparent 0 47%, rgba(185,196,207,.70) 47% 51%, transparent 51%),
+        linear-gradient(90deg, transparent 0 4px, rgba(185,196,207,.70) 4px 124px, transparent 124px),
         linear-gradient(90deg, transparent 0 4px, rgba(222,240,248,.70) 4px 60px, rgba(255,255,255,.38) 60px 68px, rgba(222,240,248,.58) 68px 120px, transparent 120px);
     background-repeat: repeat-x;
-    background-size: 158px 108px;
+    background-size: 158px 6px, 158px 8px, 158px 108px, 158px 4px, 158px 108px;
+    background-position: 0 0, 0 94px, 0 0, 0 51px, 0 0;
     filter: drop-shadow(0 8px 12px rgba(73,63,50,.08));
     pointer-events: none;
 }
