@@ -130,6 +130,52 @@ CUSTOM_CSS = """
     margin-bottom: 2px;
     color: #6f4a27;
 }
+[data-testid="stSidebar"] .stButton > button,
+[data-testid="stSidebar"] [data-testid="stFormSubmitButton"] button {
+    border: 1px solid rgba(120,76,35,.34) !important;
+    border-radius: 8px !important;
+    background:
+        linear-gradient(180deg, #c9955d, #a86f38) !important;
+    color: #fffaf0 !important;
+    font-weight: 700 !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.28),
+        0 3px 8px rgba(91,62,35,.14) !important;
+    opacity: 1 !important;
+}
+[data-testid="stSidebar"] .stButton > button:hover,
+[data-testid="stSidebar"] [data-testid="stFormSubmitButton"] button:hover {
+    border-color: rgba(104,64,28,.45) !important;
+    background:
+        linear-gradient(180deg, #d1a06c, #99602f) !important;
+    color: #fffaf0 !important;
+    opacity: 1 !important;
+}
+[data-testid="stSidebar"] .stButton > button:active,
+[data-testid="stSidebar"] [data-testid="stFormSubmitButton"] button:active {
+    transform: translateY(1px);
+    box-shadow:
+        inset 0 1px 3px rgba(69,42,20,.22),
+        0 1px 4px rgba(91,62,35,.10) !important;
+}
+[data-testid="stSidebar"] [data-testid="stExpander"] details {
+    border: 1px solid rgba(139,96,54,.20);
+    border-radius: 8px;
+    background:
+        linear-gradient(180deg, rgba(255,255,255,.74), rgba(255,250,240,.86)),
+        #fffaf0;
+    box-shadow: 0 2px 8px rgba(91,62,35,.06);
+}
+[data-testid="stSidebar"] [data-testid="stExpander"] summary {
+    color: #5d3b20;
+    font-weight: 700;
+    opacity: 1;
+}
+[data-testid="stSidebar"] [data-testid="stExpander"] summary:hover {
+    color: #4a2f1a;
+    background: rgba(232,200,159,.20);
+    opacity: 1;
+}
 [data-testid="InputInstructions"] {
     display: none;
 }
@@ -2146,7 +2192,7 @@ with st.sidebar:
             help="本名や学籍番号は入力しない運用を想定しています。全角10文字、または半角20文字以内です。",
         )
         activity = st.selectbox(
-            "今取り組んでいること",
+            "入室する部屋",
             ACTIVITY_OPTIONS,
             index=ACTIVITY_OPTIONS.index(st.session_state.activity)
             if st.session_state.activity in ACTIVITY_OPTIONS else 0,
