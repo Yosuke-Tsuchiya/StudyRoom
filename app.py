@@ -263,13 +263,13 @@ CUSTOM_CSS = """
     right: 24px;
 }
 .room-card.quick-checkin-card {
-    border-color: rgba(62,111,179,.58);
-    background: #f3f8ff;
+    border-color: rgba(102,112,133,.46);
+    background: #f6f7f9;
     box-shadow:
-        5px 7px 0 rgba(62,111,179,.16),
-        0 12px 18px rgba(35,78,130,.14),
-        inset -2px 0 0 rgba(47,113,244,.16),
-        inset 0 -4px 0 rgba(47,113,244,.14);
+        5px 7px 0 rgba(102,112,133,.14),
+        0 12px 18px rgba(52,64,84,.12),
+        inset -2px 0 0 rgba(102,112,133,.14),
+        inset 0 -4px 0 rgba(102,112,133,.12);
 }
 .desk-surface {
     border-radius: 0 0 8px 8px;
@@ -282,8 +282,8 @@ CUSTOM_CSS = """
 .quick-checkin-card .desk-surface {
     background:
         linear-gradient(180deg, rgba(255,255,255,.12), rgba(0,0,0,.06)),
-        #6f9fc7;
-    border-top-color: #517fa8;
+        #7f8790;
+    border-top-color: #667085;
 }
 .seat-note {
     box-sizing: border-box;
@@ -294,7 +294,7 @@ CUSTOM_CSS = """
     border-bottom: 1px solid rgba(135,92,52,.16);
 }
 .quick-checkin-card .seat-note {
-    background: #f3f8ff;
+    background: #f6f7f9;
 }
 .avatar {
     position: relative;
@@ -329,9 +329,9 @@ CUSTOM_CSS = """
     box-shadow: 0 1px 2px rgba(16,24,40,.12);
 }
 .quick-checkin-card .avatar {
-    background: #e3f0ff;
-    border-color: rgba(62,111,179,.34);
-    box-shadow: 0 2px 0 rgba(62,111,179,.16);
+    background: #eceff3;
+    border-color: rgba(102,112,133,.34);
+    box-shadow: 0 2px 0 rgba(102,112,133,.16);
 }
 .card-top {
     display:flex;
@@ -374,10 +374,10 @@ CUSTOM_CSS = """
     filter: drop-shadow(0 -1px 0 rgba(101,63,29,.16));
 }
 .quick-checkin-card .profile-comment {
-    background: #f3f8ff;
+    background: #f6f7f9;
 }
 .quick-checkin-card .profile-comment::before {
-    border-bottom-color: #f3f8ff;
+    border-bottom-color: #f6f7f9;
 }
 .participant-name {
     margin: 0;
@@ -393,22 +393,6 @@ CUSTOM_CSS = """
 .participant-name strong {
     display: block;
     white-space: normal;
-}
-.entry-badge {
-    display: inline-block;
-    margin: 0 0 2px 0;
-    border: 1px solid rgba(181,118,32,.34);
-    border-radius: 999px;
-    padding: 1px 5px;
-    font-size: .52rem;
-    font-weight: 700;
-    line-height: 1.25;
-    color: #8a4b0f;
-    background: #fff1c6;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 100%;
 }
 .participant-detail {
     font-size: .76rem;
@@ -2284,6 +2268,7 @@ def live_area():
 
     st.subheader("学習中の部屋")
     st.caption("ここには入室中の参加者のニックネーム、コメント、授業回、状態が表示されます。")
+    st.caption("グレーの机は、授業ページからチェックインした参加者を表しています。")
     if not participants:
         st.info("現在はまだ誰もいません。最初の一人として入室してみてください。")
 
@@ -2343,12 +2328,10 @@ def live_area():
                 difficulty_html = f'<span class="card-difficulty {difficulty_class}">{difficulty_label}</span>'
             else:
                 difficulty_html = '<span class="card-difficulty placeholder">体感</span>'
-            entry_badge_html = ""
             card_class = "room-card"
             if mine:
                 card_class += " my-card"
             if is_quick_checkin:
-                entry_badge_html = '<span class="entry-badge">チェックイン</span>'
                 card_class += " quick-checkin-card"
             member_cards.append(
                 f'<div class="{card_class}">'
@@ -2356,7 +2339,6 @@ def live_area():
                 '<div class="card-top">'
                 f'<div class="avatar">{avatar_text}{you_badge_html}</div>'
                 '<div class="participant-name">'
-                f'{entry_badge_html}'
                 '<div>'
                 f'<strong>{label}</strong>'
                 '</div>'
