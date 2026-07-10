@@ -573,31 +573,17 @@ CUSTOM_CSS = """
     box-shadow: 0 8px 18px rgba(82,61,38,.10);
 }
 [data-testid="stMain"] [data-testid="stExpander"] summary {
-    position: relative;
     min-height: 46px;
-    border-left: 0;
+    border-left: 12px solid #8c6036;
     background:
-        linear-gradient(90deg, #8c6036 0 18px, #e7c793 18px 20px, #f3dfbd 20px),
+        linear-gradient(90deg, #b98248 0 16px, #e7c793 16px 18px, #f3dfbd 18px),
         #f3dfbd;
     color: #3b2a1b;
     font-weight: 700;
 }
-[data-testid="stMain"] [data-testid="stExpander"] summary::before {
-    content: "";
-    position: absolute;
-    left: 7px;
-    top: 50%;
-    width: 3px;
-    height: 22px;
-    transform: translateY(-50%);
-    border-radius: 999px;
-    background: rgba(255,239,190,.86);
-    box-shadow: 0 0 0 1px rgba(89,58,28,.14);
-    pointer-events: none;
-}
 [data-testid="stMain"] [data-testid="stExpander"] summary:hover {
     background:
-        linear-gradient(90deg, #7f562f 0 18px, #e7c793 18px 20px, #f7e7ca 20px),
+        linear-gradient(90deg, #a8733d 0 16px, #e7c793 16px 18px, #f7e7ca 18px),
         #f7e7ca;
 }
 [data-testid="stMain"] [data-testid="stExpander"] details:has(.empty-rooms-panel) {
@@ -615,9 +601,6 @@ CUSTOM_CSS = """
 }
 [data-testid="stMain"] [data-testid="stExpander"] details:has(.empty-rooms-panel) summary:hover {
     background: rgba(242,244,247,.96);
-}
-[data-testid="stMain"] [data-testid="stExpander"] details:has(.empty-rooms-panel) summary::before {
-    content: none;
 }
 .empty-rooms-panel {
     height: 0;
