@@ -1111,9 +1111,11 @@ def study_summary_from_segments(session_id, since) -> dict | None:
                 "activity": activity,
                 "detail": detail,
                 "duration_label": format_duration_seconds(seconds),
+                "duration_minutes": seconds // 60,
             }
             for (activity, detail), seconds in breakdown.items()
         ],
+        "total_minutes": total_seconds // 60,
     }
 
 
@@ -1745,7 +1747,7 @@ def render_study_summary(summary):
 
 def build_study_summary_copy_text(summary):
     date_text = datetime.now(JST).strftime("%Y/%m/%d")
-    lines = ["日付\t部屋\t授業回\t学習時間"]
+    lines = ["日付\t部屋\t授業回\t集計時間（分）"]
     for item in summary["items"]:
         lines.append(
             "\t".join(
@@ -1753,11 +1755,11 @@ def build_study_summary_copy_text(summary):
                     date_text,
                     str(item["activity"]),
                     str(item["detail"]),
-                    str(item["duration_label"]),
+                    str(item.get("duration_minutes", 0)),
                 ]
             )
         )
-    lines.append("\t".join([date_text, "合計", "", str(summary["total_label"])]))
+    lines.append("\t".join([date_text, "合計", "", str(summary.get("total_minutes", 0))]))
     return "\n".join(lines)
 
 
