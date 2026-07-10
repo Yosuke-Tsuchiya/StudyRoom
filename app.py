@@ -280,6 +280,9 @@ header[data-testid="stHeader"] {
     box-shadow: 0 10px 24px rgba(91,62,35,.10);
     color: #2f241b;
 }
+.quick-page-spacer {
+    height: 1.2rem;
+}
 .quick-checkin h2 {
     margin: 0 -16px 12px -16px;
     padding: 12px 16px;
@@ -1892,6 +1895,7 @@ def render_quick_checkin_panel(request):
 def render_quick_checkin_page(request, error=None):
     st.markdown(
         """
+        <div class="quick-page-spacer"></div>
         <div class="sidebar-brand">
           <h1>📚 StudyRoom</h1>
           <p>みんなのオンライン自習室</p>
