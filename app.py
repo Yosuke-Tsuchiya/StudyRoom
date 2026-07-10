@@ -333,7 +333,7 @@ CUSTOM_CSS = """
     margin-bottom: 6px;
     box-shadow: 0 2px 0 rgba(101,63,29,.10);
     overflow-wrap: anywhere;
-    overflow: hidden;
+    overflow: visible;
 }
 .profile-comment::before {
     content: "";
