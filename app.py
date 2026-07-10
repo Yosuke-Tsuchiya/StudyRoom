@@ -280,12 +280,6 @@ CUSTOM_CSS = """
         #cf8847;
     border-top: 6px solid #bd7433;
 }
-.quick-checkin-card .desk-surface {
-    background:
-        linear-gradient(180deg, rgba(255,255,255,.12), rgba(0,0,0,.05)),
-        #9ec5ef;
-    border-bottom-color: #6fa2d0;
-}
 .seat-note {
     padding: 7px 9px 6px 9px;
     background: #fffaf2;
@@ -366,15 +360,15 @@ CUSTOM_CSS = """
 }
 .entry-badge {
     display: inline-block;
-    margin-top: 4px;
+    margin-left: 2px;
     border: 1px solid rgba(47,113,244,.26);
     border-radius: 999px;
-    padding: 1px 7px;
-    font-size: .64rem;
+    padding: 1px 5px;
+    font-size: .56rem;
     font-weight: 700;
-    line-height: 1.35;
+    line-height: 1.25;
     color: #175cd3;
-    background: rgba(47,113,244,.10);
+    background: #dceaff;
 }
 .participant-detail {
     font-size: .76rem;
@@ -2312,7 +2306,7 @@ def live_area():
             entry_badge_html = ""
             card_class = "room-card"
             if is_quick_checkin:
-                entry_badge_html = '<div><span class="entry-badge">授業ページからチェックイン</span></div>'
+                entry_badge_html = '<span class="entry-badge">チェックイン</span>'
                 card_class = "room-card quick-checkin-card"
             member_cards.append(
                 f'<div class="{card_class}">'
@@ -2326,13 +2320,13 @@ def live_area():
                 '</div>'
                 '<div class="desk-surface">'
                 f'<div class="profile-comment">{comment_text}</div>'
-                f'{entry_badge_html}'
                 '<div class="card-meta-row">'
                 '<div class="desk-info-row">'
                 '<span class="desk-info-icon">🗂️</span>'
                 '<span class="desk-info-line">'
                 f'<span class="desk-info-text">{detail_text}</span>'
                 f'{difficulty_html}'
+                f'{entry_badge_html}'
                 '</span>'
                 '</div>'
                 '</div>'
