@@ -588,6 +588,26 @@ CUSTOM_CSS = """
         linear-gradient(90deg, #a8733d 0 16px, #e7c793 16px 18px, #f7e7ca 18px),
         #f7e7ca;
 }
+[data-testid="stMain"] [data-testid="stExpander"] details:has(.empty-rooms-panel) {
+    border: 1px solid rgba(152,162,179,.24);
+    border-radius: 12px;
+    background: linear-gradient(180deg, rgba(248,250,252,.86), rgba(238,242,247,.88));
+    box-shadow: 0 6px 14px rgba(52,64,84,.08);
+}
+[data-testid="stMain"] [data-testid="stExpander"] details:has(.empty-rooms-panel) summary {
+    min-height: 42px;
+    border-left: 8px solid rgba(102,112,133,.38);
+    background: rgba(248,250,252,.94);
+    color: #475467;
+    font-weight: 650;
+}
+[data-testid="stMain"] [data-testid="stExpander"] details:has(.empty-rooms-panel) summary:hover {
+    background: rgba(242,244,247,.96);
+}
+.empty-rooms-panel {
+    height: 0;
+    overflow: hidden;
+}
 .room-desk-area {
     position: relative;
     overflow: hidden;
@@ -2438,6 +2458,7 @@ def live_area():
 
     if empty_rooms:
         with st.expander("空き部屋を見る", expanded=False):
+            st.markdown('<div class="empty-rooms-panel"></div>', unsafe_allow_html=True)
             cols = st.columns(3)
             for i, (activity, _) in enumerate(empty_rooms):
                 activity_text = safe_text(activity)
