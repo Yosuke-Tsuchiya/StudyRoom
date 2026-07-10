@@ -309,6 +309,9 @@ CUSTOM_CSS = """
 .profile-comment {
     position: relative;
     min-width: 0;
+    min-height: calc(.64rem * 1.3 * 2 + 10px);
+    display: flex;
+    align-items: center;
     font-size: .64rem;
     line-height: 1.3;
     color: #2f241b;
