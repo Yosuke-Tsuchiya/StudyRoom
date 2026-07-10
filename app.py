@@ -317,6 +317,7 @@ CUSTOM_CSS = """
 }
 .profile-comment {
     position: relative;
+    z-index: 1;
     min-width: 0;
     box-sizing: border-box;
     height: 2.55rem;
@@ -344,6 +345,8 @@ CUSTOM_CSS = """
     border-left: 7px solid transparent;
     border-right: 7px solid transparent;
     border-bottom: 8px solid #fffaf2;
+    z-index: 2;
+    filter: drop-shadow(0 -1px 0 rgba(101,63,29,.16));
 }
 .quick-checkin-card .profile-comment {
     background: #f3f8ff;
