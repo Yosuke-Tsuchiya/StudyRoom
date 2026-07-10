@@ -294,7 +294,7 @@ CUSTOM_CSS = """
     border-bottom: 1px solid rgba(135,92,52,.16);
 }
 .quick-checkin-card .seat-note {
-    background: #f6f7f9;
+    background: #f2f2ef;
 }
 .avatar {
     position: relative;
@@ -329,9 +329,9 @@ CUSTOM_CSS = """
     box-shadow: 0 1px 2px rgba(16,24,40,.12);
 }
 .quick-checkin-card .avatar {
-    background: #eceff3;
-    border-color: rgba(102,112,133,.34);
-    box-shadow: 0 2px 0 rgba(102,112,133,.16);
+    background: #e7e5df;
+    border-color: rgba(92,88,80,.30);
+    box-shadow: 0 2px 0 rgba(92,88,80,.14);
 }
 .card-top {
     display:flex;
@@ -374,10 +374,10 @@ CUSTOM_CSS = """
     filter: drop-shadow(0 -1px 0 rgba(101,63,29,.16));
 }
 .quick-checkin-card .profile-comment {
-    background: #f6f7f9;
+    background: #f2f2ef;
 }
 .quick-checkin-card .profile-comment::before {
-    border-bottom-color: #f6f7f9;
+    border-bottom-color: #f2f2ef;
 }
 .participant-name {
     margin: 0;
