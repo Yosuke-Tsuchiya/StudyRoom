@@ -75,9 +75,33 @@ CUSTOM_CSS = """
 <style>
 .stApp {
     background: #fffdf7;
+    color: #2f241b;
 }
 header[data-testid="stHeader"] {
     background: #fffdf7;
+}
+.stApp h1,
+.stApp h2,
+.stApp h3,
+.stApp p,
+.stApp li,
+.stApp label,
+.stApp [data-testid="stMarkdownContainer"],
+[data-testid="stSidebar"],
+[data-testid="stSidebar"] label,
+[data-testid="stSidebar"] p,
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] {
+    color: #2f241b;
+}
+[data-testid="stSidebar"] input,
+[data-testid="stSidebar"] textarea,
+[data-testid="stSidebar"] [data-baseweb="select"] > div {
+    background: #fffdf7;
+    color: #2f241b;
+}
+[data-testid="stSidebar"] input::placeholder,
+[data-testid="stSidebar"] textarea::placeholder {
+    color: #8a735c;
 }
 .block-container {padding-top: 2rem; padding-bottom: 3rem;}
 [data-testid="stSidebar"] {
