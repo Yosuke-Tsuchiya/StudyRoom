@@ -361,14 +361,14 @@ CUSTOM_CSS = """
 .entry-badge {
     display: inline-block;
     margin-left: 2px;
-    border: 1px solid rgba(47,113,244,.26);
+    border: 1px solid rgba(181,118,32,.34);
     border-radius: 999px;
     padding: 1px 5px;
     font-size: .56rem;
     font-weight: 700;
     line-height: 1.25;
-    color: #175cd3;
-    background: #dceaff;
+    color: #8a4b0f;
+    background: #fff1c6;
 }
 .participant-detail {
     font-size: .76rem;
@@ -2325,8 +2325,8 @@ def live_area():
                 '<span class="desk-info-icon">🗂️</span>'
                 '<span class="desk-info-line">'
                 f'<span class="desk-info-text">{detail_text}</span>'
-                f'{difficulty_html}'
                 f'{entry_badge_html}'
+                f'{difficulty_html}'
                 '</span>'
                 '</div>'
                 '</div>'
