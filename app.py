@@ -489,7 +489,7 @@ CUSTOM_CSS = """
     padding: 14px 16px 10px 16px;
     margin: 18px 0 18px 0;
     background:
-        linear-gradient(180deg, rgba(247,241,225,.96) 0 120px, rgba(226,199,160,.95) 120px),
+        linear-gradient(180deg, rgba(247,241,225,.96) 0 180px, rgba(226,199,160,.95) 180px),
         linear-gradient(90deg, rgba(255,255,255,.45) 0 1px, transparent 1px),
         #f6efdd;
     box-shadow: inset 0 1px 0 rgba(255,255,255,.70), 0 12px 28px rgba(65,50,34,.12);
@@ -514,8 +514,8 @@ CUSTOM_CSS = """
     position: absolute;
     left: -8%;
     right: -8%;
-    bottom: -18px;
-    height: 52%;
+    bottom: -28px;
+    height: 42%;
     background:
         repeating-linear-gradient(90deg, rgba(128,88,45,.12) 0 2px, transparent 2px 72px),
         linear-gradient(180deg, rgba(205,157,96,.16), rgba(151,93,43,.22));
@@ -530,7 +530,7 @@ CUSTOM_CSS = """
 .activity-room.mine {
     border-color: rgba(35,142,92,.42);
     background:
-        linear-gradient(180deg, rgba(241,248,229,.98) 0 120px, rgba(219,202,153,.94) 120px),
+        linear-gradient(180deg, rgba(241,248,229,.98) 0 180px, rgba(219,202,153,.94) 180px),
         #f4f3dc;
     box-shadow: inset 0 1px 0 rgba(255,255,255,.74), 0 14px 30px rgba(33,111,72,.13);
 }
