@@ -263,7 +263,6 @@ CUSTOM_CSS = """
     right: 24px;
 }
 .room-card.quick-checkin-card {
-    border-style: dashed;
     border-color: rgba(62,111,179,.58);
     background: #f3f8ff;
     box-shadow:
@@ -309,6 +308,11 @@ CUSTOM_CSS = """
     border: 2px solid rgba(143,96,45,.30);
     box-shadow: 0 2px 0 rgba(143,96,45,.18);
     color: #24303f;
+}
+.quick-checkin-card .avatar {
+    background: #e3f0ff;
+    border-color: rgba(62,111,179,.34);
+    box-shadow: 0 2px 0 rgba(62,111,179,.16);
 }
 .card-top {
     display:flex;
