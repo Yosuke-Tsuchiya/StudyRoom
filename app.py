@@ -176,6 +176,16 @@ CUSTOM_CSS = """
     background: rgba(232,200,159,.20);
     opacity: 1;
 }
+[data-testid="stSidebar"] [data-testid="stAlert"] {
+    border: 1px solid rgba(77,145,103,.34);
+    border-radius: 8px;
+    background: #e4f5df;
+    color: #264b32;
+    box-shadow: 0 2px 8px rgba(91,62,35,.06);
+}
+[data-testid="stSidebar"] [data-testid="stAlert"] * {
+    color: inherit;
+}
 [data-testid="InputInstructions"] {
     display: none;
 }
@@ -189,13 +199,15 @@ CUSTOM_CSS = """
     margin-top: 1px;
 }
 .study-summary {
-    border: 1px solid rgba(46,204,113,.35);
+    border: 1px solid rgba(77,145,103,.34);
     border-radius: 8px;
     padding: 9px 10px;
     margin: .75rem 0 1rem 0;
-    background: rgba(46,204,113,.08);
+    background: #e4f5df;
+    color: #264b32;
     font-size: .78rem;
     line-height: 1.45;
+    box-shadow: 0 2px 8px rgba(91,62,35,.06);
 }
 .study-summary strong {
     display:block;
