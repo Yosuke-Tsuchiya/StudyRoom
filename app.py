@@ -226,6 +226,7 @@ CUSTOM_CSS = """
 }
 .room-card {
     position: relative;
+    z-index: 0;
     border: 1px solid rgba(135,92,52,.45);
     border-radius: 10px 10px 8px 8px;
     padding: 0;
@@ -243,22 +244,23 @@ CUSTOM_CSS = """
 .room-card::after {
     content: "";
     position: absolute;
-    bottom: -13px;
-    width: 10px;
-    height: 18px;
+    bottom: -11px;
+    width: 9px;
+    height: 16px;
     border-radius: 999px;
     background:
-        linear-gradient(90deg, #6f7781 0%, #d5dbe2 32%, #f7f9fb 48%, #9da6b1 74%, #68717b 100%);
+        linear-gradient(90deg, #6f7680 0%, #a9b0b8 32%, #c8cdd3 48%, #8e98a3 74%, #626b75 100%);
     box-shadow:
-        0 2px 4px rgba(52,64,84,.22),
+        0 2px 3px rgba(52,64,84,.18),
         inset 0 -2px 0 rgba(52,64,84,.18);
-    opacity: .95;
+    opacity: .72;
+    z-index: -1;
 }
 .room-card::before {
-    left: 22px;
+    left: 24px;
 }
 .room-card::after {
-    right: 22px;
+    right: 24px;
 }
 .room-card.quick-checkin-card {
     border-style: dashed;
