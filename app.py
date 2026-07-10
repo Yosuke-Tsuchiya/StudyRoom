@@ -304,6 +304,9 @@ header[data-testid="stHeader"] {
 .quick-main-page-prompt {
     margin-top: 14px !important;
 }
+.quick-main-page-prompt span {
+    display: block;
+}
 .quick-checkin-subject {
     font-size: 1.65rem;
     font-weight: 800;
@@ -1887,7 +1890,11 @@ def render_quick_checkin_panel(request):
           </div>
           <p>{QUICK_JOIN_TIMEOUT_MINUTES}分間、この授業回を学習中の匿名の学生として表示されます。</p>
           <p>授業動画のタブに戻って、学習を続けてください。このタブは閉じても大丈夫です。</p>
-          <p class="quick-main-page-prompt">よければStudyRoomのメインページも開いてみてください。同じ時間に学んでいる人の気配を感じながら、学習を続けられます。退室時には今回の学習時間も確認できます。</p>
+          <p class="quick-main-page-prompt">
+            <span>よければStudyRoomのメインページも開いてみてください。</span>
+            <span>同じ時間に学んでいる人の気配を感じながら、学習を続けられます。</span>
+            <span>退室時には今回の学習時間も確認できます。</span>
+          </p>
           <a class="quick-link" href="{safe_text(main_page_url)}" target="_self">StudyRoomを開く</a>
         </section>
         """,
