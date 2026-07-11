@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>StudyRoom Status Thumbnails</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f8f3e8;
+      --panel: #fffaf0;
+      --panel-strong: #f1e2ca;
+      --text: #2f241b;
+      --muted: #796654;
+      --line: #d7b98e;
+      --accent: #a96f3d;
+      --accent-dark: #6c4325;
+      --shadow: rgba(91, 61, 34, 0.16);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0) 240px),
+        var(--bg);
+      color: var(--text);
+      font-family: "Yu Gothic", "Meiryo", system-ui, sans-serif;
+    }
+
+    main {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0 48px;
+    }
+
+    header {
+      display: flex;
+      gap: 16px;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      border-bottom: 2px solid var(--line);
+      padding-bottom: 16px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    button,
+    a.button {
+      appearance: none;
+      border: 1px solid var(--accent-dark);
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fffaf0;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 38px;
+      padding: 8px 14px;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      box-shadow: 0 2px 0 var(--accent-dark);
+    }
+
+    button:hover,
+    a.button:hover {
+      background: #965f32;
+    }
+
+    .updated {
+      color: var(--muted);
+      font-size: 12px;
+      min-width: 180px;
+      text-align: right;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      box-shadow: 0 8px 20px var(--shadow);
+      overflow: hidden;
+    }
+
+    .card-header {
+      background: var(--panel-strong);
+      border-bottom: 1px solid var(--line);
+      padding: 10px 14px;
+    }
+
+    .room {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 800;
+      line-height: 1.5;
+    }
+
+    .code {
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .thumb-link {
+      display: block;
+      padding: 14px;
+      background: #fffdf8;
+    }
+
+    img {
+      display: block;
+      width: 100%;
+      max-width: 460px;
+      height: auto;
+      margin: 0 auto;
+      border: 0;
+    }
+
+    .note {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    @media (max-width: 700px) {
+      header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .actions {
+        justify-content: flex-start;
+      }
+
+      .updated {
+        text-align: left;
+      }
+    }
+
+    #refresh-frame {
+      border: 0;
+      height: 1px;
+      left: -9999px;
+      opacity: 0;
+      position: fixed;
+      top: -9999px;
+      width: 1px;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <h1>StudyRoom Status Thumbnails</h1>
+        <p class="subtitle">各部屋の入室状況画像をまとめて確認するためのローカル用ページです。</p>
+      </div>
+      <div class="actions">
+        <button type="button" id="reload">画像を再読み込み</button>
+        <a class="button" href="https://studyroom.streamlit.app/" target="_blank" rel="noopener">StudyRoomを開く</a>
+        <div class="updated" id="updated"></div>
+      </div>
+    </header>
+
+    <section class="grid" aria-label="StudyRoom status thumbnails">
+      <article class="card">
+        <div class="card-header">
+          <p class="room">フリールーム</p>
+          <div class="code">Free Room</div>
+        </div>
+        <a class="thumb-link" href="https://studyroom-status.yosuke-tsuchiya.workers.dev/status/free-room.svg" target="_blank" rel="noopener">
+          <img src="https://studyroom-status.yosuke-tsuchiya.workers.dev/status/free-room.svg" alt="StudyRoom Live Status - Free Room">
+        </a>
+      </article>
+
+      <article class="card">
+        <div class="card-header">
+          <p class="room">情報基礎A・B</p>
+          <div class="code">Information Technology A/B</div>
+        </div>
+        <a class="thumb-link" href="https://studyroom-status.yosuke-tsuchiya.workers.dev/status/info-basic.svg" target="_blank" rel="noopener">
+          <img src="https://studyroom-status.yosuke-tsuchiya.workers.dev/status/info-basic.svg" alt="StudyRoom Live Status - Information Technology A/B">
+        </a>
+      </article>
+
+      <article class="card">
+        <div class="card-header">
+          <p class="room">インターネット技術Ⅰ・Ⅱ</p>
+          <div class="code">Internet Technology I/II</div>
+        </div>
+        <a class="thumb-link" href="https://studyroom-status.yosuke-tsuchiya.workers.dev/status/internet-tech.svg" target="_blank" rel="noopener">
+          <img src="https://studyroom-status.yosuke-tsuchiya.workers.dev/status/internet-tech.svg" alt="StudyRoom Live Status - Internet Technology I/II">
+        </a>
+      </article>
+
+      <article class="card">
+        <div class="card-header">
+          <p class="room">データ構造とアルゴリズムⅠ・Ⅱ</p>
+          <div class="code">Data Structures &amp; Algorithms I/II</div>
+        </div>
+        <a class="thumb-link" href="https://studyroom-status.yosuke-tsuchiya.workers.dev/status/data-algorithms.svg" target="_blank" rel="noopener">
+          <img src="https://studyroom-status.yosuke-tsuchiya.workers.dev/status/data-algorithms.svg" alt="StudyRoom Live Status - Data Structures and Algorithms I/II">
+        </a>
+      </article>
+
+      <article class="card">
+        <div class="card-header">
+          <p class="room">実践プログラミングⅠ・Ⅱ</p>
+          <div class="code">Practical Programming I/II</div>
+        </div>
+        <a class="thumb-link" href="https://studyroom-status.yosuke-tsuchiya.workers.dev/status/programming.svg" target="_blank" rel="noopener">
+          <img src="https://studyroom-status.yosuke-tsuchiya.workers.dev/status/programming.svg" alt="StudyRoom Live Status - Practical Programming I/II">
+        </a>
+      </article>
+
+      <article class="card">
+        <div class="card-header">
+          <p class="room">初級セキュアプログラミング</p>
+          <div class="code">Secure Programming Basics</div>
+        </div>
+        <a class="thumb-link" href="https://studyroom-status.yosuke-tsuchiya.workers.dev/status/secure-programming.svg" target="_blank" rel="noopener">
+          <img src="https://studyroom-status.yosuke-tsuchiya.workers.dev/status/secure-programming.svg" alt="StudyRoom Live Status - Secure Programming Basics">
+        </a>
+      </article>
+
+      <article class="card">
+        <div class="card-header">
+          <p class="room">基礎ゼミA・B</p>
+          <div class="code">Basic Seminar A/B</div>
+        </div>
+        <a class="thumb-link" href="https://studyroom-status.yosuke-tsuchiya.workers.dev/status/seminar.svg" target="_blank" rel="noopener">
+          <img src="https://studyroom-status.yosuke-tsuchiya.workers.dev/status/seminar.svg" alt="StudyRoom Live Status - Basic Seminar A/B">
+        </a>
+      </article>
+
+      <article class="card">
+        <div class="card-header">
+          <p class="room">資格勉強</p>
+          <div class="code">Certification Study</div>
+        </div>
+        <a class="thumb-link" href="https://studyroom-status.yosuke-tsuchiya.workers.dev/status/certification.svg" target="_blank" rel="noopener">
+          <img src="https://studyroom-status.yosuke-tsuchiya.workers.dev/status/certification.svg" alt="StudyRoom Live Status - Certification Study">
+        </a>
+      </article>
+    </section>
+
+    <p class="note">
+      画像をクリックすると、Cloudflare Workerが返すSVG画像を別タブで開きます。
+      表示が古い場合は、StudyRoomで入退室などの更新操作を行ったあと、少し待ってから「画像を再読み込み」を押してください。
+    </p>
+  </main>
+
+  <iframe id="refresh-frame" title="thumbnail refresh"></iframe>
+
+  <script>
+    const updated = document.getElementById("updated");
+    const reload = document.getElementById("reload");
+    const refreshFrame = document.getElementById("refresh-frame");
+    const thumbnails = Array.from(document.querySelectorAll(".thumb-link img"));
+
+    function updateTimestamp() {
+      const now = new Date();
+      updated.textContent = "表示更新: " + now.toLocaleString("ja-JP");
+    }
+
+    function sleep(ms) {
+      return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+
+    async function refreshThumbnails() {
+      reload.disabled = true;
+      reload.textContent = "更新中...";
+
+      for (const image of thumbnails) {
+        const url = image.getAttribute("src");
+        refreshFrame.src = url;
+        await sleep(650);
+        image.removeAttribute("src");
+        await sleep(80);
+        image.setAttribute("src", url);
+      }
+
+      updateTimestamp();
+      reload.disabled = false;
+      reload.textContent = "画像を再読み込み";
+    }
+
+    reload.addEventListener("click", () => {
+      refreshThumbnails();
+    });
+
+    updateTimestamp();
+  </script>
+</body>
+</html>
+
