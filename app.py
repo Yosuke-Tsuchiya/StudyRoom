@@ -5,6 +5,7 @@ import io
 import json
 import os
 import sqlite3
+import threading
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -1391,12 +1392,12 @@ def get_config_value(name) -> str:
         return ""
 
 
-def post_json_webhook(payload) -> tuple[bool, str]:
-    webhook_url = get_config_value("FEEDBACK_WEBHOOK_URL")
+def post_json_webhook(payload, timeout=10, webhook_url=None, token=None) -> tuple[bool, str]:
+    webhook_url = webhook_url if webhook_url is not None else get_config_value("FEEDBACK_WEBHOOK_URL")
     if not webhook_url:
         return True, ""
 
-    token = get_config_value("FEEDBACK_WEBHOOK_TOKEN")
+    token = token if token is not None else get_config_value("FEEDBACK_WEBHOOK_TOKEN")
     body = dict(payload)
     if token:
         body["token"] = token
@@ -1408,7 +1409,7 @@ def post_json_webhook(payload) -> tuple[bool, str]:
         method="POST",
     )
     try:
-        with urllib.request.urlopen(request, timeout=10) as response:
+        with urllib.request.urlopen(request, timeout=timeout) as response:
             if 200 <= response.status < 300:
                 return True, ""
             return False, f"送信先からエラーが返りました。status={response.status}"
@@ -1432,14 +1433,20 @@ def fetch_status_summary_counts():
 
 def sync_status_summary():
     total_online, free_room_online = fetch_status_summary_counts()
-    post_json_webhook(
-        {
-            "type": "status_summary",
-            "total_online": total_online,
-            "free_room_online": free_room_online,
-            "updated_at": now_iso(),
-        }
-    )
+    payload = {
+        "type": "status_summary",
+        "total_online": total_online,
+        "free_room_online": free_room_online,
+        "updated_at": now_iso(),
+    }
+    webhook_url = get_config_value("FEEDBACK_WEBHOOK_URL")
+    token = get_config_value("FEEDBACK_WEBHOOK_TOKEN")
+    threading.Thread(
+        target=post_json_webhook,
+        args=(payload,),
+        kwargs={"webhook_url": webhook_url, "token": token},
+        daemon=True,
+    ).start()
 
 
 def get_admin_password() -> str:
