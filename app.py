@@ -1065,6 +1065,8 @@ def cleanup_stale():
                 row["difficulty"],
                 row["participation_type"] or "regular",
             )
+    if stale_rows:
+        sync_status_summary()
 
 
 def log_presence_event(
@@ -1271,6 +1273,8 @@ def upsert_presence(
                 difficulty,
                 participation_type,
             )
+    if event_type:
+        sync_status_summary()
 
 
 def leave_room(session_id):
@@ -1293,7 +1297,9 @@ def leave_room(session_id):
                 row["participation_type"] or "regular",
             )
             conn.commit()
-            return study_summary_from_segments(session_id, row["joined_at"])
+            summary = study_summary_from_segments(session_id, row["joined_at"])
+            sync_status_summary()
+            return summary
     return None
 
 
@@ -1320,6 +1326,7 @@ def count_quick_participants(activity=None, detail=None):
 
 def force_leave_quick_participants(activity=None, detail=None):
     where_sql, params = quick_cleanup_where(activity, detail)
+    removed_count = 0
     with get_conn() as conn:
         rows = conn.execute(
             f"SELECT * FROM participants WHERE {where_sql} ORDER BY activity, detail, joined_at",
@@ -1349,7 +1356,9 @@ def force_leave_quick_participants(activity=None, detail=None):
                 row["difficulty"],
                 row["participation_type"] or "quick",
             )
-        return len(rows)
+        removed_count = len(rows)
+    sync_status_summary()
+    return removed_count
 
 
 def fetch_participants():
@@ -1382,7 +1391,7 @@ def get_config_value(name) -> str:
         return ""
 
 
-def send_feedback_webhook(payload) -> tuple[bool, str]:
+def post_json_webhook(payload) -> tuple[bool, str]:
     webhook_url = get_config_value("FEEDBACK_WEBHOOK_URL")
     if not webhook_url:
         return True, ""
@@ -1405,6 +1414,32 @@ def send_feedback_webhook(payload) -> tuple[bool, str]:
             return False, f"送信先からエラーが返りました。status={response.status}"
     except urllib.error.URLError as exc:
         return False, f"送信先に接続できませんでした。{exc}"
+
+
+def send_feedback_webhook(payload) -> tuple[bool, str]:
+    return post_json_webhook(payload)
+
+
+def fetch_status_summary_counts():
+    with get_conn() as conn:
+        total_online = conn.execute("SELECT COUNT(*) FROM participants").fetchone()[0]
+        free_room_online = conn.execute(
+            "SELECT COUNT(*) FROM participants WHERE activity = ?",
+            ("フリールーム",),
+        ).fetchone()[0]
+    return total_online, free_room_online
+
+
+def sync_status_summary():
+    total_online, free_room_online = fetch_status_summary_counts()
+    post_json_webhook(
+        {
+            "type": "status_summary",
+            "total_online": total_online,
+            "free_room_online": free_room_online,
+            "updated_at": now_iso(),
+        }
+    )
 
 
 def get_admin_password() -> str:
