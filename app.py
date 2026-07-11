@@ -5,6 +5,7 @@ import io
 import json
 import os
 import sqlite3
+import threading
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -1065,6 +1066,8 @@ def cleanup_stale():
                 row["difficulty"],
                 row["participation_type"] or "regular",
             )
+    if stale_rows:
+        sync_status_summary()
 
 
 def log_presence_event(
@@ -1271,6 +1274,8 @@ def upsert_presence(
                 difficulty,
                 participation_type,
             )
+    if event_type:
+        sync_status_summary()
 
 
 def leave_room(session_id):
@@ -1293,7 +1298,9 @@ def leave_room(session_id):
                 row["participation_type"] or "regular",
             )
             conn.commit()
-            return study_summary_from_segments(session_id, row["joined_at"])
+            summary = study_summary_from_segments(session_id, row["joined_at"])
+            sync_status_summary()
+            return summary
     return None
 
 
@@ -1320,6 +1327,7 @@ def count_quick_participants(activity=None, detail=None):
 
 def force_leave_quick_participants(activity=None, detail=None):
     where_sql, params = quick_cleanup_where(activity, detail)
+    removed_count = 0
     with get_conn() as conn:
         rows = conn.execute(
             f"SELECT * FROM participants WHERE {where_sql} ORDER BY activity, detail, joined_at",
@@ -1349,7 +1357,9 @@ def force_leave_quick_participants(activity=None, detail=None):
                 row["difficulty"],
                 row["participation_type"] or "quick",
             )
-        return len(rows)
+        removed_count = len(rows)
+    sync_status_summary()
+    return removed_count
 
 
 def fetch_participants():
@@ -1382,12 +1392,12 @@ def get_config_value(name) -> str:
         return ""
 
 
-def send_feedback_webhook(payload) -> tuple[bool, str]:
-    webhook_url = get_config_value("FEEDBACK_WEBHOOK_URL")
+def post_json_webhook(payload, timeout=10, webhook_url=None, token=None) -> tuple[bool, str]:
+    webhook_url = webhook_url if webhook_url is not None else get_config_value("FEEDBACK_WEBHOOK_URL")
     if not webhook_url:
         return True, ""
 
-    token = get_config_value("FEEDBACK_WEBHOOK_TOKEN")
+    token = token if token is not None else get_config_value("FEEDBACK_WEBHOOK_TOKEN")
     body = dict(payload)
     if token:
         body["token"] = token
@@ -1399,12 +1409,44 @@ def send_feedback_webhook(payload) -> tuple[bool, str]:
         method="POST",
     )
     try:
-        with urllib.request.urlopen(request, timeout=10) as response:
+        with urllib.request.urlopen(request, timeout=timeout) as response:
             if 200 <= response.status < 300:
                 return True, ""
             return False, f"送信先からエラーが返りました。status={response.status}"
     except urllib.error.URLError as exc:
         return False, f"送信先に接続できませんでした。{exc}"
+
+
+def send_feedback_webhook(payload) -> tuple[bool, str]:
+    return post_json_webhook(payload)
+
+
+def fetch_status_summary_counts():
+    with get_conn() as conn:
+        total_online = conn.execute("SELECT COUNT(*) FROM participants").fetchone()[0]
+        free_room_online = conn.execute(
+            "SELECT COUNT(*) FROM participants WHERE activity = ?",
+            ("フリールーム",),
+        ).fetchone()[0]
+    return total_online, free_room_online
+
+
+def sync_status_summary():
+    total_online, free_room_online = fetch_status_summary_counts()
+    payload = {
+        "type": "status_summary",
+        "total_online": total_online,
+        "free_room_online": free_room_online,
+        "updated_at": now_iso(),
+    }
+    webhook_url = get_config_value("FEEDBACK_WEBHOOK_URL")
+    token = get_config_value("FEEDBACK_WEBHOOK_TOKEN")
+    threading.Thread(
+        target=post_json_webhook,
+        args=(payload,),
+        kwargs={"webhook_url": webhook_url, "token": token},
+        daemon=True,
+    ).start()
 
 
 def get_admin_password() -> str:
