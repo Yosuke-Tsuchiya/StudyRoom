@@ -166,72 +166,72 @@ https://studyroom.streamlit.app/?quick=1&course=internet-tech&lesson=3
 
 | 部屋名 | 画像URL |
 | --- | --- |
-| フリールーム | `https://drive.google.com/thumbnail?id=1N2kfWqd9RPsr5rF6cZmmjdk9U7ApXDIi&sz=w460` |
-| 情報基礎A・B | `https://drive.google.com/thumbnail?id=1-CQPDMCbmRdSc5GcxqyLBIZhmDfCvKM0&sz=w460` |
-| インターネット技術Ⅰ・Ⅱ | `https://drive.google.com/thumbnail?id=1Q6zjLtwM8-xMev-dya-tvwB77UAQGwNi&sz=w460` |
-| データ構造とアルゴリズムⅠ・Ⅱ | `https://drive.google.com/thumbnail?id=11ZaZVej53eYvMis4YkePB3ft0C8h3WCY&sz=w460` |
-| 実践プログラミングⅠ・Ⅱ | `https://drive.google.com/thumbnail?id=1VTihtqH7RcuOmIVN6rdSEMMnEtFp9Ryb&sz=w460` |
-| 初級セキュアプログラミング | `https://drive.google.com/thumbnail?id=1msD10qFs8FH2J2MQUC8VvVGrKWYlqIgM&sz=w460` |
-| 基礎ゼミA・B | `https://drive.google.com/thumbnail?id=1fmBoWvqo2GINT7-ofGfdHhcrIzfj3Nc6&sz=w460` |
-| 資格勉強 | `https://drive.google.com/thumbnail?id=1ISatKs04hbDqeiZNc6krcgol_ryfgXH1&sz=w460` |
+| フリールーム | `https://studyroom-status.yosuke-tsuchiya.workers.dev/status/free-room.svg` |
+| 情報基礎A・B | `https://studyroom-status.yosuke-tsuchiya.workers.dev/status/info-basic.svg` |
+| インターネット技術Ⅰ・Ⅱ | `https://studyroom-status.yosuke-tsuchiya.workers.dev/status/internet-tech.svg` |
+| データ構造とアルゴリズムⅠ・Ⅱ | `https://studyroom-status.yosuke-tsuchiya.workers.dev/status/data-algorithms.svg` |
+| 実践プログラミングⅠ・Ⅱ | `https://studyroom-status.yosuke-tsuchiya.workers.dev/status/programming.svg` |
+| 初級セキュアプログラミング | `https://studyroom-status.yosuke-tsuchiya.workers.dev/status/secure-programming.svg` |
+| 基礎ゼミA・B | `https://studyroom-status.yosuke-tsuchiya.workers.dev/status/seminar.svg` |
+| 資格勉強 | `https://studyroom-status.yosuke-tsuchiya.workers.dev/status/certification.svg` |
 
 ### 授業ページ貼り付け用HTML
 
 フリールーム:
 
 ```html
-<img src="https://drive.google.com/thumbnail?id=1N2kfWqd9RPsr5rF6cZmmjdk9U7ApXDIi&sz=w460" alt="StudyRoom Live Status - Free Room">
+<img src="https://studyroom-status.yosuke-tsuchiya.workers.dev/status/free-room.svg" alt="StudyRoom Live Status - Free Room">
 ```
 
 情報基礎A・B:
 
 ```html
-<img src="https://drive.google.com/thumbnail?id=1-CQPDMCbmRdSc5GcxqyLBIZhmDfCvKM0&sz=w460" alt="StudyRoom Live Status - Information Technology A/B">
+<img src="https://studyroom-status.yosuke-tsuchiya.workers.dev/status/info-basic.svg" alt="StudyRoom Live Status - Information Technology A/B">
 ```
 
 インターネット技術Ⅰ・Ⅱ:
 
 ```html
-<img src="https://drive.google.com/thumbnail?id=1Q6zjLtwM8-xMev-dya-tvwB77UAQGwNi&sz=w460" alt="StudyRoom Live Status - Internet Technology I/II">
+<img src="https://studyroom-status.yosuke-tsuchiya.workers.dev/status/internet-tech.svg" alt="StudyRoom Live Status - Internet Technology I/II">
 ```
 
 データ構造とアルゴリズムⅠ・Ⅱ:
 
 ```html
-<img src="https://drive.google.com/thumbnail?id=11ZaZVej53eYvMis4YkePB3ft0C8h3WCY&sz=w460" alt="StudyRoom Live Status - Data Structures and Algorithms I/II">
+<img src="https://studyroom-status.yosuke-tsuchiya.workers.dev/status/data-algorithms.svg" alt="StudyRoom Live Status - Data Structures and Algorithms I/II">
 ```
 
 実践プログラミングⅠ・Ⅱ:
 
 ```html
-<img src="https://drive.google.com/thumbnail?id=1VTihtqH7RcuOmIVN6rdSEMMnEtFp9Ryb&sz=w460" alt="StudyRoom Live Status - Practical Programming I/II">
+<img src="https://studyroom-status.yosuke-tsuchiya.workers.dev/status/programming.svg" alt="StudyRoom Live Status - Practical Programming I/II">
 ```
 
 初級セキュアプログラミング:
 
 ```html
-<img src="https://drive.google.com/thumbnail?id=1msD10qFs8FH2J2MQUC8VvVGrKWYlqIgM&sz=w460" alt="StudyRoom Live Status - Secure Programming Basics">
+<img src="https://studyroom-status.yosuke-tsuchiya.workers.dev/status/secure-programming.svg" alt="StudyRoom Live Status - Secure Programming Basics">
 ```
 
 基礎ゼミA・B:
 
 ```html
-<img src="https://drive.google.com/thumbnail?id=1fmBoWvqo2GINT7-ofGfdHhcrIzfj3Nc6&sz=w460" alt="StudyRoom Live Status - Basic Seminar A/B">
+<img src="https://studyroom-status.yosuke-tsuchiya.workers.dev/status/seminar.svg" alt="StudyRoom Live Status - Basic Seminar A/B">
 ```
 
 資格勉強:
 
 ```html
-<img src="https://drive.google.com/thumbnail?id=1ISatKs04hbDqeiZNc6krcgol_ryfgXH1&sz=w460" alt="StudyRoom Live Status - Certification Study">
+<img src="https://studyroom-status.yosuke-tsuchiya.workers.dev/status/certification.svg" alt="StudyRoom Live Status - Certification Study">
 ```
 
 ### サムネイル画像運用メモ
 
 - 入室、退室、学習内容の更新、自動退室処理のタイミングで画像が更新されます。
 - 画像更新は非同期で実行されるため、StudyRoomの画面操作より少し遅れて反映される場合があります。
-- Google Driveのサムネイルはキャッシュされる場合があります。人数がすぐ変わらない場合は、少し待ってから再読み込みしてください。
-- Apps ScriptのウェブアプリURLを変更した場合は、Streamlit CloudのSecretsに設定している `FEEDBACK_WEBHOOK_URL` も更新してください。
-- Apps Scriptの画像生成コードを変更した場合は、既存デプロイを新バージョンに更新してください。
+- サムネイル画像はCloudflare WorkerがSVGとして生成します。通常は入退室後すぐに反映されます。
+- Cloudflare WorkerのURLを変更した場合は、Streamlit CloudのSecretsに設定している `STATUS_IMAGE_WEBHOOK_URL` も更新してください。
+- Cloudflare Workerの認証トークンを変更した場合は、Streamlit CloudのSecretsに設定している `STATUS_IMAGE_WEBHOOK_TOKEN` も更新してください。
 
 ## プロトタイプの位置づけ
 
@@ -260,3 +260,4 @@ https://studyroom.streamlit.app/?quick=1&course=internet-tech&lesson=3
 - 今後も利用したい
 
 5件法に加え、自由記述と利用ログの集計を組み合わせる設計が考えられます。
+

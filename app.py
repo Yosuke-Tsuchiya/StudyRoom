@@ -1405,7 +1405,10 @@ def post_json_webhook(payload, timeout=10, webhook_url=None, token=None) -> tupl
     request = urllib.request.Request(
         webhook_url,
         data=json.dumps(body, ensure_ascii=False).encode("utf-8"),
-        headers={"Content-Type": "application/json; charset=utf-8"},
+        headers={
+            "Content-Type": "application/json; charset=utf-8",
+            "User-Agent": "StudyRoomStatusSync/1.0",
+        },
         method="POST",
     )
     try:
@@ -1413,12 +1416,24 @@ def post_json_webhook(payload, timeout=10, webhook_url=None, token=None) -> tupl
             if 200 <= response.status < 300:
                 return True, ""
             return False, f"送信先からエラーが返りました。status={response.status}"
-    except urllib.error.URLError as exc:
+    except urllib.error.HTTPError as exc:
+        try:
+            error_body = exc.read().decode("utf-8", errors="replace")[:300]
+        except Exception:
+            error_body = ""
+        return False, f"送信先からエラーが返りました。status={exc.code} body={error_body}"
+    except (TimeoutError, OSError, urllib.error.URLError) as exc:
         return False, f"送信先に接続できませんでした。{exc}"
 
 
 def send_feedback_webhook(payload) -> tuple[bool, str]:
     return post_json_webhook(payload)
+
+
+def post_status_webhook(label, payload, webhook_url, token):
+    ok, error = post_json_webhook(payload, webhook_url=webhook_url, token=token)
+    if not ok:
+        print(f"[status-sync:{label}] failed: {error}")
 
 
 def fetch_status_summary_counts():
@@ -1445,14 +1460,21 @@ def sync_status_summary():
         "rooms": rooms,
         "updated_at": now_iso(),
     }
-    webhook_url = get_config_value("FEEDBACK_WEBHOOK_URL")
-    token = get_config_value("FEEDBACK_WEBHOOK_TOKEN")
-    threading.Thread(
-        target=post_json_webhook,
-        args=(payload,),
-        kwargs={"webhook_url": webhook_url, "token": token},
-        daemon=True,
-    ).start()
+    worker_webhook_url = get_config_value("STATUS_IMAGE_WEBHOOK_URL")
+    worker_token = get_config_value("STATUS_IMAGE_WEBHOOK_TOKEN")
+    webhook_targets = (
+        [("worker", worker_webhook_url, worker_token)]
+        if worker_webhook_url
+        else [("gas", get_config_value("FEEDBACK_WEBHOOK_URL"), get_config_value("FEEDBACK_WEBHOOK_TOKEN"))]
+    )
+    for label, webhook_url, token in webhook_targets:
+        if not webhook_url:
+            continue
+        threading.Thread(
+            target=post_status_webhook,
+            args=(label, payload, webhook_url, token),
+            daemon=True,
+        ).start()
 
 
 def get_admin_password() -> str:
