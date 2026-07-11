@@ -1424,19 +1424,25 @@ def send_feedback_webhook(payload) -> tuple[bool, str]:
 def fetch_status_summary_counts():
     with get_conn() as conn:
         total_online = conn.execute("SELECT COUNT(*) FROM participants").fetchone()[0]
-        free_room_online = conn.execute(
-            "SELECT COUNT(*) FROM participants WHERE activity = ?",
-            ("フリールーム",),
-        ).fetchone()[0]
-    return total_online, free_room_online
+        activity_rows = conn.execute(
+            """
+            SELECT activity, COUNT(*) AS online_count
+            FROM participants
+            GROUP BY activity
+            """
+        ).fetchall()
+    rooms = {activity: 0 for activity in ACTIVITY_OPTIONS}
+    rooms.update({row["activity"]: row["online_count"] for row in activity_rows})
+    return total_online, rooms
 
 
 def sync_status_summary():
-    total_online, free_room_online = fetch_status_summary_counts()
+    total_online, rooms = fetch_status_summary_counts()
     payload = {
         "type": "status_summary",
         "total_online": total_online,
-        "free_room_online": free_room_online,
+        "free_room_online": rooms.get("フリールーム", 0),
+        "rooms": rooms,
         "updated_at": now_iso(),
     }
     webhook_url = get_config_value("FEEDBACK_WEBHOOK_URL")
