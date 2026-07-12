@@ -1695,7 +1695,7 @@ def rows_to_dataframe(rows):
     return pd.DataFrame([dict(row) for row in rows])
 
 
-def render_chart_with_table(title, rows, index_col, value_col, table_columns=None):
+def render_chart_with_table(title, rows, index_col, value_col, table_columns=None, y_label=None):
     st.subheader(title)
     if not rows:
         st.caption("集計データはまだありません。")
@@ -1703,7 +1703,7 @@ def render_chart_with_table(title, rows, index_col, value_col, table_columns=Non
 
     df = rows_to_dataframe(rows)
     chart_df = df[[index_col, value_col]].set_index(index_col)
-    st.bar_chart(chart_df, height=260)
+    st.bar_chart(chart_df, height=260, y_label=y_label)
     if table_columns:
         st.dataframe(
             df[table_columns],
@@ -2309,6 +2309,7 @@ def render_admin_dashboard():
                 "date",
                 "join_count",
                 ["date", "join_count", "active_sessions", "regular_count", "quick_count"],
+                y_label="入室数（回）",
             )
         with activity_tab:
             render_chart_with_table(
@@ -2317,6 +2318,7 @@ def render_admin_dashboard():
                 "activity",
                 "join_count",
                 ["activity", "join_count", "active_sessions", "regular_count", "quick_count"],
+                y_label="入室数（回）",
             )
         with hourly_tab:
             render_chart_with_table(
@@ -2325,6 +2327,7 @@ def render_admin_dashboard():
                 "hour",
                 "join_count",
                 ["hour", "join_count", "active_sessions"],
+                y_label="入室数（回）",
             )
         with participation_tab:
             render_chart_with_table(
@@ -2333,6 +2336,7 @@ def render_admin_dashboard():
                 "participation_type",
                 "join_count",
                 ["participation_type", "join_count", "active_sessions"],
+                y_label="入室数（回）",
             )
         with study_time_tab:
             st.caption("学習時間は入室中の学習区間も含むため、提案資料では目安として扱ってください。")
@@ -2342,6 +2346,7 @@ def render_admin_dashboard():
                 "activity",
                 "total_minutes",
                 ["activity", "segment_count", "total_minutes", "average_minutes"],
+                y_label="合計学習時間（分）",
             )
 
         st.divider()
