@@ -13,6 +13,7 @@ import uuid
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
+import pandas as pd
 import streamlit as st
 import streamlit.components.v1 as components
 
@@ -1572,6 +1573,147 @@ def presence_events_csv(rows) -> str:
     return output.getvalue()
 
 
+def rows_to_csv(headers, rows) -> str:
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow([label for _, label in headers])
+    for row in rows:
+        writer.writerow([csv_safe(row[key]) for key, _ in headers])
+    return output.getvalue()
+
+
+def fetch_admin_analytics():
+    with get_conn() as conn:
+        daily_rows = conn.execute(
+            """
+            SELECT
+                substr(created_at, 1, 10) AS date,
+                COUNT(*) AS join_count,
+                COUNT(DISTINCT session_id) AS active_sessions,
+                SUM(CASE WHEN COALESCE(participation_type, 'regular') = 'quick' THEN 1 ELSE 0 END) AS quick_count,
+                SUM(CASE WHEN COALESCE(participation_type, 'regular') != 'quick' THEN 1 ELSE 0 END) AS regular_count
+            FROM presence_events
+            WHERE event_type = '入室'
+            GROUP BY substr(created_at, 1, 10)
+            ORDER BY date
+            """
+        ).fetchall()
+        activity_rows = conn.execute(
+            """
+            SELECT
+                activity,
+                COUNT(*) AS join_count,
+                COUNT(DISTINCT session_id) AS active_sessions,
+                SUM(CASE WHEN COALESCE(participation_type, 'regular') = 'quick' THEN 1 ELSE 0 END) AS quick_count,
+                SUM(CASE WHEN COALESCE(participation_type, 'regular') != 'quick' THEN 1 ELSE 0 END) AS regular_count
+            FROM presence_events
+            WHERE event_type = '入室'
+            GROUP BY activity
+            ORDER BY join_count DESC, activity
+            """
+        ).fetchall()
+        hourly_rows = conn.execute(
+            """
+            SELECT
+                substr(created_at, 12, 2) AS hour,
+                COUNT(*) AS join_count,
+                COUNT(DISTINCT session_id) AS active_sessions
+            FROM presence_events
+            WHERE event_type = '入室'
+            GROUP BY substr(created_at, 12, 2)
+            ORDER BY hour
+            """
+        ).fetchall()
+        participation_rows = conn.execute(
+            """
+            SELECT
+                COALESCE(participation_type, 'regular') AS participation_type,
+                COUNT(*) AS join_count,
+                COUNT(DISTINCT session_id) AS active_sessions
+            FROM presence_events
+            WHERE event_type = '入室'
+            GROUP BY COALESCE(participation_type, 'regular')
+            ORDER BY join_count DESC, participation_type
+            """
+        ).fetchall()
+        study_time_rows = conn.execute(
+            """
+            SELECT
+                activity,
+                COUNT(*) AS segment_count,
+                ROUND(SUM(MAX(0, (julianday(COALESCE(ended_at, datetime('now'))) - julianday(started_at)) * 86400)) / 60.0, 1) AS total_minutes,
+                ROUND(AVG(MAX(0, (julianday(COALESCE(ended_at, datetime('now'))) - julianday(started_at)) * 86400)) / 60.0, 1) AS average_minutes
+            FROM study_segments
+            GROUP BY activity
+            ORDER BY total_minutes DESC, activity
+            """
+        ).fetchall()
+    return {
+        "daily": daily_rows,
+        "activity": activity_rows,
+        "hourly": hourly_rows,
+        "participation": participation_rows,
+        "study_time": study_time_rows,
+    }
+
+
+ANALYTICS_CSV_HEADERS = {
+    "daily": [
+        ("date", "日付"),
+        ("join_count", "入室数"),
+        ("active_sessions", "利用セッション数"),
+        ("regular_count", "通常入室"),
+        ("quick_count", "簡易参加"),
+    ],
+    "activity": [
+        ("activity", "部屋"),
+        ("join_count", "入室数"),
+        ("active_sessions", "利用セッション数"),
+        ("regular_count", "通常入室"),
+        ("quick_count", "簡易参加"),
+    ],
+    "hourly": [
+        ("hour", "時間帯"),
+        ("join_count", "入室数"),
+        ("active_sessions", "利用セッション数"),
+    ],
+    "participation": [
+        ("participation_type", "参加方法"),
+        ("join_count", "入室数"),
+        ("active_sessions", "利用セッション数"),
+    ],
+    "study_time": [
+        ("activity", "部屋"),
+        ("segment_count", "学習区間数"),
+        ("total_minutes", "合計学習時間（分）"),
+        ("average_minutes", "平均学習時間（分）"),
+    ],
+}
+
+
+def rows_to_dataframe(rows):
+    return pd.DataFrame([dict(row) for row in rows])
+
+
+def render_chart_with_table(title, rows, index_col, value_col, table_columns=None):
+    st.subheader(title)
+    if not rows:
+        st.caption("集計データはまだありません。")
+        return
+
+    df = rows_to_dataframe(rows)
+    chart_df = df[[index_col, value_col]].set_index(index_col)
+    st.bar_chart(chart_df, height=260)
+    if table_columns:
+        st.dataframe(
+            df[table_columns],
+            use_container_width=True,
+            hide_index=True,
+        )
+    else:
+        st.dataframe(df, use_container_width=True, hide_index=True)
+
+
 def fetch_admin_stats():
     cleanup_stale()
     with get_conn() as conn:
@@ -2111,6 +2253,96 @@ def render_admin_dashboard():
                 )
             else:
                 st.caption("入室履歴はまだありません。")
+
+        st.divider()
+        st.subheader("集計データ")
+        analytics = fetch_admin_analytics()
+        csv_col1, csv_col2, csv_col3, csv_col4, csv_col5 = st.columns(5)
+        with csv_col1:
+            st.download_button(
+                "日別CSV",
+                data="\ufeff" + rows_to_csv(ANALYTICS_CSV_HEADERS["daily"], analytics["daily"]),
+                file_name="studyroom_daily_usage.csv",
+                mime="text/csv",
+                use_container_width=True,
+            )
+        with csv_col2:
+            st.download_button(
+                "部屋別CSV",
+                data="\ufeff" + rows_to_csv(ANALYTICS_CSV_HEADERS["activity"], analytics["activity"]),
+                file_name="studyroom_activity_usage.csv",
+                mime="text/csv",
+                use_container_width=True,
+            )
+        with csv_col3:
+            st.download_button(
+                "時間帯CSV",
+                data="\ufeff" + rows_to_csv(ANALYTICS_CSV_HEADERS["hourly"], analytics["hourly"]),
+                file_name="studyroom_hourly_usage.csv",
+                mime="text/csv",
+                use_container_width=True,
+            )
+        with csv_col4:
+            st.download_button(
+                "参加方法CSV",
+                data="\ufeff" + rows_to_csv(ANALYTICS_CSV_HEADERS["participation"], analytics["participation"]),
+                file_name="studyroom_participation_usage.csv",
+                mime="text/csv",
+                use_container_width=True,
+            )
+        with csv_col5:
+            st.download_button(
+                "学習時間CSV",
+                data="\ufeff" + rows_to_csv(ANALYTICS_CSV_HEADERS["study_time"], analytics["study_time"]),
+                file_name="studyroom_study_time_summary.csv",
+                mime="text/csv",
+                use_container_width=True,
+            )
+
+        usage_tab, activity_tab, hourly_tab, participation_tab, study_time_tab = st.tabs(
+            ["日別", "部屋別", "時間帯別", "参加方法", "学習時間"]
+        )
+        with usage_tab:
+            render_chart_with_table(
+                "日別利用状況",
+                analytics["daily"],
+                "date",
+                "join_count",
+                ["date", "join_count", "active_sessions", "regular_count", "quick_count"],
+            )
+        with activity_tab:
+            render_chart_with_table(
+                "部屋別入室数",
+                analytics["activity"],
+                "activity",
+                "join_count",
+                ["activity", "join_count", "active_sessions", "regular_count", "quick_count"],
+            )
+        with hourly_tab:
+            render_chart_with_table(
+                "時間帯別入室数",
+                analytics["hourly"],
+                "hour",
+                "join_count",
+                ["hour", "join_count", "active_sessions"],
+            )
+        with participation_tab:
+            render_chart_with_table(
+                "参加方法別入室数",
+                analytics["participation"],
+                "participation_type",
+                "join_count",
+                ["participation_type", "join_count", "active_sessions"],
+            )
+        with study_time_tab:
+            st.caption("学習時間は入室中の学習区間も含むため、提案資料では目安として扱ってください。")
+            render_chart_with_table(
+                "部屋別学習時間",
+                analytics["study_time"],
+                "activity",
+                "total_minutes",
+                ["activity", "segment_count", "total_minutes", "average_minutes"],
+            )
 
         st.divider()
         st.subheader("簡易参加の整理")
