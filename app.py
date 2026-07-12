@@ -159,35 +159,6 @@ header[data-testid="stHeader"] {
     margin-bottom: 2px;
     color: #6f4a27;
 }
-.dark-mode-notice {
-    display: none;
-    border: 1px solid rgba(139,96,54,.28);
-    border-radius: 8px;
-    padding: 9px 10px;
-    margin: .7rem 0 .6rem 0;
-    background: #fff3d6;
-    color: #4a321c;
-    font-size: .78rem;
-    line-height: 1.45;
-    box-shadow: 0 2px 8px rgba(91,62,35,.08);
-}
-.dark-mode-notice strong {
-    display: block;
-    font-size: .82rem;
-    margin-bottom: 2px;
-    color: #6f4a27;
-}
-html[data-theme="dark"] .dark-mode-notice,
-body[data-theme="dark"] .dark-mode-notice,
-[data-theme="dark"] .dark-mode-notice,
-.stApp[data-theme="dark"] .dark-mode-notice {
-    display: block;
-}
-@media (prefers-color-scheme: dark) {
-    .dark-mode-notice {
-        display: block;
-    }
-}
 [data-testid="stSidebar"] .stButton > button,
 [data-testid="stSidebar"] [data-testid="stFormSubmitButton"] button {
     border: 1px solid rgba(120,76,35,.34) !important;
@@ -2626,15 +2597,6 @@ with st.sidebar:
         "ここは発言しなくても参加できる自習室です。"
         "顔出し・音声・チャットなしで、同じ時間に学んでいる人の気配だけを感じられます。"
     )
-    st.markdown(
-        """
-        <div class="dark-mode-notice">
-          <strong>Lightモード推奨です</strong>
-          このサイトはDarkモードには対応していません。右上メニューからLightモードに切り替えてご利用ください。
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
     if st.session_state.participation_type == "quick" and st.session_state.joined:
         st.markdown(
             f"""
@@ -3068,7 +3030,10 @@ def live_area():
                         unsafe_allow_html=True,
                     )
 
-    st.caption("表示は10秒ごとに更新されます。顔・音声・学籍番号は表示しません。")
+    st.caption(
+        "表示は10秒ごとに更新されます。顔・音声・学籍番号は表示しません。  \n"
+        "Darkモードには対応していません。SystemもしくはLightモードでご利用ください。"
+    )
 
 
 live_area()
