@@ -233,6 +233,32 @@ https://studyroom.streamlit.app/?quick=1&course=internet-tech&lesson=3
 - Cloudflare WorkerのURLを変更した場合は、Streamlit CloudのSecretsに設定している `STATUS_IMAGE_WEBHOOK_URL` も更新してください。
 - Cloudflare Workerの認証トークンを変更した場合は、Streamlit CloudのSecretsに設定している `STATUS_IMAGE_WEBHOOK_TOKEN` も更新してください。
 
+### @ROOMページ表示回数画像（検討中）
+
+StudyRoomの入室状況画像とは別に、@ROOM側の授業ページが最近表示された回数を示す画像を追加する案があります。
+
+URL形式:
+
+```text
+https://studyroom-status.yosuke-tsuchiya.workers.dev/views/info-basic/lesson-1.svg
+```
+
+この画像は、該当する授業回ページが表示された回数を、直近24時間と直近7日間で表示します。
+
+```text
+@ROOM ページ表示
+情報基礎A・B 第1回
+24時間 5回表示 / 7日間 32回表示
+```
+
+注意:
+
+- 表示されるのは「人数」ではなく「画像の表示回数」です。
+- 同じ学生がページを再読み込みした場合も回数に含まれます。
+- StudyRoomに入室、チェックインした人数とは別の補助情報として扱います。
+- 実装候補のCloudflare Workerコードは `cloudflare_worker_status.js` にあります。
+- 授業ページ貼り付け用の `<img>` タグ一覧は `page_view_image_tags.md` にあります。
+
 ## プロトタイプの位置づけ
 
 この版は授業導入前のユーザーテスト用です。SQLiteを使うため、単一サーバー・小人数での検証に向きます。

@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>StudyRoom Page View Status Sample</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f8f5ec;
+      --text: #24302f;
+      --muted: #6d7a77;
+      --panel: #fffdf7;
+      --line: #d7cec0;
+      --shadow: rgba(58, 65, 62, .14);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.72), rgba(255,255,255,0) 260px),
+        var(--bg);
+      color: var(--text);
+      font-family: "Yu Gothic", "Meiryo", system-ui, sans-serif;
+    }
+
+    main {
+      width: min(1040px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 34px 0 48px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 26px;
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+
+    p {
+      margin: 10px 0 24px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.75;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 18px;
+      align-items: start;
+    }
+
+    .sample {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 16px;
+      background: var(--panel);
+      box-shadow: 0 10px 28px var(--shadow);
+    }
+
+    .sample-title {
+      margin: 0 0 10px;
+      font-size: 15px;
+      font-weight: 700;
+      color: #34413f;
+    }
+
+    svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>授業ページ表示回数 画像サンプル</h1>
+    <p>
+      StudyRoomの入室状況画像とは別情報であることが伝わるように、青緑・紺・紫系と指定色ベースの案を並べています。
+      実装時は科目名と授業回、24時間・7日間の表示回数を差し替える想定です。
+    </p>
+
+    <section class="grid" aria-label="授業ページ表示回数の画像サンプル">
+      <article class="sample">
+        <h2 class="sample-title">案A: 青緑系</h2>
+        <svg xmlns="http://www.w3.org/2000/svg" width="420" height="136" viewBox="0 0 420 136" role="img" aria-label="情報基礎A・B 第1回のページ表示サンプル">
+          <rect width="420" height="136" rx="15" fill="#eef8f4"/>
+          <rect x="1.5" y="1.5" width="417" height="133" rx="14" fill="none" stroke="#6aa99b" stroke-width="3"/>
+          <rect x="16" y="14" width="388" height="34" rx="9" fill="#2f8f83"/>
+          <text x="28" y="37" font-family="Yu Gothic, Meiryo, sans-serif" font-size="18" font-weight="700" fill="#f7fffc">@ROOM ページ表示</text>
+          <text x="28" y="70" font-family="Yu Gothic, Meiryo, sans-serif" font-size="17" font-weight="700" fill="#173c38">情報基礎A・B 第1回</text>
+          <rect x="28" y="84" width="172" height="30" rx="8" fill="#d7efe8"/>
+          <rect x="214" y="84" width="172" height="30" rx="8" fill="#d7efe8"/>
+          <text x="44" y="104" font-family="Yu Gothic, Meiryo, sans-serif" font-size="15" font-weight="700" fill="#225e57">24時間: 5回表示</text>
+          <text x="230" y="104" font-family="Yu Gothic, Meiryo, sans-serif" font-size="15" font-weight="700" fill="#225e57">7日間: 32回表示</text>
+          <text x="392" y="126" text-anchor="end" font-family="Arial, sans-serif" font-size="10" fill="#5c7b75">Updated: 2026-07-14 10:30</text>
+        </svg>
+      </article>
+
+      <article class="sample">
+        <h2 class="sample-title">案B: 紺系</h2>
+        <svg xmlns="http://www.w3.org/2000/svg" width="420" height="136" viewBox="0 0 420 136" role="img" aria-label="情報基礎A・B 第1回のページ表示サンプル">
+          <rect width="420" height="136" rx="15" fill="#f0f4fb"/>
+          <rect x="1.5" y="1.5" width="417" height="133" rx="14" fill="none" stroke="#7386aa" stroke-width="3"/>
+          <rect x="16" y="14" width="388" height="34" rx="9" fill="#405b8d"/>
+          <text x="28" y="37" font-family="Yu Gothic, Meiryo, sans-serif" font-size="18" font-weight="700" fill="#f8fbff">@ROOM ページ表示</text>
+          <text x="28" y="70" font-family="Yu Gothic, Meiryo, sans-serif" font-size="17" font-weight="700" fill="#243451">情報基礎A・B 第1回</text>
+          <rect x="28" y="84" width="172" height="30" rx="8" fill="#dbe4f4"/>
+          <rect x="214" y="84" width="172" height="30" rx="8" fill="#dbe4f4"/>
+          <text x="44" y="104" font-family="Yu Gothic, Meiryo, sans-serif" font-size="15" font-weight="700" fill="#31486f">24時間: 5回表示</text>
+          <text x="230" y="104" font-family="Yu Gothic, Meiryo, sans-serif" font-size="15" font-weight="700" fill="#31486f">7日間: 32回表示</text>
+          <text x="392" y="126" text-anchor="end" font-family="Arial, sans-serif" font-size="10" fill="#66738d">Updated: 2026-07-14 10:30</text>
+        </svg>
+      </article>
+
+      <article class="sample">
+        <h2 class="sample-title">案C: 紫グレー系</h2>
+        <svg xmlns="http://www.w3.org/2000/svg" width="420" height="136" viewBox="0 0 420 136" role="img" aria-label="情報基礎A・B 第1回のページ表示サンプル">
+          <rect width="420" height="136" rx="15" fill="#f6f1f7"/>
+          <rect x="1.5" y="1.5" width="417" height="133" rx="14" fill="none" stroke="#9a83a7" stroke-width="3"/>
+          <rect x="16" y="14" width="388" height="34" rx="9" fill="#765687"/>
+          <text x="28" y="37" font-family="Yu Gothic, Meiryo, sans-serif" font-size="18" font-weight="700" fill="#fff9ff">@ROOM ページ表示</text>
+          <text x="28" y="70" font-family="Yu Gothic, Meiryo, sans-serif" font-size="17" font-weight="700" fill="#402b4a">情報基礎A・B 第1回</text>
+          <rect x="28" y="84" width="172" height="30" rx="8" fill="#eadff0"/>
+          <rect x="214" y="84" width="172" height="30" rx="8" fill="#eadff0"/>
+          <text x="44" y="104" font-family="Yu Gothic, Meiryo, sans-serif" font-size="15" font-weight="700" fill="#5a3f66">24時間: 5回表示</text>
+          <text x="230" y="104" font-family="Yu Gothic, Meiryo, sans-serif" font-size="15" font-weight="700" fill="#5a3f66">7日間: 32回表示</text>
+          <text x="392" y="126" text-anchor="end" font-family="Arial, sans-serif" font-size="10" fill="#806d88">Updated: 2026-07-14 10:30</text>
+        </svg>
+      </article>
+
+      <article class="sample">
+        <h2 class="sample-title">案D: #066C6F ベース</h2>
+        <svg xmlns="http://www.w3.org/2000/svg" width="460" height="120" viewBox="0 0 460 120" role="img" aria-label="情報基礎A・B 第1回のページ表示サンプル">
+          <rect width="460" height="120" rx="14" fill="#edf7f6"/>
+          <rect x="1.5" y="1.5" width="457" height="117" rx="13" fill="none" stroke="#4d9a9c" stroke-width="3"/>
+          <rect x="16" y="13" width="428" height="32" rx="9" fill="#066C6F"/>
+          <text x="28" y="35" font-family="Yu Gothic, Meiryo, sans-serif" font-size="18" font-weight="700" fill="#f5ffff">@ROOM ページ表示</text>
+          <text x="28" y="66" font-family="Yu Gothic, Meiryo, sans-serif" font-size="16" font-weight="700" fill="#06484b">情報基礎A・B 第1回</text>
+          <rect x="28" y="76" width="180" height="28" rx="8" fill="#d7eeed"/>
+          <rect x="222" y="76" width="180" height="28" rx="8" fill="#d7eeed"/>
+          <text x="44" y="95" font-family="Yu Gothic, Meiryo, sans-serif" font-size="14" font-weight="700" fill="#07585b">24時間: 5回表示</text>
+          <text x="238" y="95" font-family="Yu Gothic, Meiryo, sans-serif" font-size="14" font-weight="700" fill="#07585b">7日間: 32回表示</text>
+          <text x="432" y="113" text-anchor="end" font-family="Arial, sans-serif" font-size="10" fill="#5b7f80">Updated: 2026-07-14 10:30</text>
+        </svg>
+      </article>
+
+      <article class="sample">
+        <h2 class="sample-title">案E: 横分割レイアウト</h2>
+        <svg xmlns="http://www.w3.org/2000/svg" width="460" height="120" viewBox="0 0 460 120" role="img" aria-label="情報基礎A・B 第1回のページ表示サンプル">
+          <rect width="460" height="120" rx="14" fill="#edf7f6"/>
+          <rect x="1.5" y="1.5" width="457" height="117" rx="13" fill="none" stroke="#4d9a9c" stroke-width="3"/>
+          <rect x="0" y="0" width="154" height="120" rx="14" fill="#066C6F"/>
+          <rect x="140" y="0" width="24" height="120" fill="#066C6F"/>
+          <text x="24" y="37" font-family="Yu Gothic, Meiryo, sans-serif" font-size="18" font-weight="700" fill="#f5ffff">@ROOM</text>
+          <text x="24" y="61" font-family="Yu Gothic, Meiryo, sans-serif" font-size="16" font-weight="700" fill="#dff7f6">ページ表示</text>
+          <text x="24" y="90" font-family="Arial, sans-serif" font-size="10" fill="#bde3e3">Updated: 2026-07-14 10:30</text>
+          <text x="184" y="35" font-family="Yu Gothic, Meiryo, sans-serif" font-size="17" font-weight="700" fill="#06484b">情報基礎A・B 第1回</text>
+          <text x="184" y="67" font-family="Yu Gothic, Meiryo, sans-serif" font-size="15" fill="#557879">24時間</text>
+          <text x="252" y="69" font-family="Yu Gothic, Meiryo, sans-serif" font-size="24" font-weight="700" fill="#07585b">5</text>
+          <text x="277" y="67" font-family="Yu Gothic, Meiryo, sans-serif" font-size="15" fill="#557879">回表示</text>
+          <text x="184" y="98" font-family="Yu Gothic, Meiryo, sans-serif" font-size="15" fill="#557879">7日間</text>
+          <text x="252" y="100" font-family="Yu Gothic, Meiryo, sans-serif" font-size="24" font-weight="700" fill="#07585b">32</text>
+          <text x="289" y="98" font-family="Yu Gothic, Meiryo, sans-serif" font-size="15" fill="#557879">回表示</text>
+        </svg>
+      </article>
+
+      <article class="sample">
+        <h2 class="sample-title">案F: 数値強調レイアウト</h2>
+        <svg xmlns="http://www.w3.org/2000/svg" width="460" height="120" viewBox="0 0 460 120" role="img" aria-label="情報基礎A・B 第1回のページ表示サンプル">
+          <rect width="460" height="120" rx="14" fill="#edf7f6"/>
+          <rect x="1.5" y="1.5" width="457" height="117" rx="13" fill="none" stroke="#4d9a9c" stroke-width="3"/>
+          <rect x="16" y="12" width="428" height="28" rx="9" fill="#066C6F"/>
+          <text x="28" y="31" font-family="Yu Gothic, Meiryo, sans-serif" font-size="16" font-weight="700" fill="#f5ffff">@ROOM ページ表示</text>
+          <text x="262" y="31" font-family="Yu Gothic, Meiryo, sans-serif" font-size="14" font-weight="700" fill="#dff7f6">情報基礎A・B 第1回</text>
+          <rect x="28" y="52" width="186" height="44" rx="10" fill="#d7eeed"/>
+          <rect x="232" y="52" width="186" height="44" rx="10" fill="#d7eeed"/>
+          <text x="46" y="75" font-family="Yu Gothic, Meiryo, sans-serif" font-size="14" fill="#557879">24時間</text>
+          <text x="108" y="80" font-family="Yu Gothic, Meiryo, sans-serif" font-size="28" font-weight="700" fill="#07585b">5</text>
+          <text x="137" y="76" font-family="Yu Gothic, Meiryo, sans-serif" font-size="14" fill="#557879">回表示</text>
+          <text x="250" y="75" font-family="Yu Gothic, Meiryo, sans-serif" font-size="14" fill="#557879">7日間</text>
+          <text x="312" y="80" font-family="Yu Gothic, Meiryo, sans-serif" font-size="28" font-weight="700" fill="#07585b">32</text>
+          <text x="354" y="76" font-family="Yu Gothic, Meiryo, sans-serif" font-size="14" fill="#557879">回表示</text>
+          <text x="432" y="113" text-anchor="end" font-family="Arial, sans-serif" font-size="10" fill="#5b7f80">Updated: 2026-07-14 10:30</text>
+        </svg>
+      </article>
+
+      <article class="sample">
+        <h2 class="sample-title">参考: StudyRoom入室状況を案E風にした場合</h2>
+        <svg xmlns="http://www.w3.org/2000/svg" width="460" height="120" viewBox="0 0 460 120" role="img" aria-label="StudyRoom入室状況の案E風サンプル">
+          <rect width="460" height="120" rx="14" fill="#fff8ea"/>
+          <rect x="1.5" y="1.5" width="457" height="117" rx="13" fill="none" stroke="#c8945d" stroke-width="3"/>
+          <rect x="0" y="0" width="154" height="120" rx="14" fill="#a96f3d"/>
+          <rect x="140" y="0" width="24" height="120" fill="#a96f3d"/>
+          <text x="24" y="37" font-family="Arial, sans-serif" font-size="19" font-weight="700" fill="#fff8ea">StudyRoom</text>
+          <text x="24" y="61" font-family="Yu Gothic, Meiryo, sans-serif" font-size="15" font-weight="700" fill="#ffe8c6">利用状況</text>
+          <text x="24" y="90" font-family="Arial, sans-serif" font-size="10" fill="#f4d6ad">Updated: 2026-07-14 10:30</text>
+          <text x="184" y="35" font-family="Yu Gothic, Meiryo, sans-serif" font-size="17" font-weight="700" fill="#4b2f17">情報基礎A・B</text>
+          <text x="184" y="67" font-family="Yu Gothic, Meiryo, sans-serif" font-size="15" fill="#7d6245">この科目</text>
+          <text x="262" y="69" font-family="Yu Gothic, Meiryo, sans-serif" font-size="24" font-weight="700" fill="#6c4325">5</text>
+          <text x="288" y="67" font-family="Yu Gothic, Meiryo, sans-serif" font-size="15" fill="#7d6245">人が学習中</text>
+          <text x="184" y="98" font-family="Yu Gothic, Meiryo, sans-serif" font-size="15" fill="#7d6245">全体</text>
+          <text x="262" y="100" font-family="Yu Gothic, Meiryo, sans-serif" font-size="24" font-weight="700" fill="#6c4325">32</text>
+          <text x="300" y="98" font-family="Yu Gothic, Meiryo, sans-serif" font-size="15" fill="#7d6245">人が学習中</text>
+        </svg>
+      </article>
+    </section>
+  </main>
+</body>
+</html>
