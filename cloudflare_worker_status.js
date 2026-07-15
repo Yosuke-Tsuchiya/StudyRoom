@@ -145,9 +145,9 @@ function countSince(events, minTime) {
 
 function renderStudyRoomStatusSvg({ courseLabel, roomOnline, totalOnline, updatedAt }) {
   return `
-<svg xmlns="http://www.w3.org/2000/svg" width="520" height="120" viewBox="0 0 520 120">
-  <rect width="520" height="120" rx="14" fill="#fff8ea"/>
-  <rect x="1.5" y="1.5" width="517" height="117" rx="13" fill="none" stroke="#c8945d" stroke-width="3"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="120" viewBox="0 0 500 120">
+  <rect width="500" height="120" rx="14" fill="#fff8ea"/>
+  <rect x="1.5" y="1.5" width="497" height="117" rx="13" fill="none" stroke="#c8945d" stroke-width="3"/>
   <rect x="0" y="0" width="154" height="120" rx="14" fill="#a96f3d"/>
   <rect x="140" y="0" width="24" height="120" fill="#a96f3d"/>
   <text x="24" y="37" font-family="Arial, 'Yu Gothic', Meiryo, sans-serif" font-size="19" font-weight="700" fill="#fff8ea">StudyRoom</text>
@@ -165,9 +165,9 @@ function renderStudyRoomStatusSvg({ courseLabel, roomOnline, totalOnline, update
 
 function renderPageViewSvg({ courseLabel, lessonLabel, last24h, last7d, updatedAt }) {
   return `
-<svg xmlns="http://www.w3.org/2000/svg" width="520" height="120" viewBox="0 0 520 120">
-  <rect width="520" height="120" rx="14" fill="#edf7f6"/>
-  <rect x="1.5" y="1.5" width="517" height="117" rx="13" fill="none" stroke="#4d9a9c" stroke-width="3"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="120" viewBox="0 0 500 120">
+  <rect width="500" height="120" rx="14" fill="#edf7f6"/>
+  <rect x="1.5" y="1.5" width="497" height="117" rx="13" fill="none" stroke="#4d9a9c" stroke-width="3"/>
   <rect x="0" y="0" width="154" height="120" rx="14" fill="#066C6F"/>
   <rect x="140" y="0" width="24" height="120" fill="#066C6F"/>
   <text x="24" y="37" font-family="Arial, 'Yu Gothic', Meiryo, sans-serif" font-size="18" font-weight="700" fill="#f5ffff">@ROOM</text>
