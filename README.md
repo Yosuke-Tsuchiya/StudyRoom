@@ -255,6 +255,7 @@ https://studyroom-status.yosuke-tsuchiya.workers.dev/views/info-basic/lesson-1.s
 
 - 表示されるのは「人数」ではなく「画像の表示回数」です。
 - 同じ学生がページを再読み込みした場合も回数に含まれます。
+- Cloudflare KVの書き込み回数を抑えるため、同じ授業回の表示は15分に1回を上限として記録します。そのため表示回数は厳密なアクセス数ではなく目安です。
 - StudyRoomに入室、チェックインした人数とは別の補助情報として扱います。
 - 実装候補のCloudflare Workerコードは `cloudflare_worker_status.js` にあります。
 - 授業ページ貼り付け用の `<img>` タグ一覧は `page_view_image_tags.md` にあります。

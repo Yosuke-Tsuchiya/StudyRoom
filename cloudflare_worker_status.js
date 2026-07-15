@@ -1,5 +1,6 @@
 const STATUS_KEY = "status-summary";
 const VIEW_RETENTION_MS = 7 * 24 * 60 * 60 * 1000;
+const VIEW_WRITE_INTERVAL_MS = 15 * 60 * 1000;
 
 const COURSES = {
   "free-room": { room: "フリールーム", label: "フリールーム" },
@@ -133,9 +134,13 @@ async function recordPageView(env, courseCode, lesson, now) {
 
   const minTime = now - VIEW_RETENTION_MS;
   events = events.filter((timestamp) => Number(timestamp) >= minTime);
-  events.push(now);
 
-  await env.STATUS_KV.put(key, JSON.stringify(events));
+  const lastRecordedAt = events.length ? Number(events[events.length - 1]) : 0;
+  if (!lastRecordedAt || now - lastRecordedAt >= VIEW_WRITE_INTERVAL_MS) {
+    events.push(now);
+    await env.STATUS_KV.put(key, JSON.stringify(events));
+  }
+
   return events;
 }
 
