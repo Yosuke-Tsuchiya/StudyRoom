@@ -60,6 +60,12 @@ DIFFICULTY_META = {
     "ふつう": {"score": 2, "label": "ふつう", "class": "normal"},
     "むずかしい": {"score": 3, "label": "むずかしめ", "class": "hard"},
 }
+UNDERSTANDING_OPTIONS = [
+    ("understood", "🙂 理解できた"),
+    ("normal", "😐 普通"),
+    ("difficult", "😵 難しかった"),
+]
+UNDERSTANDING_LABELS = dict(UNDERSTANDING_OPTIONS)
 QUICK_JOIN_NICKNAME = "匿名学生さん"
 QUICK_JOIN_AVATAR = "📖"
 QUICK_JOIN_COMMENT = DEFAULT_COMMENT
@@ -995,6 +1001,20 @@ def init_db():
                 started_at TEXT NOT NULL,
                 ended_at TEXT
             );
+
+            CREATE TABLE IF NOT EXISTS exit_surveys (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                session_id TEXT NOT NULL,
+                nickname TEXT,
+                activity TEXT,
+                detail TEXT,
+                participation_type TEXT,
+                total_minutes INTEGER,
+                total_label TEXT,
+                understanding TEXT NOT NULL,
+                summary_json TEXT,
+                created_at TEXT NOT NULL
+            );
             """
         )
         columns = {row["name"] for row in conn.execute("PRAGMA table_info(participants)").fetchall()}
@@ -1017,7 +1037,7 @@ def init_db():
             conn.execute("ALTER TABLE presence_events ADD COLUMN difficulty TEXT")
         if "participation_type" not in event_columns:
             conn.execute("ALTER TABLE presence_events ADD COLUMN participation_type TEXT")
-        for table_name in ("participants", "feedback", "presence_events", "study_segments"):
+        for table_name in ("participants", "feedback", "presence_events", "study_segments", "exit_surveys"):
             conn.execute(
                 f"UPDATE {table_name} SET activity = ? WHERE activity = ?",
                 ("フリールーム", "その他"),
@@ -1310,6 +1330,18 @@ def leave_room(session_id):
             )
             conn.commit()
             summary = study_summary_from_segments(session_id, row["joined_at"])
+            if summary:
+                summary.update(
+                    {
+                        "survey_key": f"{row['session_id']}:{closed_at}",
+                        "session_id": row["session_id"],
+                        "nickname": row["nickname"],
+                        "activity": row["activity"],
+                        "detail": row["detail"],
+                        "participation_type": row["participation_type"] or "regular",
+                        "left_at": closed_at,
+                    }
+                )
             sync_status_summary()
             return summary
     return None
@@ -1390,6 +1422,41 @@ def add_feedback(session_id, nickname, activity, detail, category, body):
             VALUES (?, ?, ?, ?, ?, ?, ?)
             """,
             (session_id, nickname, activity, detail, category, body[:1000], now_iso()),
+        )
+
+
+def add_exit_survey(summary, understanding):
+    if not summary or understanding not in UNDERSTANDING_LABELS:
+        return
+
+    summary_payload = {
+        "items": summary.get("items", []),
+        "total_minutes": summary.get("total_minutes", 0),
+        "total_label": summary.get("total_label", ""),
+        "left_at": summary.get("left_at", ""),
+    }
+    with get_conn() as conn:
+        conn.execute(
+            """
+            INSERT INTO exit_surveys
+                (
+                    session_id, nickname, activity, detail, participation_type,
+                    total_minutes, total_label, understanding, summary_json, created_at
+                )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                summary.get("session_id", ""),
+                summary.get("nickname", ""),
+                summary.get("activity", ""),
+                summary.get("detail", ""),
+                summary.get("participation_type", "regular"),
+                int(summary.get("total_minutes", 0) or 0),
+                summary.get("total_label", ""),
+                understanding,
+                json.dumps(summary_payload, ensure_ascii=False),
+                now_iso(),
+            ),
         )
 
 
@@ -1523,6 +1590,18 @@ def fetch_presence_events(limit=500):
         ).fetchall()
 
 
+def fetch_exit_surveys(limit=500):
+    with get_conn() as conn:
+        return conn.execute(
+            """
+            SELECT * FROM exit_surveys
+            ORDER BY id DESC
+            LIMIT ?
+            """,
+            (limit,),
+        ).fetchall()
+
+
 def feedback_csv(rows) -> str:
     output = io.StringIO()
     writer = csv.writer(output)
@@ -1578,6 +1657,45 @@ def presence_events_csv(rows) -> str:
                 row["room_count"],
                 row["total_count"],
                 row["session_id"],
+            ]
+        )
+    return output.getvalue()
+
+
+def exit_surveys_csv(rows) -> str:
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(
+        [
+            "id",
+            "created_at",
+            "understanding",
+            "understanding_label",
+            "nickname",
+            "activity",
+            "detail",
+            "participation_type",
+            "total_minutes",
+            "total_label",
+            "session_id",
+            "summary_json",
+        ]
+    )
+    for row in rows:
+        writer.writerow(
+            [
+                row["id"],
+                row["created_at"],
+                csv_safe(row["understanding"]),
+                csv_safe(UNDERSTANDING_LABELS.get(row["understanding"], row["understanding"])),
+                csv_safe(row["nickname"]),
+                csv_safe(row["activity"]),
+                csv_safe(row["detail"]),
+                csv_safe(row["participation_type"]),
+                row["total_minutes"],
+                csv_safe(row["total_label"]),
+                row["session_id"],
+                csv_safe(row["summary_json"]),
             ]
         )
     return output.getvalue()
@@ -1734,6 +1852,7 @@ def fetch_admin_stats():
         current_regular = current_total - current_quick
         feedback_total = conn.execute("SELECT COUNT(*) FROM feedback").fetchone()[0]
         event_total = conn.execute("SELECT COUNT(*) FROM presence_events").fetchone()[0]
+        survey_total = conn.execute("SELECT COUNT(*) FROM exit_surveys").fetchone()[0]
         active_rooms = conn.execute(
             """
             SELECT
@@ -1755,7 +1874,16 @@ def fetch_admin_stats():
             ORDER BY count DESC, activity
             """
         ).fetchall()
-    return current_total, current_regular, current_quick, feedback_total, event_total, active_rooms, join_counts
+    return (
+        current_total,
+        current_regular,
+        current_quick,
+        feedback_total,
+        event_total,
+        survey_total,
+        active_rooms,
+        join_counts,
+    )
 
 
 def safe_text(value) -> str:
@@ -2051,6 +2179,29 @@ def render_study_summary(summary):
         """,
         height=76,
     )
+    render_exit_survey(summary)
+
+
+def render_exit_survey(summary):
+    survey_key = summary.get("survey_key")
+    if not survey_key:
+        return
+
+    answered_key = st.session_state.get("exit_survey_answered_key")
+    st.markdown("#### 今日の学習内容はどうでしたか？")
+    st.caption("回答は任意です。授業改善の参考として、先生が集計して確認します。")
+
+    if answered_key == survey_key:
+        st.success("回答ありがとうございました。")
+        return
+
+    cols = st.columns(len(UNDERSTANDING_OPTIONS))
+    for col, (value, label) in zip(cols, UNDERSTANDING_OPTIONS):
+        with col:
+            if st.button(label, key=f"exit_survey_{value}_{survey_key}", use_container_width=True):
+                add_exit_survey(summary, value)
+                st.session_state.exit_survey_answered_key = survey_key
+                st.success("回答ありがとうございました。")
 
 
 def build_study_summary_copy_text(summary):
@@ -2222,16 +2373,28 @@ def render_admin_dashboard():
             st.session_state.admin_authenticated = False
             st.rerun()
 
-    current_total, current_regular, current_quick, feedback_total, event_total, active_rooms, join_counts = fetch_admin_stats()
-    c1, c2, c3 = st.columns(3)
+    (
+        current_total,
+        current_regular,
+        current_quick,
+        feedback_total,
+        event_total,
+        survey_total,
+        active_rooms,
+        join_counts,
+    ) = fetch_admin_stats()
+    c1, c2, c3, c4 = st.columns(4)
     c1.metric("現在の入室者", f"{current_total}人", f"通常 {current_regular} / 簡易 {current_quick}")
     c2.metric("意見・要望", f"{feedback_total}件")
     c3.metric("入退室履歴", f"{event_total}件")
+    c4.metric("退室アンケート", f"{survey_total}件")
     cleanup_message = st.session_state.pop("admin_cleanup_message", None)
     if cleanup_message:
         st.success(cleanup_message)
 
-    overview_tab, events_tab, feedback_tab = st.tabs(["利用状況", "入退室履歴", "意見・要望"])
+    overview_tab, events_tab, survey_tab, feedback_tab = st.tabs(
+        ["利用状況", "入退室履歴", "退室アンケート", "意見・要望"]
+    )
 
     with overview_tab:
         left, right = st.columns(2)
@@ -2421,6 +2584,41 @@ def render_admin_dashboard():
             )
         else:
             st.caption("入退室履歴はまだありません。")
+
+    with survey_tab:
+        survey_rows = fetch_exit_surveys(limit=500)
+        st.download_button(
+            "退室アンケートCSVをダウンロード",
+            data="\ufeff" + exit_surveys_csv(survey_rows),
+            file_name="studyroom_exit_surveys.csv",
+            mime="text/csv",
+            use_container_width=True,
+        )
+        if survey_rows:
+            survey_display_rows = [
+                {
+                    "日時": row["created_at"],
+                    "理解度": UNDERSTANDING_LABELS.get(row["understanding"], row["understanding"]),
+                    "ニックネーム": row["nickname"] or "",
+                    "部屋": row["activity"] or "",
+                    "授業回": row["detail"] or "",
+                    "学習時間（分）": row["total_minutes"] or 0,
+                    "参加方法": row["participation_type"] or "regular",
+                }
+                for row in survey_rows
+            ]
+            survey_df = pd.DataFrame(survey_display_rows)
+            summary_df = (
+                survey_df.groupby(["部屋", "授業回", "理解度"], dropna=False)
+                .size()
+                .reset_index(name="回答数")
+            )
+            st.subheader("回答集計")
+            st.dataframe(summary_df, use_container_width=True, hide_index=True)
+            st.subheader("回答一覧")
+            st.dataframe(survey_df, use_container_width=True, hide_index=True)
+        else:
+            st.caption("退室アンケートの回答はまだありません。")
 
     with feedback_tab:
         feedback_rows = fetch_feedback(limit=500)
