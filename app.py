@@ -2189,7 +2189,7 @@ def render_exit_survey(summary):
 
     answered_key = st.session_state.get("exit_survey_answered_key")
     st.markdown("#### 今日の学習内容はどうでしたか？")
-    st.caption("回答は任意です。授業改善の参考として、先生が集計して確認します。")
+    st.caption("回答は任意です。授業改善の参考にさせていただきます。")
 
     if answered_key == survey_key:
         st.success("回答ありがとうございました。")
