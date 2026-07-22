@@ -2997,6 +2997,7 @@ with st.sidebar:
         "授業に関する質問や雑談をしたい場合は、DiscordのStudyRoom-ChatSpaceをご利用ください。"
     )
     st.link_button("Discordを開く", DISCORD_INVITE_URL, use_container_width=True)
+    st.caption("※ StudyRoom-ChatSpaceの利用にはDiscordアカウントが必要です。")
 
     st.divider()
     st.subheader("意見・要望")
