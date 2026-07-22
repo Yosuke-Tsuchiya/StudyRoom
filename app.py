@@ -2991,7 +2991,7 @@ with st.sidebar:
                 st.rerun()
 
     st.divider()
-    st.subheader("質問・雑談")
+    st.subheader("相談・情報交換")
     st.caption(
         "StudyRoomはチャットなしの自習スペースです。"
         "同じ授業を学んでいる人どうしで相談や情報交換をしたい場合は、StudyRoom-ChatSpaceをご利用ください。"
