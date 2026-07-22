@@ -2994,7 +2994,7 @@ with st.sidebar:
     st.subheader("質問・雑談")
     st.caption(
         "StudyRoomはチャットなしの自習スペースです。"
-        "授業に関する質問や雑談をしたい場合は、DiscordのStudyRoom-ChatSpaceをご利用ください。"
+        "同じ授業を学んでいる人どうしで相談や情報交換をしたい場合は、StudyRoom-ChatSpaceをご利用ください。"
     )
     st.link_button("Discordを開く", DISCORD_INVITE_URL, use_container_width=True)
     st.caption("※ StudyRoom-ChatSpaceの利用にはDiscordアカウントが必要です。")
