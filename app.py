@@ -26,6 +26,7 @@ NICKNAME_MAX_WIDTH = 20
 COMMENT_MAX_WIDTH = 40
 FEEDBACK_MAX_CHARS = 1000
 FEEDBACK_COOLDOWN_SECONDS = 30
+DISCORD_INVITE_URL = "https://discord.gg/xww5NwxmaM"
 JST = timezone(timedelta(hours=9))
 ACTIVITY_OPTIONS = [
     "フリールーム",
@@ -176,7 +177,8 @@ header[data-testid="stHeader"] {
     color: #6f4a27;
 }
 [data-testid="stSidebar"] .stButton > button,
-[data-testid="stSidebar"] [data-testid="stFormSubmitButton"] button {
+[data-testid="stSidebar"] [data-testid="stFormSubmitButton"] button,
+[data-testid="stSidebar"] [data-testid="stLinkButton"] a {
     border: 1px solid rgba(120,76,35,.34) !important;
     border-radius: 8px !important;
     background:
@@ -189,7 +191,8 @@ header[data-testid="stHeader"] {
     opacity: 1 !important;
 }
 [data-testid="stSidebar"] .stButton > button:hover,
-[data-testid="stSidebar"] [data-testid="stFormSubmitButton"] button:hover {
+[data-testid="stSidebar"] [data-testid="stFormSubmitButton"] button:hover,
+[data-testid="stSidebar"] [data-testid="stLinkButton"] a:hover {
     border-color: rgba(104,64,28,.45) !important;
     background:
         linear-gradient(180deg, #d1a06c, #99602f) !important;
@@ -197,7 +200,8 @@ header[data-testid="stHeader"] {
     opacity: 1 !important;
 }
 [data-testid="stSidebar"] .stButton > button:active,
-[data-testid="stSidebar"] [data-testid="stFormSubmitButton"] button:active {
+[data-testid="stSidebar"] [data-testid="stFormSubmitButton"] button:active,
+[data-testid="stSidebar"] [data-testid="stLinkButton"] a:active {
     transform: translateY(1px);
     box-shadow:
         inset 0 1px 3px rgba(69,42,20,.22),
@@ -2985,6 +2989,14 @@ with st.sidebar:
                 st.session_state.participation_type = "regular"
                 st.session_state.expires_at = None
                 st.rerun()
+
+    st.divider()
+    st.subheader("質問・雑談")
+    st.caption(
+        "StudyRoomはチャットなしの自習スペースです。"
+        "授業に関する質問や雑談をしたい場合は、DiscordのStudyRoom-ChatSpaceをご利用ください。"
+    )
+    st.link_button("Discordを開く", DISCORD_INVITE_URL, use_container_width=True)
 
     st.divider()
     st.subheader("意見・要望")
