@@ -182,8 +182,8 @@ header[data-testid="stHeader"] {
     border: 1px solid rgba(120,76,35,.34) !important;
     border-radius: 8px !important;
     background:
-        linear-gradient(180deg, #c9955d, #a86f38) !important;
-    color: #fffaf0 !important;
+        linear-gradient(180deg, #f4d5a7, #d79d63) !important;
+    color: #4f3219 !important;
     font-weight: 700 !important;
     box-shadow:
         inset 0 1px 0 rgba(255,255,255,.28),
@@ -195,8 +195,8 @@ header[data-testid="stHeader"] {
 [data-testid="stSidebar"] [data-testid="stLinkButton"] a:hover {
     border-color: rgba(104,64,28,.45) !important;
     background:
-        linear-gradient(180deg, #d1a06c, #99602f) !important;
-    color: #fffaf0 !important;
+        linear-gradient(180deg, #f8dfb9, #c9894f) !important;
+    color: #3f2915 !important;
     opacity: 1 !important;
 }
 [data-testid="stSidebar"] .stButton > button:active,
@@ -210,14 +210,14 @@ header[data-testid="stHeader"] {
 [data-testid="stSidebar"] .stButton > button[kind="secondary"] {
     border-color: rgba(137,54,43,.36) !important;
     background:
-        linear-gradient(180deg, #b85f4f, #8f3f35) !important;
-    color: #fff8f2 !important;
+        linear-gradient(180deg, #f0c0ad, #cf7e6f) !important;
+    color: #4b241e !important;
 }
 [data-testid="stSidebar"] .stButton > button[kind="secondary"]:hover {
     border-color: rgba(122,43,34,.46) !important;
     background:
-        linear-gradient(180deg, #c76d5c, #7e352d) !important;
-    color: #fff8f2 !important;
+        linear-gradient(180deg, #f5cab9, #bc6e61) !important;
+    color: #3f1f1a !important;
     opacity: 1 !important;
 }
 .leave-room-note {
