@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>StudyRoom Classroom Presence Sample</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f7f3ea;
+      --text: #2f2a24;
+      --muted: #746b5f;
+      --panel: #fffdf8;
+      --line: #d8cbbb;
+      --shadow: rgba(65, 52, 38, .14);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.78), rgba(255,255,255,0) 280px),
+        var(--bg);
+      color: var(--text);
+      font-family: "Yu Gothic", "Meiryo", system-ui, sans-serif;
+    }
+
+    main {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 34px 0 52px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: 26px;
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+
+    p {
+      margin: 0 0 24px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.75;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+
+    .sample {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 16px;
+      background: var(--panel);
+      box-shadow: 0 12px 30px var(--shadow);
+    }
+
+    .sample-title {
+      margin: 0 0 10px;
+      font-size: 15px;
+      font-weight: 700;
+      color: #3d352c;
+    }
+
+    svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>教室風「人の気配」画像サンプル</h1>
+    <p>
+      授業ページに表示する想定の大きめSVGです。数字を主役にせず、最近この授業回を開いた人の気配を丸い座席アイコンで表現します。
+      文字入りの丸はStudyRoomでチェックインして1文字アイコンを設定した人、薄い丸は授業ページ閲覧だけの匿名の気配、という想定です。
+    </p>
+
+    <section class="grid" aria-label="教室風SVG画像サンプル">
+      <article class="sample">
+        <h2 class="sample-title">案A: 黒板と机を正面から見る</h2>
+        <svg xmlns="http://www.w3.org/2000/svg" width="960" height="520" viewBox="0 0 960 520" role="img" aria-label="情報基礎A・B 第1回を最近開いた人の気配">
+          <defs>
+            <linearGradient id="wallA" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#fff8ea"/>
+              <stop offset=".7" stop-color="#f6ead4"/>
+              <stop offset="1" stop-color="#e5c899"/>
+            </linearGradient>
+            <linearGradient id="floorA" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#d3a66e"/>
+              <stop offset="1" stop-color="#a96f3d"/>
+            </linearGradient>
+            <filter id="softShadowA" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="7" stdDeviation="6" flood-color="#5f4129" flood-opacity=".20"/>
+            </filter>
+          </defs>
+          <rect width="960" height="520" rx="24" fill="#fff8ea"/>
+          <rect x="2" y="2" width="956" height="516" rx="22" fill="none" stroke="#c8945d" stroke-width="4"/>
+          <rect x="18" y="18" width="924" height="484" rx="18" fill="url(#wallA)"/>
+          <rect x="18" y="318" width="924" height="184" rx="0" fill="url(#floorA)"/>
+          <path d="M18 318 H942" stroke="#b8864e" stroke-width="4"/>
+
+          <rect x="96" y="54" width="768" height="136" rx="14" fill="#2f5d4d" filter="url(#softShadowA)"/>
+          <rect x="112" y="70" width="736" height="104" rx="8" fill="#376b59"/>
+          <text x="132" y="111" font-family="Yu Gothic, Meiryo, sans-serif" font-size="30" font-weight="700" fill="#f6fff8">情報基礎A・B 第1回</text>
+          <text x="132" y="150" font-family="Yu Gothic, Meiryo, sans-serif" font-size="22" fill="#d9f0e2">この授業回を最近開いた人の気配</text>
+          <text x="828" y="166" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#c3decf">Updated: 2026-07-25 21:10</text>
+
+          <g opacity=".3" stroke="#ead0a6" stroke-width="2">
+            <path d="M120 354 H840"/>
+            <path d="M132 407 H828"/>
+            <path d="M146 460 H814"/>
+          </g>
+
+          <g transform="translate(124 232)" filter="url(#softShadowA)">
+            <g transform="translate(0 0)">
+              <rect x="0" y="38" width="122" height="52" rx="12" fill="#b77a43"/>
+              <rect x="12" y="50" width="98" height="28" rx="8" fill="#cf9658"/>
+              <line x1="20" y1="90" x2="8" y2="128" stroke="#8e6f55" stroke-width="7" stroke-linecap="round"/>
+              <line x1="102" y1="90" x2="114" y2="128" stroke="#8e6f55" stroke-width="7" stroke-linecap="round"/>
+              <circle cx="61" cy="28" r="25" fill="#f4c76f" stroke="#8f622f" stroke-width="4"/>
+              <text x="61" y="38" text-anchor="middle" font-family="Yu Gothic, Meiryo, sans-serif" font-size="25" font-weight="700" fill="#5b3618">学</text>
+            </g>
+            <g transform="translate(142 0)">
+              <rect x="0" y="38" width="122" height="52" rx="12" fill="#b77a43"/>
+              <rect x="12" y="50" width="98" height="28" rx="8" fill="#cf9658"/>
+              <line x1="20" y1="90" x2="8" y2="128" stroke="#8e6f55" stroke-width="7" stroke-linecap="round"/>
+              <line x1="102" y1="90" x2="114" y2="128" stroke="#8e6f55" stroke-width="7" stroke-linecap="round"/>
+              <circle cx="61" cy="28" r="25" fill="#fff5dc" stroke="#9b7b55" stroke-width="4"/>
+              <circle cx="61" cy="28" r="9" fill="#c9b69d"/>
+            </g>
+            <g transform="translate(284 0)">
+              <rect x="0" y="38" width="122" height="52" rx="12" fill="#b77a43"/>
+              <rect x="12" y="50" width="98" height="28" rx="8" fill="#cf9658"/>
+              <line x1="20" y1="90" x2="8" y2="128" stroke="#8e6f55" stroke-width="7" stroke-linecap="round"/>
+              <line x1="102" y1="90" x2="114" y2="128" stroke="#8e6f55" stroke-width="7" stroke-linecap="round"/>
+              <circle cx="61" cy="28" r="25" fill="#9fd3be" stroke="#4f806a" stroke-width="4"/>
+              <text x="61" y="38" text-anchor="middle" font-family="Yu Gothic, Meiryo, sans-serif" font-size="25" font-weight="700" fill="#254936">☕</text>
+            </g>
+            <g transform="translate(426 0)">
+              <rect x="0" y="38" width="122" height="52" rx="12" fill="#b77a43"/>
+              <rect x="12" y="50" width="98" height="28" rx="8" fill="#cf9658"/>
+              <line x1="20" y1="90" x2="8" y2="128" stroke="#8e6f55" stroke-width="7" stroke-linecap="round"/>
+              <line x1="102" y1="90" x2="114" y2="128" stroke="#8e6f55" stroke-width="7" stroke-linecap="round"/>
+              <circle cx="61" cy="28" r="25" fill="#fff5dc" stroke="#9b7b55" stroke-width="4"/>
+              <circle cx="61" cy="28" r="9" fill="#c9b69d"/>
+            </g>
+            <g transform="translate(568 0)">
+              <rect x="0" y="38" width="122" height="52" rx="12" fill="#b77a43"/>
+              <rect x="12" y="50" width="98" height="28" rx="8" fill="#cf9658"/>
+              <line x1="20" y1="90" x2="8" y2="128" stroke="#8e6f55" stroke-width="7" stroke-linecap="round"/>
+              <line x1="102" y1="90" x2="114" y2="128" stroke="#8e6f55" stroke-width="7" stroke-linecap="round"/>
+              <circle cx="61" cy="28" r="25" fill="#f3a79d" stroke="#9b5148" stroke-width="4"/>
+              <text x="61" y="38" text-anchor="middle" font-family="Yu Gothic, Meiryo, sans-serif" font-size="25" font-weight="700" fill="#5f211b">🔥</text>
+            </g>
+          </g>
+
+          <g transform="translate(196 372)" filter="url(#softShadowA)">
+            <g transform="translate(0 0)">
+              <rect x="0" y="34" width="122" height="48" rx="12" fill="#a96f3d"/>
+              <rect x="12" y="46" width="98" height="24" rx="8" fill="#c28a50"/>
+              <line x1="20" y1="82" x2="8" y2="116" stroke="#82684f" stroke-width="7" stroke-linecap="round"/>
+              <line x1="102" y1="82" x2="114" y2="116" stroke="#82684f" stroke-width="7" stroke-linecap="round"/>
+              <circle cx="61" cy="25" r="24" fill="#fff5dc" stroke="#9b7b55" stroke-width="4"/>
+              <circle cx="61" cy="25" r="9" fill="#c9b69d"/>
+            </g>
+            <g transform="translate(142 0)">
+              <rect x="0" y="34" width="122" height="48" rx="12" fill="#a96f3d"/>
+              <rect x="12" y="46" width="98" height="24" rx="8" fill="#c28a50"/>
+              <line x1="20" y1="82" x2="8" y2="116" stroke="#82684f" stroke-width="7" stroke-linecap="round"/>
+              <line x1="102" y1="82" x2="114" y2="116" stroke="#82684f" stroke-width="7" stroke-linecap="round"/>
+              <circle cx="61" cy="25" r="24" fill="#f4c76f" stroke="#8f622f" stroke-width="4"/>
+              <text x="61" y="34" text-anchor="middle" font-family="Yu Gothic, Meiryo, sans-serif" font-size="24" font-weight="700" fill="#5b3618">A</text>
+            </g>
+            <g transform="translate(284 0)">
+              <rect x="0" y="34" width="122" height="48" rx="12" fill="#a96f3d"/>
+              <rect x="12" y="46" width="98" height="24" rx="8" fill="#c28a50"/>
+              <line x1="20" y1="82" x2="8" y2="116" stroke="#82684f" stroke-width="7" stroke-linecap="round"/>
+              <line x1="102" y1="82" x2="114" y2="116" stroke="#82684f" stroke-width="7" stroke-linecap="round"/>
+              <circle cx="61" cy="25" r="24" fill="#fff5dc" stroke="#9b7b55" stroke-width="4"/>
+              <circle cx="61" cy="25" r="9" fill="#c9b69d"/>
+            </g>
+          </g>
+
+          <rect x="656" y="426" width="214" height="44" rx="12" fill="rgba(255,248,234,.86)" stroke="#d0ad82"/>
+          <circle cx="684" cy="448" r="11" fill="#f4c76f" stroke="#8f622f" stroke-width="3"/>
+          <text x="704" y="453" font-family="Yu Gothic, Meiryo, sans-serif" font-size="14" fill="#5d4630">StudyRoomで設定した1文字</text>
+          <circle cx="684" cy="474" r="11" fill="#fff5dc" stroke="#9b7b55" stroke-width="3"/>
+          <circle cx="684" cy="474" r="4" fill="#c9b69d"/>
+          <text x="704" y="479" font-family="Yu Gothic, Meiryo, sans-serif" font-size="14" fill="#5d4630">授業ページ閲覧の匿名表示</text>
+        </svg>
+      </article>
+
+      <article class="sample">
+        <h2 class="sample-title">案B: 上から見た座席表風</h2>
+        <svg xmlns="http://www.w3.org/2000/svg" width="960" height="520" viewBox="0 0 960 520" role="img" aria-label="実践プログラミング 第3回を最近開いた人の気配">
+          <defs>
+            <linearGradient id="floorB" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#f8efd9"/>
+              <stop offset="1" stop-color="#d9b078"/>
+            </linearGradient>
+            <filter id="softShadowB" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#5f4129" flood-opacity=".18"/>
+            </filter>
+          </defs>
+          <rect width="960" height="520" rx="24" fill="#fff8ea"/>
+          <rect x="2" y="2" width="956" height="516" rx="22" fill="none" stroke="#c8945d" stroke-width="4"/>
+          <rect x="18" y="18" width="924" height="484" rx="18" fill="url(#floorB)"/>
+          <rect x="58" y="42" width="844" height="78" rx="18" fill="#fffaf0" stroke="#d7b98e" stroke-width="2"/>
+          <text x="86" y="78" font-family="Yu Gothic, Meiryo, sans-serif" font-size="28" font-weight="700" fill="#4b2f17">実践プログラミングⅠ・Ⅱ 第3回</text>
+          <text x="86" y="104" font-family="Yu Gothic, Meiryo, sans-serif" font-size="17" fill="#765a3a">最近この授業回を開いた人の気配</text>
+          <text x="872" y="97" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#8d785f">Updated: 2026-07-25 21:10</text>
+
+          <g transform="translate(86 158)" filter="url(#softShadowB)">
+            <g>
+              <rect x="0" y="0" width="112" height="72" rx="14" fill="#bd8050"/>
+              <rect x="14" y="11" width="84" height="48" rx="10" fill="#d8a46b"/>
+              <circle cx="56" cy="36" r="24" fill="#f4c76f" stroke="#8f622f" stroke-width="4"/>
+              <text x="56" y="46" text-anchor="middle" font-family="Yu Gothic, Meiryo, sans-serif" font-size="24" font-weight="700" fill="#5b3618">学</text>
+            </g>
+            <g transform="translate(132 0)">
+              <rect x="0" y="0" width="112" height="72" rx="14" fill="#bd8050"/>
+              <rect x="14" y="11" width="84" height="48" rx="10" fill="#d8a46b"/>
+              <circle cx="56" cy="36" r="24" fill="#d9e5df" stroke="#899d94" stroke-width="4"/>
+              <circle cx="56" cy="36" r="9" fill="#a3b5ad"/>
+            </g>
+            <g transform="translate(264 0)">
+              <rect x="0" y="0" width="112" height="72" rx="14" fill="#bd8050"/>
+              <rect x="14" y="11" width="84" height="48" rx="10" fill="#d8a46b"/>
+              <circle cx="56" cy="36" r="24" fill="#b4d7ee" stroke="#5f89a9" stroke-width="4"/>
+              <text x="56" y="46" text-anchor="middle" font-family="Yu Gothic, Meiryo, sans-serif" font-size="24" font-weight="700" fill="#214e6a">💻</text>
+            </g>
+            <g transform="translate(396 0)">
+              <rect x="0" y="0" width="112" height="72" rx="14" fill="#bd8050"/>
+              <rect x="14" y="11" width="84" height="48" rx="10" fill="#d8a46b"/>
+              <circle cx="56" cy="36" r="24" fill="#d9e5df" stroke="#899d94" stroke-width="4"/>
+              <circle cx="56" cy="36" r="9" fill="#a3b5ad"/>
+            </g>
+            <g transform="translate(528 0)">
+              <rect x="0" y="0" width="112" height="72" rx="14" fill="#bd8050"/>
+              <rect x="14" y="11" width="84" height="48" rx="10" fill="#d8a46b"/>
+              <circle cx="56" cy="36" r="24" fill="#c9b8ee" stroke="#8066aa" stroke-width="4"/>
+              <text x="56" y="46" text-anchor="middle" font-family="Yu Gothic, Meiryo, sans-serif" font-size="24" font-weight="700" fill="#4a3470">？</text>
+            </g>
+            <g transform="translate(660 0)">
+              <rect x="0" y="0" width="112" height="72" rx="14" fill="#bd8050"/>
+              <rect x="14" y="11" width="84" height="48" rx="10" fill="#d8a46b"/>
+              <circle cx="56" cy="36" r="24" fill="#d9e5df" stroke="#899d94" stroke-width="4"/>
+              <circle cx="56" cy="36" r="9" fill="#a3b5ad"/>
+            </g>
+
+            <g transform="translate(0 112)">
+              <rect x="0" y="0" width="112" height="72" rx="14" fill="#ad7449"/>
+              <rect x="14" y="11" width="84" height="48" rx="10" fill="#c98f5c"/>
+              <circle cx="56" cy="36" r="24" fill="#f0b0a5" stroke="#a35a51" stroke-width="4"/>
+              <text x="56" y="46" text-anchor="middle" font-family="Yu Gothic, Meiryo, sans-serif" font-size="24" font-weight="700" fill="#6a2e28">火</text>
+            </g>
+            <g transform="translate(132 112)">
+              <rect x="0" y="0" width="112" height="72" rx="14" fill="#ad7449"/>
+              <rect x="14" y="11" width="84" height="48" rx="10" fill="#c98f5c"/>
+              <circle cx="56" cy="36" r="24" fill="#d9e5df" stroke="#899d94" stroke-width="4"/>
+              <circle cx="56" cy="36" r="9" fill="#a3b5ad"/>
+            </g>
+            <g transform="translate(264 112)">
+              <rect x="0" y="0" width="112" height="72" rx="14" fill="#ad7449"/>
+              <rect x="14" y="11" width="84" height="48" rx="10" fill="#c98f5c"/>
+              <circle cx="56" cy="36" r="24" fill="#f4c76f" stroke="#8f622f" stroke-width="4"/>
+              <text x="56" y="46" text-anchor="middle" font-family="Yu Gothic, Meiryo, sans-serif" font-size="24" font-weight="700" fill="#5b3618">休</text>
+            </g>
+            <g transform="translate(396 112)">
+              <rect x="0" y="0" width="112" height="72" rx="14" fill="#ad7449"/>
+              <rect x="14" y="11" width="84" height="48" rx="10" fill="#c98f5c"/>
+              <circle cx="56" cy="36" r="24" fill="#d9e5df" stroke="#899d94" stroke-width="4"/>
+              <circle cx="56" cy="36" r="9" fill="#a3b5ad"/>
+            </g>
+            <g transform="translate(528 112)">
+              <rect x="0" y="0" width="112" height="72" rx="14" fill="#ad7449"/>
+              <rect x="14" y="11" width="84" height="48" rx="10" fill="#c98f5c"/>
+              <circle cx="56" cy="36" r="24" fill="#d9e5df" stroke="#899d94" stroke-width="4"/>
+              <circle cx="56" cy="36" r="9" fill="#a3b5ad"/>
+            </g>
+            <g transform="translate(660 112)">
+              <rect x="0" y="0" width="112" height="72" rx="14" fill="#ad7449"/>
+              <rect x="14" y="11" width="84" height="48" rx="10" fill="#c98f5c"/>
+              <circle cx="56" cy="36" r="24" fill="#9fd3be" stroke="#4f806a" stroke-width="4"/>
+              <text x="56" y="46" text-anchor="middle" font-family="Yu Gothic, Meiryo, sans-serif" font-size="24" font-weight="700" fill="#254936">☕</text>
+            </g>
+          </g>
+
+          <text x="86" y="454" font-family="Yu Gothic, Meiryo, sans-serif" font-size="16" fill="#67523b">丸の数が、この授業回を最近開いた人の気配です。</text>
+          <text x="86" y="478" font-family="Yu Gothic, Meiryo, sans-serif" font-size="14" fill="#806a50">StudyRoomにチェックインすると、自分の1文字アイコンを設定できます。</text>
+        </svg>
+      </article>
+
+      <article class="sample">
+        <h2 class="sample-title">案C: 授業ページに置きやすい横長教室</h2>
+        <svg xmlns="http://www.w3.org/2000/svg" width="960" height="360" viewBox="0 0 960 360" role="img" aria-label="データ構造とアルゴリズム 第8回を最近開いた人の気配">
+          <defs>
+            <filter id="softShadowC" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="5" stdDeviation="4" flood-color="#5f4129" flood-opacity=".18"/>
+            </filter>
+          </defs>
+          <rect width="960" height="360" rx="22" fill="#fff8ea"/>
+          <rect x="2" y="2" width="956" height="356" rx="20" fill="none" stroke="#c8945d" stroke-width="4"/>
+          <rect x="18" y="18" width="924" height="206" rx="18" fill="#f8edda"/>
+          <rect x="18" y="206" width="924" height="136" rx="0" fill="#c9975d"/>
+          <rect x="54" y="48" width="314" height="122" rx="16" fill="#386b58" filter="url(#softShadowC)"/>
+          <text x="82" y="88" font-family="Yu Gothic, Meiryo, sans-serif" font-size="24" font-weight="700" fill="#f6fff8">データ構造とアルゴリズムⅠ・Ⅱ</text>
+          <text x="82" y="124" font-family="Yu Gothic, Meiryo, sans-serif" font-size="22" fill="#d9f0e2">第8回</text>
+          <text x="82" y="151" font-family="Yu Gothic, Meiryo, sans-serif" font-size="15" fill="#c3decf">この授業回を最近開いた人の気配</text>
+
+          <g transform="translate(410 63)" filter="url(#softShadowC)">
+            <g transform="translate(0 0)">
+              <rect x="0" y="34" width="88" height="40" rx="10" fill="#b77a43"/>
+              <circle cx="44" cy="25" r="22" fill="#f4c76f" stroke="#8f622f" stroke-width="4"/>
+              <text x="44" y="34" text-anchor="middle" font-family="Yu Gothic, Meiryo, sans-serif" font-size="22" font-weight="700" fill="#5b3618">学</text>
+            </g>
+            <g transform="translate(106 0)">
+              <rect x="0" y="34" width="88" height="40" rx="10" fill="#b77a43"/>
+              <circle cx="44" cy="25" r="22" fill="#fff5dc" stroke="#9b7b55" stroke-width="4"/>
+              <circle cx="44" cy="25" r="8" fill="#c9b69d"/>
+            </g>
+            <g transform="translate(212 0)">
+              <rect x="0" y="34" width="88" height="40" rx="10" fill="#b77a43"/>
+              <circle cx="44" cy="25" r="22" fill="#9fd3be" stroke="#4f806a" stroke-width="4"/>
+              <text x="44" y="34" text-anchor="middle" font-family="Yu Gothic, Meiryo, sans-serif" font-size="22" font-weight="700" fill="#254936">☕</text>
+            </g>
+            <g transform="translate(318 0)">
+              <rect x="0" y="34" width="88" height="40" rx="10" fill="#b77a43"/>
+              <circle cx="44" cy="25" r="22" fill="#fff5dc" stroke="#9b7b55" stroke-width="4"/>
+              <circle cx="44" cy="25" r="8" fill="#c9b69d"/>
+            </g>
+            <g transform="translate(424 0)">
+              <rect x="0" y="34" width="88" height="40" rx="10" fill="#b77a43"/>
+              <circle cx="44" cy="25" r="22" fill="#b4d7ee" stroke="#5f89a9" stroke-width="4"/>
+              <text x="44" y="34" text-anchor="middle" font-family="Yu Gothic, Meiryo, sans-serif" font-size="22" font-weight="700" fill="#214e6a">💻</text>
+            </g>
+
+            <g transform="translate(0 100)">
+              <rect x="0" y="34" width="88" height="40" rx="10" fill="#a96f3d"/>
+              <circle cx="44" cy="25" r="22" fill="#fff5dc" stroke="#9b7b55" stroke-width="4"/>
+              <circle cx="44" cy="25" r="8" fill="#c9b69d"/>
+            </g>
+            <g transform="translate(106 100)">
+              <rect x="0" y="34" width="88" height="40" rx="10" fill="#a96f3d"/>
+              <circle cx="44" cy="25" r="22" fill="#f4c76f" stroke="#8f622f" stroke-width="4"/>
+              <text x="44" y="34" text-anchor="middle" font-family="Yu Gothic, Meiryo, sans-serif" font-size="22" font-weight="700" fill="#5b3618">猫</text>
+            </g>
+            <g transform="translate(212 100)">
+              <rect x="0" y="34" width="88" height="40" rx="10" fill="#a96f3d"/>
+              <circle cx="44" cy="25" r="22" fill="#fff5dc" stroke="#9b7b55" stroke-width="4"/>
+              <circle cx="44" cy="25" r="8" fill="#c9b69d"/>
+            </g>
+            <g transform="translate(318 100)">
+              <rect x="0" y="34" width="88" height="40" rx="10" fill="#a96f3d"/>
+              <circle cx="44" cy="25" r="22" fill="#f0b0a5" stroke="#a35a51" stroke-width="4"/>
+              <text x="44" y="34" text-anchor="middle" font-family="Yu Gothic, Meiryo, sans-serif" font-size="22" font-weight="700" fill="#6a2e28">🔥</text>
+            </g>
+          </g>
+
+          <rect x="54" y="263" width="360" height="46" rx="12" fill="#fff8ea" stroke="#d0ad82"/>
+          <text x="76" y="292" font-family="Yu Gothic, Meiryo, sans-serif" font-size="16" fill="#5d4630">StudyRoomにチェックインすると、1文字アイコンを設定できます。</text>
+          <text x="884" y="326" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#7a5a3a">Updated: 2026-07-25 21:10</text>
+        </svg>
+      </article>
+    </section>
+  </main>
+</body>
+</html>
