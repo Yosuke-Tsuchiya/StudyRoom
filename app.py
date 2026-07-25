@@ -2334,10 +2334,17 @@ def room_sort_key(activity, members):
     return (2, ACTIVITY_OPTIONS.index(activity) if activity in ACTIVITY_OPTIONS else 999)
 
 
+def detail_sort_rank(detail):
+    if detail in DETAIL_OPTIONS[:8]:
+        return DETAIL_OPTIONS.index(detail) + 1
+    if detail == "その他":
+        return 0
+    return -1
+
+
 def participant_sort_key(participant):
     detail = participant["detail"]
-    detail_index = DETAIL_OPTIONS.index(detail) if detail in DETAIL_OPTIONS else len(DETAIL_OPTIONS)
-    return (detail_index, participant["joined_at"])
+    return (-detail_sort_rank(detail), participant["joined_at"])
 
 
 def is_admin_route() -> bool:
