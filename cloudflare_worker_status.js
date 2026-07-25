@@ -1,6 +1,8 @@
 const STATUS_KEY = "status-summary";
 const VIEW_RETENTION_MS = 7 * 24 * 60 * 60 * 1000;
-const VIEW_WRITE_INTERVAL_MS = 15 * 60 * 1000;
+const UNCHECKED_PRESENCE_MS = 15 * 60 * 1000;
+const MAX_EVENTS_PER_LESSON = 10000;
+const LESSON_NUMBERS = ["1", "2", "3", "4", "5", "6", "7", "8"];
 
 const COURSES = {
   "free-room": { room: "フリールーム", label: "フリールーム" },
@@ -80,17 +82,20 @@ async function syncStatusSummary(request, env) {
 
 async function renderStatusImage(env, courseCode) {
   const course = COURSES[courseCode] || COURSES["free-room"];
+  const now = Date.now();
   const summary = await getStatusSummary(env);
   const roomOnline = Number(summary.rooms?.[course.room] || 0);
   const totalOnline = Number(summary.total_online || 0);
-  const participants = Array.isArray(summary.participants)
+  const checkedParticipants = Array.isArray(summary.participants)
     ? summary.participants.filter((participant) => participant.activity === course.room)
     : [];
-  const updatedAt = formatDateTime(summary.updated_at);
+  const uncheckedParticipants = await getUncheckedParticipants(env, courseCode, course.room, now);
+  const participants = [...checkedParticipants, ...uncheckedParticipants];
+  const updatedAt = formatDateTime(new Date(now).toISOString());
 
   return svgResponse(renderStudyRoomStatusSvg({
     courseLabel: course.label,
-    roomOnline,
+    roomOnline: roomOnline + uncheckedParticipants.length,
     totalOnline,
     participants,
     updatedAt,
@@ -140,13 +145,44 @@ async function recordPageView(env, courseCode, lesson, now) {
   const minTime = now - VIEW_RETENTION_MS;
   events = events.filter((timestamp) => Number(timestamp) >= minTime);
 
-  const lastRecordedAt = events.length ? Number(events[events.length - 1]) : 0;
-  if (!lastRecordedAt || now - lastRecordedAt >= VIEW_WRITE_INTERVAL_MS) {
-    events.push(now);
-    await env.STATUS_KV.put(key, JSON.stringify(events));
+  events.push(now);
+  if (events.length > MAX_EVENTS_PER_LESSON) {
+    events = events.slice(events.length - MAX_EVENTS_PER_LESSON);
   }
+  await env.STATUS_KV.put(key, JSON.stringify(events));
 
   return events;
+}
+
+async function getUncheckedParticipants(env, courseCode, roomName, now) {
+  const minTime = now - UNCHECKED_PRESENCE_MS;
+  const results = [];
+
+  for (const lesson of LESSON_NUMBERS) {
+    const key = `page-views:${courseCode}:lesson-${lesson}`;
+    const raw = await env.STATUS_KV.get(key);
+    if (!raw) continue;
+
+    let events = [];
+    try {
+      events = JSON.parse(raw);
+    } catch {
+      events = [];
+    }
+
+    for (const timestamp of events) {
+      const recordedAt = Number(timestamp);
+      if (recordedAt < minTime) continue;
+      results.push({
+        activity: roomName,
+        detail: `第${lesson}回`,
+        participation_type: "unchecked",
+        joined_at: new Date(recordedAt).toISOString(),
+      });
+    }
+  }
+
+  return results;
 }
 
 function countSince(events, minTime) {
