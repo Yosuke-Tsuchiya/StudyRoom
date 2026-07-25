@@ -2971,6 +2971,7 @@ with st.sidebar:
                 index=list(AVATAR_COLOR_OPTIONS.values()).index(current_avatar_color),
             )
             avatar_color = AVATAR_COLOR_OPTIONS[avatar_color_label]
+            st.caption("ここで設定した文字と色は、授業ページの教室画像にも反映されます。")
             comment = st.text_input(
                 "コメント",
                 value=st.session_state.comment or DEFAULT_COMMENT,
