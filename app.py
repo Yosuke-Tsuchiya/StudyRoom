@@ -1611,7 +1611,7 @@ def status_worker_base_url() -> str:
 @st.cache_data(ttl=10, show_spinner=False)
 def fetch_unchecked_participants_from_worker(base_url: str):
     if not base_url:
-        return []
+        return None
 
     request = urllib.request.Request(
         f"{base_url}/unchecked.json",
@@ -1619,16 +1619,16 @@ def fetch_unchecked_participants_from_worker(base_url: str):
         method="GET",
     )
     try:
-        with urllib.request.urlopen(request, timeout=2) as response:
+        with urllib.request.urlopen(request, timeout=4) as response:
             if response.status != 200:
-                return []
+                return None
             payload = json.loads(response.read().decode("utf-8"))
     except Exception:
-        return []
+        return None
 
     participants = payload.get("participants", [])
     if not isinstance(participants, list):
-        return []
+        return None
 
     allowed_activities = set(ACTIVITY_OPTIONS)
     rows = []
@@ -1656,6 +1656,15 @@ def fetch_unchecked_participants_from_worker(base_url: str):
             "expires_at": str(participant.get("expires_at") or ""),
         })
     return rows
+
+
+def load_unchecked_participants():
+    participants = fetch_unchecked_participants_from_worker(status_worker_base_url())
+    if participants is None:
+        return st.session_state.get("last_unchecked_participants", [])
+
+    st.session_state.last_unchecked_participants = participants
+    return participants
 
 
 def get_admin_password() -> str:
@@ -3238,7 +3247,7 @@ def live_area():
                 expires_at=expires_at,
             )
 
-    participants = list(fetch_participants()) + fetch_unchecked_participants_from_worker(status_worker_base_url())
+    participants = list(fetch_participants()) + load_unchecked_participants()
     unique_activities = len({p["activity"] for p in participants})
 
     with sidebar_status.container():
