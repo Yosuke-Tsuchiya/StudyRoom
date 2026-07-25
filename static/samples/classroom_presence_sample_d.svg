@@ -1,0 +1,167 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="520" viewBox="0 0 960 520" role="img" aria-label="データ構造とアルゴリズムⅠ・Ⅱ 全体を受けている人の気配">
+          <defs>
+            <linearGradient id="wallD" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#fff8ea"/>
+              <stop offset=".62" stop-color="#f4e7cf"/>
+              <stop offset="1" stop-color="#d7b27b"/>
+            </linearGradient>
+            <linearGradient id="floorD" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#f1dfbf"/>
+              <stop offset=".58" stop-color="#e4c99f"/>
+              <stop offset="1" stop-color="#d0a76f"/>
+            </linearGradient>
+            <filter id="softShadowD" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#5f4129" flood-opacity=".18"/>
+            </filter>
+            <clipPath id="classroomClipD">
+              <rect x="4" y="4" width="952" height="512" rx="20"/>
+            </clipPath>
+          </defs>
+          <rect width="960" height="520" rx="24" fill="#fff8ea"/>
+          <rect x="2" y="2" width="956" height="516" rx="22" fill="none" stroke="#c8945d" stroke-width="4"/>
+          <g clip-path="url(#classroomClipD)">
+            <rect x="4" y="4" width="952" height="512" fill="url(#wallD)"/>
+            <rect x="4" y="184" width="952" height="332" fill="url(#floorD)"/>
+            <g stroke="#b8844f" stroke-width="1" opacity=".16">
+              <path d="M80 184 L0 516"/>
+              <path d="M160 184 L80 516"/>
+              <path d="M240 184 L180 516"/>
+              <path d="M320 184 L280 516"/>
+              <path d="M400 184 L380 516"/>
+              <path d="M480 184 L480 516"/>
+              <path d="M560 184 L580 516"/>
+              <path d="M640 184 L680 516"/>
+              <path d="M720 184 L780 516"/>
+              <path d="M800 184 L880 516"/>
+              <path d="M880 184 L960 516"/>
+            </g>
+            <path d="M4 184 H956" stroke="#bf9056" stroke-width="1"/>
+          </g>
+
+          <rect x="48" y="26" width="864" height="128" rx="13" fill="#a96f3d" filter="url(#softShadowD)"/>
+          <rect x="55" y="33" width="850" height="114" rx="9" fill="#376b59"/>
+          <text x="92" y="80" font-family="Yu Gothic, Meiryo, sans-serif" font-size="26" font-weight="700" fill="#f6fff8">データ構造とアルゴリズムⅠ・Ⅱ 全体</text>
+          <text x="92" y="119" font-family="Yu Gothic, Meiryo, sans-serif" font-size="22" fill="#d9f0e2">この授業を受けている人の気配</text>
+          <text x="874" y="135" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#d6eadf">Updated: 2026-07-25 21:10</text>
+          <circle cx="796" cy="170" r="10" fill="#d9e5df" stroke="#899d94" stroke-width="2"/>
+          <text x="905" y="175" text-anchor="end" font-family="Yu Gothic, Meiryo, sans-serif" font-size="14" fill="#5d4630">未チェックイン</text>
+
+          <g transform="translate(62 214)" filter="url(#softShadowD)">
+            <g transform="translate(0 0)">
+              <rect x="0" y="0" width="104" height="64" rx="13" fill="#c8945d" stroke="#a96f3d" stroke-width="1.2"/>
+              <circle cx="52" cy="32" r="22" fill="#f4c76f" stroke="#8f622f" stroke-width="4"/>
+              <text x="52" y="41" text-anchor="middle" font-family="Yu Gothic, Meiryo, sans-serif" font-size="22" font-weight="700" fill="#5b3618">学</text>
+              <text x="84" y="55" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="600" fill="#dfc89e">8</text>
+            </g>
+            <g transform="translate(122 0)">
+              <rect x="0" y="0" width="104" height="64" rx="13" fill="#c8945d" stroke="#a96f3d" stroke-width="1.2"/>
+              <circle cx="52" cy="32" r="22" fill="#d9e5df" stroke="#899d94" stroke-width="4"/>
+              <text x="84" y="55" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="600" fill="#dfc89e">8</text>
+            </g>
+            <g transform="translate(244 0)">
+              <rect x="0" y="0" width="104" height="64" rx="13" fill="#c8945d" stroke="#a96f3d" stroke-width="1.2"/>
+              <circle cx="52" cy="32" r="22" fill="#9fd3be" stroke="#4f806a" stroke-width="4"/>
+              <text x="52" y="41" text-anchor="middle" font-family="Yu Gothic, Meiryo, sans-serif" font-size="22" font-weight="700" fill="#254936">☕</text>
+              <text x="84" y="55" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="600" fill="#dfc89e">7</text>
+            </g>
+            <g transform="translate(366 0)">
+              <rect x="0" y="0" width="104" height="64" rx="13" fill="#c8945d" stroke="#a96f3d" stroke-width="1.2"/>
+              <circle cx="52" cy="32" r="22" fill="#d9e5df" stroke="#899d94" stroke-width="4"/>
+              <text x="84" y="55" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="600" fill="#dfc89e">7</text>
+            </g>
+            <g transform="translate(488 0)">
+              <rect x="0" y="0" width="104" height="64" rx="13" fill="#c8945d" stroke="#a96f3d" stroke-width="1.2"/>
+              <circle cx="52" cy="32" r="22" fill="#f3a79d" stroke="#9b5148" stroke-width="4"/>
+              <text x="52" y="41" text-anchor="middle" font-family="Yu Gothic, Meiryo, sans-serif" font-size="22" font-weight="700" fill="#5f211b">火</text>
+              <text x="84" y="55" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="600" fill="#dfc89e">6</text>
+            </g>
+            <g transform="translate(610 0)">
+              <rect x="0" y="0" width="104" height="64" rx="13" fill="#c8945d" stroke="#a96f3d" stroke-width="1.2"/>
+              <circle cx="52" cy="32" r="22" fill="#d9e5df" stroke="#899d94" stroke-width="4"/>
+              <text x="84" y="55" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="600" fill="#dfc89e">6</text>
+            </g>
+            <g transform="translate(732 0)">
+              <rect x="0" y="0" width="104" height="64" rx="13" fill="#c8945d" stroke="#a96f3d" stroke-width="1.2"/>
+              <circle cx="52" cy="32" r="22" fill="#b4d7ee" stroke="#5f89a9" stroke-width="4"/>
+              <text x="52" y="41" text-anchor="middle" font-family="Yu Gothic, Meiryo, sans-serif" font-size="22" font-weight="700" fill="#214e6a">💻</text>
+              <text x="84" y="55" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="600" fill="#dfc89e">5</text>
+            </g>
+
+            <g transform="translate(0 94)">
+              <rect x="0" y="0" width="104" height="64" rx="13" fill="#bd8650" stroke="#9b673a" stroke-width="1.2"/>
+              <circle cx="52" cy="32" r="22" fill="#d9e5df" stroke="#899d94" stroke-width="4"/>
+              <text x="84" y="55" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="600" fill="#dfc89e">5</text>
+            </g>
+            <g transform="translate(122 94)">
+              <rect x="0" y="0" width="104" height="64" rx="13" fill="#bd8650" stroke="#9b673a" stroke-width="1.2"/>
+              <circle cx="52" cy="32" r="22" fill="#f4c76f" stroke="#8f622f" stroke-width="4"/>
+              <text x="52" y="41" text-anchor="middle" font-family="Yu Gothic, Meiryo, sans-serif" font-size="22" font-weight="700" fill="#5b3618">A</text>
+              <text x="84" y="55" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="600" fill="#dfc89e">4</text>
+            </g>
+            <g transform="translate(244 94)">
+              <rect x="0" y="0" width="104" height="64" rx="13" fill="#bd8650" stroke="#9b673a" stroke-width="1.2"/>
+              <circle cx="52" cy="32" r="22" fill="#d9e5df" stroke="#899d94" stroke-width="4"/>
+              <text x="84" y="55" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="600" fill="#dfc89e">4</text>
+            </g>
+            <g transform="translate(366 94)">
+              <rect x="0" y="0" width="104" height="64" rx="13" fill="#bd8650" stroke="#9b673a" stroke-width="1.2"/>
+              <circle cx="52" cy="32" r="22" fill="#c9b8ee" stroke="#8066aa" stroke-width="4"/>
+              <text x="52" y="41" text-anchor="middle" font-family="Yu Gothic, Meiryo, sans-serif" font-size="22" font-weight="700" fill="#4a3470">？</text>
+              <text x="84" y="55" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="600" fill="#dfc89e">3</text>
+            </g>
+            <g transform="translate(488 94)">
+              <rect x="0" y="0" width="104" height="64" rx="13" fill="#bd8650" stroke="#9b673a" stroke-width="1.2"/>
+              <circle cx="52" cy="32" r="22" fill="#d9e5df" stroke="#899d94" stroke-width="4"/>
+              <text x="84" y="55" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="600" fill="#dfc89e">3</text>
+            </g>
+            <g transform="translate(610 94)">
+              <rect x="0" y="0" width="104" height="64" rx="13" fill="#bd8650" stroke="#9b673a" stroke-width="1.2"/>
+              <circle cx="52" cy="32" r="22" fill="#d9e5df" stroke="#899d94" stroke-width="4"/>
+              <text x="84" y="55" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="600" fill="#dfc89e">2</text>
+            </g>
+            <g transform="translate(732 94)">
+              <rect x="0" y="0" width="104" height="64" rx="13" fill="#bd8650" stroke="#9b673a" stroke-width="1.2"/>
+              <circle cx="52" cy="32" r="22" fill="#9fd3be" stroke="#4f806a" stroke-width="4"/>
+              <text x="52" y="41" text-anchor="middle" font-family="Yu Gothic, Meiryo, sans-serif" font-size="22" font-weight="700" fill="#254936">猫</text>
+              <text x="84" y="55" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="600" fill="#dfc89e">2</text>
+            </g>
+
+            <g transform="translate(0 188)">
+              <rect x="0" y="0" width="104" height="64" rx="13" fill="#ad7746" stroke="#8f5d35" stroke-width="1.2"/>
+              <circle cx="52" cy="32" r="22" fill="#d9e5df" stroke="#899d94" stroke-width="4"/>
+              <text x="84" y="55" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="600" fill="#dfc89e">2</text>
+            </g>
+            <g transform="translate(122 188)">
+              <rect x="0" y="0" width="104" height="64" rx="13" fill="#ad7746" stroke="#8f5d35" stroke-width="1.2"/>
+              <circle cx="52" cy="32" r="22" fill="#f4c76f" stroke="#8f622f" stroke-width="4"/>
+              <text x="52" y="41" text-anchor="middle" font-family="Yu Gothic, Meiryo, sans-serif" font-size="22" font-weight="700" fill="#5b3618">復</text>
+              <text x="84" y="55" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="600" fill="#dfc89e">2</text>
+            </g>
+            <g transform="translate(244 188)">
+              <rect x="0" y="0" width="104" height="64" rx="13" fill="#ad7746" stroke="#8f5d35" stroke-width="1.2"/>
+              <circle cx="52" cy="32" r="22" fill="#d9e5df" stroke="#899d94" stroke-width="4"/>
+              <text x="84" y="55" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="600" fill="#dfc89e">1</text>
+            </g>
+            <g transform="translate(366 188)">
+              <rect x="0" y="0" width="104" height="64" rx="13" fill="#ad7746" stroke="#8f5d35" stroke-width="1.2"/>
+              <circle cx="52" cy="32" r="22" fill="#d9e5df" stroke="#899d94" stroke-width="4"/>
+              <text x="84" y="55" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="600" fill="#dfc89e">1</text>
+            </g>
+            <g transform="translate(488 188)">
+              <rect x="0" y="0" width="104" height="64" rx="13" fill="#ad7746" stroke="#8f5d35" stroke-width="1.2"/>
+              <circle cx="52" cy="32" r="22" fill="#d9e5df" stroke="#899d94" stroke-width="4"/>
+              <text x="84" y="55" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="600" fill="#dfc89e">他</text>
+            </g>
+            <g transform="translate(610 188)">
+              <rect x="0" y="0" width="104" height="64" rx="13" fill="#ad7746" stroke="#8f5d35" stroke-width="1.2"/>
+              <circle cx="52" cy="32" r="22" fill="#f0b0a5" stroke="#a35a51" stroke-width="4"/>
+              <text x="52" y="41" text-anchor="middle" font-family="Yu Gothic, Meiryo, sans-serif" font-size="22" font-weight="700" fill="#6a2e28">🔥</text>
+              <text x="84" y="55" text-anchor="middle" font-family="Yu Gothic, Meiryo, sans-serif" font-size="13" font-weight="600" fill="#dfc89e">他</text>
+            </g>
+            <g transform="translate(732 188)">
+              <rect x="0" y="0" width="104" height="64" rx="13" fill="#ad7746" stroke="#8f5d35" stroke-width="1.2"/>
+              <rect x="20" y="17" width="64" height="30" rx="15" fill="#fff8ea" stroke="#8d6a45" stroke-width="3"/>
+              <text x="52" y="38" text-anchor="middle" font-family="Yu Gothic, Meiryo, sans-serif" font-size="17" font-weight="700" fill="#5d4630">他8名</text>
+            </g>
+          </g>
+        </svg>
