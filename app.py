@@ -59,7 +59,7 @@ AVATAR_COLOR_OPTIONS = {
     "空色ブルー": "#b4d7ee",
     "やわらかピンク": "#f3a79d",
     "ラベンダー": "#c9b8ee",
-    "カフェブラウン": "#d6a26c",
+    "ミント": "#8fd7cf",
 }
 AVATAR_COLOR_LABELS_BY_VALUE = {value: label for label, value in AVATAR_COLOR_OPTIONS.items()}
 PROHIBITED_AVATAR_CHARS = {"死", "殺", "暴", "犯", "毒", "血", "呪", "虐", "裸", "性", "嬲", "姦", "卍", "💀", "🔪", "🩸", "💣", "🖕"}
