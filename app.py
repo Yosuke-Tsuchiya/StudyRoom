@@ -1608,7 +1608,7 @@ def status_worker_base_url() -> str:
     return webhook_url.rstrip("/")
 
 
-@st.cache_data(ttl=10, show_spinner=False)
+@st.cache_data(ttl=30, show_spinner=False)
 def fetch_unchecked_participants_from_worker(base_url: str):
     if not base_url:
         return None
@@ -3225,7 +3225,7 @@ with st.sidebar:
     st.markdown('<div class="sidebar-credit">Copyright 2026 Yosuke Tsuchiya</div>', unsafe_allow_html=True)
 
 
-@st.fragment(run_every="10s")
+@st.fragment(run_every="20s")
 def live_area():
     if st.session_state.joined:
         expires_at = st.session_state.expires_at
@@ -3424,7 +3424,7 @@ def live_area():
                     )
 
     st.caption(
-        "表示は10秒ごとに更新されます。顔・音声・学籍番号は表示しません。  \n"
+        "表示は20秒ごとに更新されます。顔・音声・学籍番号は表示しません。  \n"
         "Darkモードには対応していません。SystemもしくはLightモードでご利用ください。"
     )
 
