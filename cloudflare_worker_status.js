@@ -70,6 +70,7 @@ async function syncStatusSummary(request, env) {
     JSON.stringify({
       total_online: Number(payload.total_online || 0),
       rooms: payload.rooms || {},
+      participants: Array.isArray(payload.participants) ? payload.participants : [],
       updated_at: payload.updated_at || new Date().toISOString(),
     })
   );
@@ -82,12 +83,16 @@ async function renderStatusImage(env, courseCode) {
   const summary = await getStatusSummary(env);
   const roomOnline = Number(summary.rooms?.[course.room] || 0);
   const totalOnline = Number(summary.total_online || 0);
+  const participants = Array.isArray(summary.participants)
+    ? summary.participants.filter((participant) => participant.activity === course.room)
+    : [];
   const updatedAt = formatDateTime(summary.updated_at);
 
   return svgResponse(renderStudyRoomStatusSvg({
     courseLabel: course.label,
     roomOnline,
     totalOnline,
+    participants,
     updatedAt,
   }));
 }
@@ -148,24 +153,143 @@ function countSince(events, minTime) {
   return events.filter((timestamp) => Number(timestamp) >= minTime).length;
 }
 
-function renderStudyRoomStatusSvg({ courseLabel, roomOnline, totalOnline, updatedAt }) {
+function renderStudyRoomStatusSvg({ courseLabel, roomOnline, totalOnline, participants, updatedAt }) {
+  const sortedParticipants = [...participants].sort(comparePresenceParticipants);
+  const visibleParticipants = sortedParticipants.slice(0, 20);
+  const overflowCount = Math.max(0, sortedParticipants.length - visibleParticipants.length);
+  const message = roomOnline > 0 ? "この授業を受けている人の気配" : "まだ人の気配はありません";
+  const seats = Array.from({ length: 20 }, (_, index) => renderClassroomSeat(index, visibleParticipants[index])).join("");
+  const overflowSeat = overflowCount > 0 ? renderOverflowSeat(20, overflowCount) : renderClassroomSeat(20, null);
+
   return `
-<svg xmlns="http://www.w3.org/2000/svg" width="500" height="120" viewBox="0 0 500 120">
-  <rect width="500" height="120" rx="14" fill="#fff8ea"/>
-  <rect x="1.5" y="1.5" width="497" height="117" rx="13" fill="none" stroke="#c8945d" stroke-width="3"/>
-  <rect x="0" y="0" width="154" height="120" rx="14" fill="#a96f3d"/>
-  <rect x="140" y="0" width="24" height="120" fill="#a96f3d"/>
-  <text x="24" y="37" font-family="Arial, 'Yu Gothic', Meiryo, sans-serif" font-size="19" font-weight="700" fill="#fff8ea">StudyRoom</text>
-  <text x="24" y="61" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="15" font-weight="700" fill="#ffe8c6">利用状況</text>
-  <text x="24" y="90" font-family="Arial, sans-serif" font-size="10" fill="#f4d6ad">Updated: ${escapeXml(updatedAt)}</text>
-  <text x="184" y="35" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="17" font-weight="700" fill="#4b2f17">${escapeXml(courseLabel)}</text>
-  <text x="184" y="67" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="15" fill="#7d6245">この科目</text>
-  <text x="262" y="69" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="24" font-weight="700" fill="#6c4325">${roomOnline}</text>
-  <text x="300" y="67" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="15" fill="#7d6245">人が学習中</text>
-  <text x="184" y="98" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="15" fill="#7d6245">全体</text>
-  <text x="262" y="100" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="24" font-weight="700" fill="#6c4325">${totalOnline}</text>
-  <text x="300" y="98" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="15" fill="#7d6245">人が学習中</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="520" viewBox="0 0 960 520" role="img" aria-label="${escapeXml(courseLabel)} 全体を受けている人の気配">
+  <defs>
+    <linearGradient id="statusFloor" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f2d4a3"/>
+      <stop offset="1" stop-color="#d39b58"/>
+    </linearGradient>
+    <filter id="statusSoftShadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#7b4d24" flood-opacity=".18"/>
+    </filter>
+    <clipPath id="statusFrameClip">
+      <rect x="2" y="2" width="956" height="516" rx="26"/>
+    </clipPath>
+  </defs>
+  <rect x="1.5" y="1.5" width="957" height="517" rx="26" fill="#fff8ea" stroke="#b98048" stroke-width="3"/>
+  <g clip-path="url(#statusFrameClip)">
+    <rect x="2" y="2" width="956" height="181" fill="#fff8ea"/>
+    <rect x="2" y="183" width="956" height="335" fill="url(#statusFloor)"/>
+    <path d="M2 183 H958" stroke="#bf9056" stroke-width="1"/>
+    <g opacity=".22" stroke="#a8753e" stroke-width="1">
+      <path d="M480 183 L480 518"/>
+      <path d="M402 183 L364 518"/>
+      <path d="M558 183 L596 518"/>
+      <path d="M324 183 L248 518"/>
+      <path d="M636 183 L712 518"/>
+      <path d="M246 183 L132 518"/>
+      <path d="M714 183 L828 518"/>
+      <path d="M168 183 L16 518"/>
+      <path d="M792 183 L944 518"/>
+    </g>
+  </g>
+
+  <rect x="48" y="26" width="864" height="128" rx="13" fill="#a96f3d" filter="url(#statusSoftShadow)"/>
+  <rect x="55" y="33" width="850" height="114" rx="9" fill="#376b59"/>
+  <text x="92" y="80" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="26" font-weight="700" fill="#f6fff8">${escapeXml(courseLabel)} 全体</text>
+  <text x="92" y="119" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="22" fill="#d9f0e2">${escapeXml(message)}</text>
+  <text x="874" y="135" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#d6eadf">Updated: ${escapeXml(updatedAt)}</text>
+  <circle cx="796" cy="170" r="10" fill="#d9e5df" stroke="#899d94" stroke-width="2"/>
+  <text x="905" y="175" text-anchor="end" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="14" fill="#5d4630">未チェックイン</text>
+
+  <g transform="translate(62 214)" filter="url(#statusSoftShadow)">
+    ${seats}
+    ${overflowSeat}
+  </g>
 </svg>`.trim();
+}
+
+function comparePresenceParticipants(a, b) {
+  const priorityA = participationPriority(a);
+  const priorityB = participationPriority(b);
+  if (priorityA !== priorityB) return priorityA - priorityB;
+
+  const lessonA = detailRank(a.detail);
+  const lessonB = detailRank(b.detail);
+  if (lessonA !== lessonB) return lessonB - lessonA;
+
+  return String(a.joined_at || "").localeCompare(String(b.joined_at || ""));
+}
+
+function participationPriority(participant) {
+  return (participant.participation_type || "regular") === "regular" ? 0 : 1;
+}
+
+function detailRank(detail) {
+  const match = String(detail || "").match(/^第([1-8])回$/);
+  if (match) return Number(match[1]);
+  if (detail === "その他") return 0;
+  return -1;
+}
+
+function lessonBadge(detail) {
+  const match = String(detail || "").match(/^第([1-8])回$/);
+  if (match) return match[1];
+  if (detail === "その他") return "他";
+  return "";
+}
+
+function renderClassroomSeat(index, participant) {
+  const cols = 7;
+  const x = (index % cols) * 122;
+  const y = Math.floor(index / cols) * 94;
+  const row = Math.floor(index / cols);
+  const desk = row === 0
+    ? { fill: "#c8945d", stroke: "#a96f3d" }
+    : row === 1
+      ? { fill: "#bd8650", stroke: "#9b673a" }
+      : { fill: "#ad7746", stroke: "#8f5d35" };
+  const emptyDesk = row === 0
+    ? { fill: "#dfbd8c", stroke: "#c99b67" }
+    : row === 1
+      ? { fill: "#d8b17e", stroke: "#bd8d58" }
+      : { fill: "#cfa470", stroke: "#ac7d4d" };
+  const deskStyle = participant ? desk : emptyDesk;
+  const marker = participant ? renderPresenceMarker(participant) : "";
+  return `
+    <g transform="translate(${x} ${y})">
+      <rect x="0" y="0" width="104" height="64" rx="13" fill="${deskStyle.fill}" stroke="${deskStyle.stroke}" stroke-width="1.2"/>
+      ${marker}
+    </g>`;
+}
+
+function renderPresenceMarker(participant) {
+  const isRegular = (participant.participation_type || "regular") === "regular";
+  const badge = escapeXml(lessonBadge(participant.detail));
+  if (!isRegular) {
+    return `
+      <circle cx="52" cy="32" r="22" fill="#d9e5df" stroke="#899d94" stroke-width="4"/>
+      <text x="84" y="55" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="600" fill="#dfc89e">${badge}</text>`;
+  }
+
+  const avatar = escapeXml(String(participant.avatar || "🧑‍💻").trim() || "🧑‍💻");
+  const color = sanitizeHexColor(participant.avatar_color, "#f4c76f");
+  const stroke = darkenHexColor(color);
+  return `
+    <circle cx="52" cy="32" r="22" fill="${color}" stroke="${stroke}" stroke-width="4"/>
+    <text x="52" y="41" text-anchor="middle" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="22" font-weight="700" fill="#3f2b1a">${avatar}</text>
+    <text x="84" y="55" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="600" fill="#dfc89e">${badge}</text>`;
+}
+
+function renderOverflowSeat(index, overflowCount) {
+  const cols = 7;
+  const x = (index % cols) * 122;
+  const y = Math.floor(index / cols) * 94;
+  return `
+    <g transform="translate(${x} ${y})">
+      <rect x="0" y="0" width="104" height="64" rx="13" fill="#ad7746" stroke="#8f5d35" stroke-width="1.2"/>
+      <rect x="20" y="17" width="64" height="30" rx="15" fill="#fff8ea" stroke="#8d6a45" stroke-width="3"/>
+      <text x="52" y="38" text-anchor="middle" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="17" font-weight="700" fill="#5d4630">他${overflowCount}名</text>
+    </g>`;
 }
 
 function renderPageViewSvg({ courseLabel, lessonLabel, last24h, last7d, updatedAt }) {
@@ -209,6 +333,23 @@ function formatDateTime(value) {
   }).formatToParts(date);
   const map = Object.fromEntries(parts.map((part) => [part.type, part.value]));
   return `${map.year}-${map.month}-${map.day} ${map.hour}:${map.minute}`;
+}
+
+function sanitizeHexColor(value, fallback) {
+  const color = String(value || "").trim();
+  return /^#[0-9a-fA-F]{6}$/.test(color) ? color : fallback;
+}
+
+function darkenHexColor(value) {
+  const color = sanitizeHexColor(value, "#f4c76f").slice(1);
+  const r = Math.max(0, Math.round(parseInt(color.slice(0, 2), 16) * 0.58));
+  const g = Math.max(0, Math.round(parseInt(color.slice(2, 4), 16) * 0.58));
+  const b = Math.max(0, Math.round(parseInt(color.slice(4, 6), 16) * 0.58));
+  return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+}
+
+function toHex(value) {
+  return value.toString(16).padStart(2, "0");
 }
 
 function escapeXml(value) {

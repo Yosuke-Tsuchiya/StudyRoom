@@ -50,9 +50,19 @@ MOOD_OPTIONS = [
     "もうひと頑張り",
     "休憩中",
 ]
-AVATAR_OPTIONS = ["🧑‍💻", "📖", "✏️", "🎧", "💻", "📝", "🧠", "☕"]
 DEFAULT_COMMENT = "一緒に学習中"
 DEFAULT_AVATAR = "🧑‍💻"
+DEFAULT_AVATAR_COLOR = "#f4c76f"
+AVATAR_COLOR_OPTIONS = {
+    "あたたかい黄": "#f4c76f",
+    "若葉グリーン": "#9fd3be",
+    "空色ブルー": "#b4d7ee",
+    "やわらかピンク": "#f3a79d",
+    "ラベンダー": "#c9b8ee",
+    "カフェブラウン": "#d6a26c",
+}
+AVATAR_COLOR_LABELS_BY_VALUE = {value: label for label, value in AVATAR_COLOR_OPTIONS.items()}
+PROHIBITED_AVATAR_CHARS = {"死", "殺", "暴", "犯", "毒", "血", "呪", "虐", "裸", "性", "嬲", "姦", "卍", "💀", "🔪", "🩸", "💣", "🖕"}
 DEFAULT_MOOD = "集中して学習中"
 DEFAULT_DIFFICULTY = "表示なし"
 DIFFICULTY_OPTIONS = ["表示なし", "ふつう", "やさしい", "むずかしい"]
@@ -958,6 +968,7 @@ def init_db():
                 session_id TEXT PRIMARY KEY,
                 nickname TEXT NOT NULL,
                 avatar TEXT,
+                avatar_color TEXT,
                 comment TEXT,
                 activity TEXT NOT NULL,
                 detail TEXT,
@@ -1024,6 +1035,8 @@ def init_db():
         columns = {row["name"] for row in conn.execute("PRAGMA table_info(participants)").fetchall()}
         if "avatar" not in columns:
             conn.execute("ALTER TABLE participants ADD COLUMN avatar TEXT")
+        if "avatar_color" not in columns:
+            conn.execute("ALTER TABLE participants ADD COLUMN avatar_color TEXT")
         if "comment" not in columns:
             conn.execute("ALTER TABLE participants ADD COLUMN comment TEXT")
         if "difficulty" not in columns:
@@ -1247,6 +1260,7 @@ def upsert_presence(
     session_id,
     nickname,
     avatar,
+    avatar_color,
     comment,
     activity,
     detail,
@@ -1262,13 +1276,14 @@ def upsert_presence(
             """
             INSERT INTO participants
                 (
-                    session_id, nickname, avatar, comment, activity, detail,
+                    session_id, nickname, avatar, avatar_color, comment, activity, detail,
                     mood, difficulty, participation_type, expires_at, joined_at, last_seen
                 )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(session_id) DO UPDATE SET
                 nickname=excluded.nickname,
                 avatar=excluded.avatar,
+                avatar_color=excluded.avatar_color,
                 comment=excluded.comment,
                 activity=excluded.activity,
                 detail=excluded.detail,
@@ -1282,6 +1297,7 @@ def upsert_presence(
                 session_id,
                 nickname,
                 avatar,
+                avatar_color,
                 comment,
                 activity,
                 detail,
@@ -1528,18 +1544,40 @@ def fetch_status_summary_counts():
             GROUP BY activity
             """
         ).fetchall()
+        participant_rows = conn.execute(
+            """
+            SELECT
+                session_id, activity, detail, avatar, avatar_color,
+                participation_type, joined_at
+            FROM participants
+            ORDER BY activity, joined_at
+            """
+        ).fetchall()
     rooms = {activity: 0 for activity in ACTIVITY_OPTIONS}
     rooms.update({row["activity"]: row["online_count"] for row in activity_rows})
-    return total_online, rooms
+    participants = [
+        {
+            "session_id": row["session_id"],
+            "activity": row["activity"],
+            "detail": row["detail"],
+            "avatar": normalize_avatar(row["avatar"]),
+            "avatar_color": normalize_avatar_color(row["avatar_color"]),
+            "participation_type": row["participation_type"] or "regular",
+            "joined_at": row["joined_at"],
+        }
+        for row in participant_rows
+    ]
+    return total_online, rooms, participants
 
 
 def sync_status_summary():
-    total_online, rooms = fetch_status_summary_counts()
+    total_online, rooms, participants = fetch_status_summary_counts()
     payload = {
         "type": "status_summary",
         "total_online": total_online,
         "free_room_online": rooms.get("フリールーム", 0),
         "rooms": rooms,
+        "participants": participants,
         "updated_at": now_iso(),
     }
     worker_webhook_url = get_config_value("STATUS_IMAGE_WEBHOOK_URL")
@@ -1902,6 +1940,15 @@ def normalize_difficulty(value) -> str:
     return DEFAULT_DIFFICULTY
 
 
+def normalize_avatar(value) -> str:
+    return str(value or "").strip() or DEFAULT_AVATAR
+
+
+def normalize_avatar_color(value) -> str:
+    value = str(value or "").strip()
+    return value if value in AVATAR_COLOR_LABELS_BY_VALUE else DEFAULT_AVATAR_COLOR
+
+
 def load_saved_preferences() -> dict:
     context = getattr(st, "context", None)
     cookies = getattr(context, "cookies", {}) if context else {}
@@ -1947,6 +1994,7 @@ def current_preferences() -> dict:
         "session_id": st.session_state.session_id,
         "nickname": st.session_state.nickname,
         "avatar": st.session_state.avatar,
+        "avatar_color": st.session_state.avatar_color,
         "comment": st.session_state.comment,
         "activity": st.session_state.activity,
         "detail": st.session_state.detail,
@@ -2318,6 +2366,22 @@ def validate_comment(value) -> str | None:
     return None
 
 
+def validate_avatar(value) -> str | None:
+    text = normalize_avatar(value)
+    if text in PROHIBITED_AVATAR_CHARS:
+        return "この文字は使用できません。別の文字を選んでください。"
+
+    compact = text.replace("\ufe0e", "").replace("\ufe0f", "")
+    if "\u200d" in compact:
+        if len(compact) > 5:
+            return "教室画像に表示する文字は1文字で入力してください。"
+        return None
+
+    if len(compact) != 1:
+        return "教室画像に表示する文字は1文字で入力してください。"
+    return None
+
+
 def validate_feedback(value) -> str | None:
     if not value:
         return "内容を入力してください。"
@@ -2673,7 +2737,9 @@ if "joined" not in st.session_state:
 if "nickname" not in st.session_state:
     st.session_state.nickname = saved_value(saved_preferences, "nickname", "")
 if "avatar" not in st.session_state:
-    st.session_state.avatar = saved_value(saved_preferences, "avatar", DEFAULT_AVATAR, AVATAR_OPTIONS)
+    st.session_state.avatar = normalize_avatar(saved_value(saved_preferences, "avatar", DEFAULT_AVATAR))
+if "avatar_color" not in st.session_state:
+    st.session_state.avatar_color = normalize_avatar_color(saved_value(saved_preferences, "avatar_color", DEFAULT_AVATAR_COLOR))
 if "comment" not in st.session_state:
     st.session_state.comment = saved_value(saved_preferences, "comment", DEFAULT_COMMENT)
 if "activity" not in st.session_state:
@@ -2700,7 +2766,8 @@ if "last_feedback_at" not in st.session_state:
 existing_participant = fetch_participant(st.session_state.session_id)
 if existing_participant and not st.session_state.joined:
     st.session_state.nickname = existing_participant["nickname"] or st.session_state.nickname
-    st.session_state.avatar = existing_participant["avatar"] or st.session_state.avatar
+    st.session_state.avatar = normalize_avatar(existing_participant["avatar"] or st.session_state.avatar)
+    st.session_state.avatar_color = normalize_avatar_color(existing_participant["avatar_color"] or st.session_state.avatar_color)
     st.session_state.comment = existing_participant["comment"] or st.session_state.comment
     st.session_state.activity = existing_participant["activity"] or st.session_state.activity
     st.session_state.detail = existing_participant["detail"] or st.session_state.detail
@@ -2720,7 +2787,8 @@ if (
     if takeover_row:
         st.session_state.session_id = takeover_row["session_id"]
         st.session_state.nickname = takeover_row["nickname"] or QUICK_JOIN_NICKNAME
-        st.session_state.avatar = takeover_row["avatar"] or DEFAULT_AVATAR
+        st.session_state.avatar = normalize_avatar(takeover_row["avatar"] or DEFAULT_AVATAR)
+        st.session_state.avatar_color = normalize_avatar_color(takeover_row["avatar_color"] or DEFAULT_AVATAR_COLOR)
         st.session_state.comment = takeover_row["comment"] or DEFAULT_COMMENT
         st.session_state.activity = takeover_row["activity"] or ACTIVITY_OPTIONS[0]
         st.session_state.detail = takeover_row["detail"] or "第1回"
@@ -2751,6 +2819,7 @@ if quick_join_request:
             ).isoformat(timespec="seconds")
             st.session_state.nickname = QUICK_JOIN_NICKNAME
             st.session_state.avatar = QUICK_JOIN_AVATAR
+            st.session_state.avatar_color = DEFAULT_AVATAR_COLOR
             st.session_state.comment = QUICK_JOIN_COMMENT
             st.session_state.activity = quick_join_request["activity"]
             st.session_state.detail = quick_join_request["detail"]
@@ -2765,6 +2834,7 @@ if quick_join_request:
                 st.session_state.session_id,
                 QUICK_JOIN_NICKNAME,
                 QUICK_JOIN_AVATAR,
+                DEFAULT_AVATAR_COLOR,
                 QUICK_JOIN_COMMENT,
                 quick_join_request["activity"],
                 quick_join_request["detail"],
@@ -2887,12 +2957,20 @@ with st.sidebar:
             if st.session_state.detail in DETAIL_OPTIONS else 0,
         )
         with st.expander("詳細設定", expanded=False):
-            avatar = st.selectbox(
-                "アイコン",
-                AVATAR_OPTIONS,
-                index=AVATAR_OPTIONS.index(st.session_state.avatar)
-                if st.session_state.avatar in AVATAR_OPTIONS else 0,
+            avatar = st.text_input(
+                "教室画像に表示する1文字",
+                value="" if st.session_state.avatar == DEFAULT_AVATAR else st.session_state.avatar,
+                placeholder=DEFAULT_AVATAR,
+                max_chars=5,
+                help="教室風の利用状況画像に表示されます。空欄の場合は 🧑‍💻 が表示されます。不適切な文字は使用できません。",
             )
+            current_avatar_color = normalize_avatar_color(st.session_state.avatar_color)
+            avatar_color_label = st.selectbox(
+                "アイコンの色",
+                list(AVATAR_COLOR_OPTIONS.keys()),
+                index=list(AVATAR_COLOR_OPTIONS.values()).index(current_avatar_color),
+            )
+            avatar_color = AVATAR_COLOR_OPTIONS[avatar_color_label]
             comment = st.text_input(
                 "コメント",
                 value=st.session_state.comment or DEFAULT_COMMENT,
@@ -2915,16 +2993,21 @@ with st.sidebar:
         if not st.session_state.joined:
             if st.button("入室する", type="primary", use_container_width=True):
                 cleaned = nickname.strip()
+                cleaned_avatar = normalize_avatar(avatar)
                 cleaned_comment = comment.strip() or DEFAULT_COMMENT
                 nickname_error = validate_nickname(cleaned)
+                avatar_error = validate_avatar(cleaned_avatar)
                 comment_error = validate_comment(cleaned_comment)
                 if nickname_error:
                     st.error(nickname_error)
+                elif avatar_error:
+                    st.error(avatar_error)
                 elif comment_error:
                     st.error(comment_error)
                 else:
                     st.session_state.nickname = cleaned
-                    st.session_state.avatar = avatar
+                    st.session_state.avatar = cleaned_avatar
+                    st.session_state.avatar_color = avatar_color
                     st.session_state.comment = cleaned_comment
                     st.session_state.activity = activity
                     st.session_state.detail = detail
@@ -2938,7 +3021,8 @@ with st.sidebar:
                     upsert_presence(
                         st.session_state.session_id,
                         cleaned,
-                        avatar,
+                        cleaned_avatar,
+                        avatar_color,
                         cleaned_comment,
                         activity,
                         detail,
@@ -2950,18 +3034,23 @@ with st.sidebar:
         else:
             if st.button("学習内容を更新", type="primary", use_container_width=True):
                 cleaned = nickname.strip() or st.session_state.nickname
+                cleaned_avatar = normalize_avatar(avatar)
                 cleaned_comment = comment.strip() or DEFAULT_COMMENT
                 nickname_error = validate_nickname(cleaned)
+                avatar_error = validate_avatar(cleaned_avatar)
                 comment_error = validate_comment(cleaned_comment)
                 if nickname_error:
                     st.error(nickname_error)
+                elif avatar_error:
+                    st.error(avatar_error)
                 elif comment_error:
                     st.error(comment_error)
                 else:
                     previous_activity = st.session_state.activity
                     previous_detail = st.session_state.detail
                     st.session_state.nickname = cleaned
-                    st.session_state.avatar = avatar
+                    st.session_state.avatar = cleaned_avatar
+                    st.session_state.avatar_color = avatar_color
                     st.session_state.comment = cleaned_comment
                     st.session_state.activity = activity
                     st.session_state.detail = detail
@@ -2975,7 +3064,8 @@ with st.sidebar:
                     upsert_presence(
                         st.session_state.session_id,
                         cleaned,
-                        avatar,
+                        cleaned_avatar,
+                        avatar_color,
                         cleaned_comment,
                         activity,
                         detail,
@@ -3076,6 +3166,7 @@ def live_area():
                 st.session_state.session_id,
                 st.session_state.nickname,
                 st.session_state.avatar,
+                st.session_state.avatar_color,
                 st.session_state.comment,
                 st.session_state.activity,
                 st.session_state.detail,
@@ -3160,7 +3251,9 @@ def live_area():
         for p in room_members:
             mine = p["session_id"] == st.session_state.session_id
             label = safe_text(p["nickname"])
-            avatar_text = safe_text(p["avatar"] if p["avatar"] in AVATAR_OPTIONS else AVATAR_OPTIONS[0])
+            avatar_text = safe_text(normalize_avatar(p["avatar"]))
+            avatar_color = normalize_avatar_color(p["avatar_color"])
+            avatar_style = "" if (p["participation_type"] or "regular") == "quick" else f' style="background:{safe_text(avatar_color)};"'
             you_badge_html = '<span class="you-badge">あなた</span>' if mine else ""
             comment_text = safe_text(p["comment"] or "一緒に学習中")
             detail_text = safe_text(p["detail"] or "学習中")
@@ -3190,7 +3283,7 @@ def live_area():
                 f'<div class="{card_class}">'
                 '<div class="seat-note">'
                 '<div class="card-top">'
-                f'<div class="avatar">{avatar_text}{you_badge_html}</div>'
+                f'<div class="avatar"{avatar_style}>{avatar_text}{you_badge_html}</div>'
                 '<div class="participant-name">'
                 '<div>'
                 f'<strong>{label}</strong>'
