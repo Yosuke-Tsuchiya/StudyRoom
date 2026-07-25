@@ -417,6 +417,8 @@
             <rect x="4" y="4" width="952" height="512" fill="url(#wallD)"/>
             <rect x="4" y="184" width="952" height="332" fill="url(#floorD)"/>
             <g stroke="#b8844f" stroke-width="1" opacity=".16">
+              <path d="M80 184 L4 516"/>
+              <path d="M136 184 L12 516"/>
               <path d="M192 184 L92 516"/>
               <path d="M248 184 L172 516"/>
               <path d="M304 184 L252 516"/>
@@ -428,6 +430,8 @@
               <path d="M640 184 L732 516"/>
               <path d="M696 184 L812 516"/>
               <path d="M752 184 L892 516"/>
+              <path d="M808 184 L948 516"/>
+              <path d="M864 184 L956 438"/>
             </g>
             <path d="M4 184 H956" stroke="#bf9056" stroke-width="1"/>
           </g>
@@ -590,7 +594,7 @@
           ? `<circle cx="52" cy="32" r="22" fill="#d9e5df" stroke="#899d94" stroke-width="4"/><circle cx="52" cy="32" r="8" fill="#a3b5ad"/>`
           : `<circle cx="52" cy="32" r="22" fill="${person.fill}" stroke="${person.stroke}" stroke-width="4"/><text x="52" y="41" text-anchor="middle" font-family="Yu Gothic, Meiryo, sans-serif" font-size="22" font-weight="700" fill="${person.text}">${person.label}</text>`
         : '';
-      return `<g transform="translate(${x} ${y})" ${person ? '' : 'opacity=".45"'}>${seatBase}${marker}</g>`;
+      return `<g transform="translate(${x} ${y})">${seatBase}${marker}</g>`;
     }
 
     function renderSampleD(count) {
@@ -625,6 +629,8 @@
               <rect x="4" y="4" width="952" height="512" fill="url(#wallDCount${count})"/>
               <rect x="4" y="184" width="952" height="332" fill="url(#floorDCount${count})"/>
               <g stroke="#b8844f" stroke-width="1" opacity=".16">
+                <path d="M80 184 L4 516"/>
+                <path d="M136 184 L12 516"/>
                 <path d="M192 184 L92 516"/>
                 <path d="M248 184 L172 516"/>
                 <path d="M304 184 L252 516"/>
@@ -636,6 +642,8 @@
                 <path d="M640 184 L732 516"/>
                 <path d="M696 184 L812 516"/>
                 <path d="M752 184 L892 516"/>
+                <path d="M808 184 L948 516"/>
+                <path d="M864 184 L956 438"/>
               </g>
               <path d="M4 184 H956" stroke="#bf9056" stroke-width="1"/>
             </g>
