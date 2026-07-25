@@ -417,21 +417,19 @@
             <rect x="4" y="4" width="952" height="512" fill="url(#wallD)"/>
             <rect x="4" y="184" width="952" height="332" fill="url(#floorD)"/>
             <g stroke="#b8844f" stroke-width="1" opacity=".16">
-              <path d="M80 184 L4 516"/>
-              <path d="M136 184 L12 516"/>
-              <path d="M192 184 L92 516"/>
-              <path d="M248 184 L172 516"/>
-              <path d="M304 184 L252 516"/>
-              <path d="M360 184 L332 516"/>
-              <path d="M416 184 L412 516"/>
-              <path d="M472 184 L492 516"/>
-              <path d="M528 184 L572 516"/>
-              <path d="M584 184 L652 516"/>
-              <path d="M640 184 L732 516"/>
-              <path d="M696 184 L812 516"/>
-              <path d="M752 184 L892 516"/>
-              <path d="M808 184 L948 516"/>
-              <path d="M864 184 L956 438"/>
+              <path d="M60 184 L0 516"/>
+              <path d="M120 184 L80 516"/>
+              <path d="M180 184 L160 516"/>
+              <path d="M240 184 L240 516"/>
+              <path d="M300 184 L320 516"/>
+              <path d="M360 184 L400 516"/>
+              <path d="M420 184 L480 516"/>
+              <path d="M480 184 L560 516"/>
+              <path d="M540 184 L640 516"/>
+              <path d="M600 184 L720 516"/>
+              <path d="M660 184 L800 516"/>
+              <path d="M720 184 L880 516"/>
+              <path d="M780 184 L960 516"/>
             </g>
             <path d="M4 184 H956" stroke="#bf9056" stroke-width="1"/>
           </g>
@@ -586,8 +584,14 @@
         : row === 1
           ? { fill: '#bd8650', stroke: '#9b673a' }
           : { fill: '#ad7746', stroke: '#8f5d35' };
+      const emptyDesk = row === 0
+        ? { fill: '#dfbd8c', stroke: '#c99b67' }
+        : row === 1
+          ? { fill: '#d8b17e', stroke: '#bd8d58' }
+          : { fill: '#cfa470', stroke: '#ac7d4d' };
+      const deskStyle = person ? desk : emptyDesk;
       const seatBase = `
-        <rect x="0" y="0" width="104" height="64" rx="13" fill="${desk.fill}" stroke="${desk.stroke}" stroke-width="1.2"/>
+        <rect x="0" y="0" width="104" height="64" rx="13" fill="${deskStyle.fill}" stroke="${deskStyle.stroke}" stroke-width="1.2"/>
       `;
       const marker = person
         ? person.kind === 'anon'
@@ -629,21 +633,19 @@
               <rect x="4" y="4" width="952" height="512" fill="url(#wallDCount${count})"/>
               <rect x="4" y="184" width="952" height="332" fill="url(#floorDCount${count})"/>
               <g stroke="#b8844f" stroke-width="1" opacity=".16">
-                <path d="M80 184 L4 516"/>
-                <path d="M136 184 L12 516"/>
-                <path d="M192 184 L92 516"/>
-                <path d="M248 184 L172 516"/>
-                <path d="M304 184 L252 516"/>
-                <path d="M360 184 L332 516"/>
-                <path d="M416 184 L412 516"/>
-                <path d="M472 184 L492 516"/>
-                <path d="M528 184 L572 516"/>
-                <path d="M584 184 L652 516"/>
-                <path d="M640 184 L732 516"/>
-                <path d="M696 184 L812 516"/>
-                <path d="M752 184 L892 516"/>
-                <path d="M808 184 L948 516"/>
-                <path d="M864 184 L956 438"/>
+                <path d="M60 184 L0 516"/>
+                <path d="M120 184 L80 516"/>
+                <path d="M180 184 L160 516"/>
+                <path d="M240 184 L240 516"/>
+                <path d="M300 184 L320 516"/>
+                <path d="M360 184 L400 516"/>
+                <path d="M420 184 L480 516"/>
+                <path d="M480 184 L560 516"/>
+                <path d="M540 184 L640 516"/>
+                <path d="M600 184 L720 516"/>
+                <path d="M660 184 L800 516"/>
+                <path d="M720 184 L880 516"/>
+                <path d="M780 184 L960 516"/>
               </g>
               <path d="M4 184 H956" stroke="#bf9056" stroke-width="1"/>
             </g>
