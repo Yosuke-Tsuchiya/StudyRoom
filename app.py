@@ -6,6 +6,7 @@ import json
 import os
 import sqlite3
 import threading
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -82,6 +83,7 @@ QUICK_JOIN_AVATAR = "📖"
 QUICK_JOIN_COMMENT = DEFAULT_COMMENT
 QUICK_JOIN_MOOD = DEFAULT_MOOD
 QUICK_JOIN_DIFFICULTY = "表示なし"
+UNCHECKED_PRESENCE_POLL_INTERVAL_SECONDS = 10
 QUICK_COURSE_CODES = {
     "free-room": "フリールーム",
     "info-basic": "情報基礎A・B",
@@ -1608,7 +1610,6 @@ def status_worker_base_url() -> str:
     return webhook_url.rstrip("/")
 
 
-@st.cache_data(ttl=30, show_spinner=False)
 def fetch_unchecked_participants_from_worker(base_url: str):
     if not base_url:
         return None
@@ -1658,13 +1659,40 @@ def fetch_unchecked_participants_from_worker(base_url: str):
     return rows
 
 
-def load_unchecked_participants():
-    participants = fetch_unchecked_participants_from_worker(status_worker_base_url())
-    if participants is None:
-        return st.session_state.get("last_unchecked_participants", [])
+class UncheckedPresencePoller:
+    def __init__(self, base_url: str):
+        self.base_url = base_url
+        self.participants = []
+        self.lock = threading.Lock()
+        self.thread = threading.Thread(target=self._poll_loop, daemon=True)
+        self.thread.start()
 
-    st.session_state.last_unchecked_participants = participants
-    return participants
+    def get_participants(self):
+        with self.lock:
+            return list(self.participants)
+
+    def _poll_loop(self):
+        while True:
+            try:
+                participants = fetch_unchecked_participants_from_worker(self.base_url)
+                if participants is not None:
+                    with self.lock:
+                        self.participants = participants
+            except Exception:
+                pass
+            time.sleep(UNCHECKED_PRESENCE_POLL_INTERVAL_SECONDS)
+
+
+@st.cache_resource(show_spinner=False)
+def get_unchecked_presence_poller(base_url: str):
+    return UncheckedPresencePoller(base_url)
+
+
+def load_unchecked_participants():
+    base_url = status_worker_base_url()
+    if not base_url:
+        return []
+    return get_unchecked_presence_poller(base_url).get_participants()
 
 
 def get_admin_password() -> str:
@@ -3225,7 +3253,7 @@ with st.sidebar:
     st.markdown('<div class="sidebar-credit">Copyright 2026 Yosuke Tsuchiya</div>', unsafe_allow_html=True)
 
 
-@st.fragment(run_every="20s")
+@st.fragment(run_every="10s")
 def live_area():
     if st.session_state.joined:
         expires_at = st.session_state.expires_at
@@ -3424,7 +3452,7 @@ def live_area():
                     )
 
     st.caption(
-        "表示は20秒ごとに更新されます。顔・音声・学籍番号は表示しません。  \n"
+        "表示は10秒ごとに更新されます。顔・音声・学籍番号は表示しません。  \n"
         "Darkモードには対応していません。SystemもしくはLightモードでご利用ください。"
     )
 
