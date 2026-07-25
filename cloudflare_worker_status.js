@@ -51,6 +51,10 @@ export default {
         return renderPageViewImage(env, viewMatch[1], viewMatch[2]);
       }
 
+      if (url.pathname === "/unchecked.json") {
+        return renderUncheckedJson(env);
+      }
+
       return new Response("StudyRoom status worker", {
         status: 200,
         headers: { "content-type": "text/plain; charset=utf-8" },
@@ -118,6 +122,15 @@ async function renderPageViewImage(env, courseCode, lesson) {
   }));
 }
 
+async function renderUncheckedJson(env) {
+  const now = Date.now();
+  return json({
+    ok: true,
+    participants: await getAllUncheckedParticipants(env, now),
+    updated_at: new Date(now).toISOString(),
+  });
+}
+
 async function getStatusSummary(env) {
   const raw = await env.STATUS_KV.get(STATUS_KEY);
   if (!raw) {
@@ -174,15 +187,31 @@ async function getUncheckedParticipants(env, courseCode, roomName, now) {
       const recordedAt = Number(timestamp);
       if (recordedAt < minTime) continue;
       results.push({
+        session_id: `unchecked:${courseCode}:lesson-${lesson}:${recordedAt}`,
+        nickname: "匿名学生さん",
         activity: roomName,
         detail: `第${lesson}回`,
+        avatar: "",
+        avatar_color: "",
+        comment: "授業ページを表示中",
+        mood: "未チェックイン",
+        difficulty: "表示なし",
         participation_type: "unchecked",
         joined_at: new Date(recordedAt).toISOString(),
+        expires_at: new Date(recordedAt + UNCHECKED_PRESENCE_MS).toISOString(),
       });
     }
   }
 
   return results;
+}
+
+async function getAllUncheckedParticipants(env, now) {
+  const participants = [];
+  for (const [courseCode, course] of Object.entries(COURSES)) {
+    participants.push(...await getUncheckedParticipants(env, courseCode, course.room, now));
+  }
+  return participants;
 }
 
 function countSince(events, minTime) {

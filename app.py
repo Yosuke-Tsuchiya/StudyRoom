@@ -1597,6 +1597,67 @@ def sync_status_summary():
         ).start()
 
 
+def status_worker_base_url() -> str:
+    base_url = get_config_value("STATUS_IMAGE_BASE_URL")
+    if base_url:
+        return base_url.rstrip("/")
+
+    webhook_url = get_config_value("STATUS_IMAGE_WEBHOOK_URL")
+    if webhook_url.endswith("/sync"):
+        return webhook_url[:-5].rstrip("/")
+    return webhook_url.rstrip("/")
+
+
+@st.cache_data(ttl=10, show_spinner=False)
+def fetch_unchecked_participants_from_worker(base_url: str):
+    if not base_url:
+        return []
+
+    request = urllib.request.Request(
+        f"{base_url}/unchecked.json",
+        headers={"User-Agent": "StudyRoomUncheckedPresence/1.0"},
+        method="GET",
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=2) as response:
+            if response.status != 200:
+                return []
+            payload = json.loads(response.read().decode("utf-8"))
+    except Exception:
+        return []
+
+    participants = payload.get("participants", [])
+    if not isinstance(participants, list):
+        return []
+
+    allowed_activities = set(ACTIVITY_OPTIONS)
+    rows = []
+    for index, participant in enumerate(participants):
+        if not isinstance(participant, dict):
+            continue
+        activity = str(participant.get("activity") or "")
+        if activity not in allowed_activities:
+            continue
+        detail = str(participant.get("detail") or "その他")
+        if detail not in DETAIL_OPTIONS:
+            detail = "その他"
+        rows.append({
+            "session_id": str(participant.get("session_id") or f"unchecked:{index}"),
+            "nickname": QUICK_JOIN_NICKNAME,
+            "avatar": QUICK_JOIN_AVATAR,
+            "avatar_color": "",
+            "comment": "授業ページを表示中",
+            "activity": activity,
+            "detail": detail,
+            "mood": "未チェックイン",
+            "difficulty": "表示なし",
+            "participation_type": "unchecked",
+            "joined_at": str(participant.get("joined_at") or now_iso()),
+            "expires_at": str(participant.get("expires_at") or ""),
+        })
+    return rows
+
+
 def get_admin_password() -> str:
     return get_config_value("STUDY_ROOM_ADMIN_PASSWORD")
 
@@ -3177,7 +3238,7 @@ def live_area():
                 expires_at=expires_at,
             )
 
-    participants = fetch_participants()
+    participants = list(fetch_participants()) + fetch_unchecked_participants_from_worker(status_worker_base_url())
     unique_activities = len({p["activity"] for p in participants})
 
     with sidebar_status.container():
@@ -3209,7 +3270,7 @@ def live_area():
         """
         <div class="room-caption">
           <div>ここには入室中の参加者のニックネーム、コメント、授業回、状態が表示されます。</div>
-          <div>グレーの机は、授業ページからチェックインした参加者を表しています。</div>
+          <div>グレーの机は、授業ページを開いている未チェックインの参加者を表しています。</div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -3254,16 +3315,17 @@ def live_area():
             label = safe_text(p["nickname"])
             avatar_text = safe_text(normalize_avatar(p["avatar"]))
             avatar_color = normalize_avatar_color(p["avatar_color"])
-            avatar_style = "" if (p["participation_type"] or "regular") == "quick" else f' style="background:{safe_text(avatar_color)};"'
+            participation_type = p["participation_type"] or "regular"
+            is_indirect_presence = participation_type in {"quick", "unchecked"}
+            avatar_style = "" if is_indirect_presence else f' style="background:{safe_text(avatar_color)};"'
             you_badge_html = '<span class="you-badge">あなた</span>' if mine else ""
             comment_text = safe_text(p["comment"] or "一緒に学習中")
             detail_text = safe_text(p["detail"] or "学習中")
             mood_text = safe_text(p["mood"] or "学習中")
-            is_quick_checkin = (p["participation_type"] or "regular") == "quick"
-            time_icon = "⏳" if is_quick_checkin else "⏱"
+            time_icon = "⏳" if is_indirect_presence else "⏱"
             time_text = (
                 remaining_checkin_time(p["expires_at"])
-                if is_quick_checkin
+                if is_indirect_presence
                 else elapsed_study_time(p["joined_at"])
             )
             time_text = safe_text(time_text)
@@ -3278,7 +3340,7 @@ def live_area():
             card_class = "room-card"
             if mine:
                 card_class += " my-card"
-            if is_quick_checkin:
+            if is_indirect_presence:
                 card_class += " quick-checkin-card"
             member_cards.append(
                 f'<div class="{card_class}">'
