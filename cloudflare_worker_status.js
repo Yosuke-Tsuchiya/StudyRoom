@@ -359,21 +359,39 @@ function renderOverflowSeat(index, overflowCount) {
 
 function renderPageViewSvg({ courseLabel, lessonLabel, last24h, last7d, updatedAt }) {
   return `
-<svg xmlns="http://www.w3.org/2000/svg" width="500" height="120" viewBox="0 0 500 120">
-  <rect width="500" height="120" rx="14" fill="#edf7f6"/>
-  <rect x="1.5" y="1.5" width="497" height="117" rx="13" fill="none" stroke="#4d9a9c" stroke-width="3"/>
-  <rect x="0" y="0" width="154" height="120" rx="14" fill="#066C6F"/>
-  <rect x="140" y="0" width="24" height="120" fill="#066C6F"/>
-  <text x="24" y="37" font-family="Arial, 'Yu Gothic', Meiryo, sans-serif" font-size="18" font-weight="700" fill="#f5ffff">@ROOM</text>
-  <text x="24" y="61" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="16" font-weight="700" fill="#dff7f6">ページ表示</text>
-  <text x="24" y="90" font-family="Arial, sans-serif" font-size="10" fill="#bde3e3">Updated: ${escapeXml(updatedAt)}</text>
-  <text x="184" y="35" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="17" font-weight="700" fill="#06484b">${escapeXml(courseLabel)} ${escapeXml(lessonLabel)}</text>
-  <text x="184" y="67" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="15" fill="#557879">24時間</text>
-  <text x="252" y="69" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="24" font-weight="700" fill="#07585b">${last24h}</text>
-  <text x="292" y="67" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="15" fill="#557879">回表示</text>
-  <text x="184" y="98" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="15" fill="#557879">7日間</text>
-  <text x="252" y="100" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="24" font-weight="700" fill="#07585b">${last7d}</text>
-  <text x="292" y="98" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="15" fill="#557879">回表示</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="180" viewBox="0 0 960 180" role="img" aria-label="${escapeXml(courseLabel)} ${escapeXml(lessonLabel)} のページ表示状況">
+  <defs>
+    <linearGradient id="viewPanel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#066C6F"/>
+      <stop offset="1" stop-color="#0a5558"/>
+    </linearGradient>
+    <filter id="viewSoftShadow" x="-20%" y="-30%" width="140%" height="170%">
+      <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#06484b" flood-opacity=".14"/>
+    </filter>
+  </defs>
+  <rect width="960" height="180" rx="20" fill="#edf7f6"/>
+  <rect x="1.5" y="1.5" width="957" height="177" rx="19" fill="none" stroke="#4d9a9c" stroke-width="3"/>
+  <rect x="0" y="0" width="276" height="180" rx="20" fill="url(#viewPanel)"/>
+  <rect x="256" y="0" width="34" height="180" fill="#0a5558"/>
+  <text x="34" y="56" font-family="Arial, 'Yu Gothic', Meiryo, sans-serif" font-size="25" font-weight="700" fill="#f5ffff">@ROOM</text>
+  <text x="34" y="88" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="23" font-weight="700" fill="#dff7f6">ページ表示</text>
+  <text x="34" y="133" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="14" fill="#bde3e3">授業ページの閲覧状況</text>
+  <text x="34" y="157" font-family="Arial, sans-serif" font-size="12" fill="#bde3e3">Updated: ${escapeXml(updatedAt)}</text>
+
+  <text x="326" y="50" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="25" font-weight="700" fill="#06484b">${escapeXml(courseLabel)} ${escapeXml(lessonLabel)}</text>
+  <text x="326" y="79" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="15" fill="#557879">この授業回ページが表示された回数です</text>
+
+  <g filter="url(#viewSoftShadow)">
+    <rect x="326" y="102" width="260" height="52" rx="13" fill="#d7eeed"/>
+    <text x="350" y="134" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="18" fill="#557879">24時間</text>
+    <text x="458" y="139" text-anchor="end" font-family="Arial, 'Yu Gothic', Meiryo, sans-serif" font-size="33" font-weight="700" fill="#07585b">${last24h}</text>
+    <text x="474" y="134" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="18" fill="#557879">回表示</text>
+
+    <rect x="620" y="102" width="260" height="52" rx="13" fill="#d7eeed"/>
+    <text x="644" y="134" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="18" fill="#557879">7日間</text>
+    <text x="752" y="139" text-anchor="end" font-family="Arial, 'Yu Gothic', Meiryo, sans-serif" font-size="33" font-weight="700" fill="#07585b">${last7d}</text>
+    <text x="768" y="134" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="18" fill="#557879">回表示</text>
+  </g>
 </svg>`.trim();
 }
 
