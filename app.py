@@ -2958,7 +2958,7 @@ with st.sidebar:
         )
         with st.expander("詳細設定", expanded=False):
             avatar = st.text_input(
-                "教室画像に表示する1文字",
+                "アイコンの文字",
                 value="" if st.session_state.avatar == DEFAULT_AVATAR else st.session_state.avatar,
                 placeholder=DEFAULT_AVATAR,
                 max_chars=5,
