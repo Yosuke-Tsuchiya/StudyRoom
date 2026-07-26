@@ -71,6 +71,11 @@
       color: #34413f;
     }
 
+    .stack-preview {
+      display: grid;
+      gap: 0;
+    }
+
     svg {
       display: block;
       width: 100%;
@@ -87,6 +92,66 @@
     </p>
 
     <section class="grid" aria-label="授業ページ表示回数の画像サンプル">
+      <article class="sample" style="grid-column: 1 / -1;">
+        <h2 class="sample-title">授業ページ配置イメージ: 閲覧数画像 + 授業風画像</h2>
+        <div class="stack-preview">
+          <svg xmlns="http://www.w3.org/2000/svg" width="960" height="120" viewBox="0 0 960 120" role="img" aria-label="データ構造とアルゴリズムⅠ・Ⅱ 第8回のページ表示サンプル">
+            <rect width="960" height="120" rx="14" fill="#edf6fa"/>
+            <rect x="1" y="1" width="958" height="118" rx="13" fill="none" stroke="#007EA8" stroke-width="2"/>
+            <rect x="0" y="0" width="960" height="38" rx="14" fill="#007EA8"/>
+            <rect x="0" y="26" width="960" height="14" fill="#007EA8"/>
+            <text x="28" y="26" font-family="Arial, 'Yu Gothic', Meiryo, sans-serif" font-size="17" font-weight="700" fill="#f5ffff">@ROOM ページ表示</text>
+            <text x="928" y="26" text-anchor="end" font-family="Arial, sans-serif" font-size="11" fill="#d9f5ff">Updated: 2026-07-26 10:30</text>
+            <text x="28" y="75" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="23" font-weight="700" fill="#06465c">データ構造とアルゴリズムⅠ・Ⅱ 第8回</text>
+            <text x="28" y="99" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="14" fill="#557b87">この授業回ページが表示された回数です</text>
+            <text x="642" y="87" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="15" fill="#4f7784">24時間</text>
+            <text x="752" y="88" text-anchor="end" font-family="Arial, 'Yu Gothic', Meiryo, sans-serif" font-size="30" font-weight="700" fill="#005f7f">128</text>
+            <text x="762" y="87" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="15" fill="#4f7784">回</text>
+            <path d="M802 58 V100" stroke="#93cfe2" stroke-width="2"/>
+            <text x="826" y="87" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="15" fill="#4f7784">7日間</text>
+            <text x="918" y="88" text-anchor="end" font-family="Arial, 'Yu Gothic', Meiryo, sans-serif" font-size="30" font-weight="700" fill="#005f7f">86</text>
+            <text x="928" y="87" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="15" fill="#4f7784">回</text>
+          </svg>
+
+          <svg xmlns="http://www.w3.org/2000/svg" width="960" height="520" viewBox="0 0 960 520" role="img" aria-label="StudyRoom授業風画像サンプル">
+            <defs>
+              <linearGradient id="classroomFloorSample" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#f2d4a3"/>
+                <stop offset="1" stop-color="#d39b58"/>
+              </linearGradient>
+              <filter id="classroomShadowSample" x="-20%" y="-20%" width="140%" height="150%">
+                <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#7b4d24" flood-opacity=".18"/>
+              </filter>
+              <clipPath id="classroomFrameClipSample">
+                <rect x="2" y="2" width="956" height="516" rx="13"/>
+              </clipPath>
+            </defs>
+            <rect x="1.5" y="1.5" width="957" height="517" rx="14" fill="#fff8ea" stroke="#b98048" stroke-width="3"/>
+            <g clip-path="url(#classroomFrameClipSample)">
+              <rect x="2" y="2" width="956" height="181" fill="#fff8ea"/>
+              <rect x="2" y="183" width="956" height="335" fill="url(#classroomFloorSample)"/>
+              <path d="M2 183 H958" stroke="#bf9056" stroke-width="1"/>
+            </g>
+            <rect x="48" y="26" width="864" height="128" rx="13" fill="#a96f3d" filter="url(#classroomShadowSample)"/>
+            <rect x="55" y="33" width="850" height="114" rx="9" fill="#376b59"/>
+            <text x="92" y="80" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="26" font-weight="700" fill="#f6fff8">データ構造とアルゴリズムⅠ・Ⅱ 全体</text>
+            <text x="92" y="119" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="22" fill="#d9f0e2">この授業を受けている人の気配</text>
+            <text x="874" y="135" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#d6eadf">Updated: 2026-07-26 10:30</text>
+            <g transform="translate(62 214)" filter="url(#classroomShadowSample)">
+              <rect x="0" y="0" width="104" height="64" rx="13" fill="#c8945d" stroke="#a96f3d" stroke-width="1.2"/>
+              <circle cx="52" cy="32" r="22" fill="#8fd7cf" stroke="#537d78" stroke-width="4"/>
+              <text x="52" y="41" text-anchor="middle" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="22" font-weight="700" fill="#3f2b1a">学</text>
+              <text x="84" y="55" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="600" fill="#dfc89e">8</text>
+              <rect x="122" y="0" width="104" height="64" rx="13" fill="#c8945d" stroke="#a96f3d" stroke-width="1.2"/>
+              <circle cx="174" cy="32" r="22" fill="#d9e5df" stroke="#899d94" stroke-width="4"/>
+              <text x="206" y="55" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="600" fill="#dfc89e">7</text>
+              <rect x="244" y="0" width="104" height="64" rx="13" fill="#dfbd8c" stroke="#c99b67" stroke-width="1.2"/>
+              <rect x="366" y="0" width="104" height="64" rx="13" fill="#dfbd8c" stroke="#c99b67" stroke-width="1.2"/>
+            </g>
+          </svg>
+        </div>
+      </article>
+
       <article class="sample">
         <h2 class="sample-title">案A: 青緑系</h2>
         <svg xmlns="http://www.w3.org/2000/svg" width="420" height="136" viewBox="0 0 420 136" role="img" aria-label="情報基礎A・B 第1回のページ表示サンプル">
@@ -250,9 +315,9 @@
       <article class="sample" style="grid-column: 1 / -1;">
         <h2 class="sample-title">案J: コンパクト上下分割</h2>
         <svg xmlns="http://www.w3.org/2000/svg" width="960" height="120" viewBox="0 0 960 120" role="img" aria-label="データ構造とアルゴリズムⅠ・Ⅱ 第8回のページ表示サンプル">
-          <rect width="960" height="120" rx="14" fill="#edf7f6"/>
-          <rect x="1.5" y="1.5" width="957" height="117" rx="13" fill="none" stroke="#4d9a9c" stroke-width="3"/>
-          <rect x="0" y="0" width="960" height="38" rx="14" fill="#066C6F"/>
+          <rect width="960" height="120" rx="26" fill="#edf7f6"/>
+          <rect x="1.5" y="1.5" width="957" height="117" rx="24.5" fill="none" stroke="#4d9a9c" stroke-width="3"/>
+          <rect x="0" y="0" width="960" height="38" rx="26" fill="#066C6F"/>
           <rect x="0" y="26" width="960" height="14" fill="#066C6F"/>
           <text x="28" y="26" font-family="Arial, 'Yu Gothic', Meiryo, sans-serif" font-size="17" font-weight="700" fill="#f5ffff">@ROOM ページ表示</text>
           <text x="928" y="26" text-anchor="end" font-family="Arial, sans-serif" font-size="11" fill="#bde3e3">Updated: 2026-07-26 10:30</text>
