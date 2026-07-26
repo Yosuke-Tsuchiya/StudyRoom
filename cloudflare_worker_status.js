@@ -359,22 +359,22 @@ function renderOverflowSeat(index, overflowCount) {
 
 function renderPageViewSvg({ courseLabel, lessonLabel, last24h, last7d, updatedAt }) {
   return `
-<svg xmlns="http://www.w3.org/2000/svg" width="960" height="120" viewBox="0 0 960 120" role="img" aria-label="${escapeXml(courseLabel)} ${escapeXml(lessonLabel)} のページ表示状況">
-  <rect width="960" height="120" rx="14" fill="#edf6fa"/>
-  <rect x="1" y="1" width="958" height="118" rx="13" fill="none" stroke="#007EA8" stroke-width="2"/>
-  <rect x="0" y="0" width="960" height="38" rx="14" fill="#007EA8"/>
-  <rect x="0" y="26" width="960" height="14" fill="#007EA8"/>
-  <text x="28" y="26" font-family="Arial, 'Yu Gothic', Meiryo, sans-serif" font-size="17" font-weight="700" fill="#f5ffff">@ROOM ページ表示</text>
-  <text x="928" y="26" text-anchor="end" font-family="Arial, sans-serif" font-size="11" fill="#d9f5ff">Updated: ${escapeXml(updatedAt)}</text>
-  <text x="28" y="75" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="23" font-weight="700" fill="#06465c">${escapeXml(courseLabel)} ${escapeXml(lessonLabel)}</text>
-  <text x="28" y="99" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="14" fill="#557b87">この授業回ページが表示された回数です</text>
-  <text x="642" y="87" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="15" fill="#4f7784">24時間</text>
-  <text x="752" y="88" text-anchor="end" font-family="Arial, 'Yu Gothic', Meiryo, sans-serif" font-size="30" font-weight="700" fill="#005f7f">${last24h}</text>
-  <text x="762" y="87" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="15" fill="#4f7784">回</text>
-  <path d="M802 58 V100" stroke="#93cfe2" stroke-width="2"/>
-  <text x="826" y="87" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="15" fill="#4f7784">7日間</text>
-  <text x="918" y="88" text-anchor="end" font-family="Arial, 'Yu Gothic', Meiryo, sans-serif" font-size="30" font-weight="700" fill="#005f7f">${last7d}</text>
-  <text x="928" y="87" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="15" fill="#4f7784">回</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="100" viewBox="0 0 960 100" role="img" aria-label="${escapeXml(courseLabel)} ${escapeXml(lessonLabel)} のページ表示状況">
+  <rect width="960" height="100" rx="14" fill="#edf6fa"/>
+  <rect x="1" y="1" width="958" height="98" rx="13" fill="none" stroke="#007EA8" stroke-width="2"/>
+  <rect x="0" y="0" width="960" height="32" rx="14" fill="#007EA8"/>
+  <rect x="0" y="22" width="960" height="12" fill="#007EA8"/>
+  <text x="28" y="23" font-family="Arial, 'Yu Gothic', Meiryo, sans-serif" font-size="16" font-weight="700" fill="#f5ffff">@ROOM ページ表示</text>
+  <text x="928" y="23" text-anchor="end" font-family="Arial, sans-serif" font-size="10" fill="#d9f5ff">Updated: ${escapeXml(updatedAt)}</text>
+  <text x="28" y="61" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="21" font-weight="700" fill="#06465c">${escapeXml(courseLabel)} ${escapeXml(lessonLabel)}</text>
+  <text x="28" y="84" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="13" fill="#557b87">この授業回ページが表示された回数です</text>
+  <text x="642" y="76" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="14" fill="#4f7784">24時間</text>
+  <text x="752" y="77" text-anchor="end" font-family="Arial, 'Yu Gothic', Meiryo, sans-serif" font-size="28" font-weight="700" fill="#005f7f">${last24h}</text>
+  <text x="762" y="76" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="14" fill="#4f7784">回</text>
+  <path d="M802 50 V88" stroke="#93cfe2" stroke-width="2"/>
+  <text x="826" y="76" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="14" fill="#4f7784">7日間</text>
+  <text x="918" y="77" text-anchor="end" font-family="Arial, 'Yu Gothic', Meiryo, sans-serif" font-size="28" font-weight="700" fill="#005f7f">${last7d}</text>
+  <text x="928" y="76" font-family="'Yu Gothic', Meiryo, sans-serif" font-size="14" fill="#4f7784">回</text>
 </svg>`.trim();
 }
 
